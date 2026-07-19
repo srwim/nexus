@@ -1,0 +1,20 @@
+{
+  "zip": "",
+  "siteUrl": "https://srwim.github.io/nexus/",
+  "leagues": ["nfl", "nba"],
+  "ratings": {
+    "politics": 3,
+    "world": 3,
+    "conflict": 3,
+    "local": 3,
+    "weather": 3,
+    "sports": 3,
+    "tech": 3,
+    "space": 3,
+    "ai": 3,
+    "culture": 3
+  },
+  "newsletter": {
+    "to": ""
+  }
+}
