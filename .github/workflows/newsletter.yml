@@ -1,0 +1,29 @@
+name: Daily newsletter
+
+on:
+  schedule:
+    - cron: "0 13 * * *" # 13:00 UTC daily — adjust to taste
+  workflow_dispatch: # lets you send a test run from the Actions tab
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Build and send
+        run: node scripts/send-newsletter.mjs
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          NEWSLETTER_FROM: ${{ secrets.NEWSLETTER_FROM }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SPONSY_API_KEY: ${{ secrets.SPONSY_API_KEY }}
+          SPONSY_PUBLICATION_ID: ${{ secrets.SPONSY_PUBLICATION_ID }}
+          HUBSPOT_TOKEN: ${{ secrets.HUBSPOT_TOKEN }}
+          HUBSPOT_LIST_ID: ${{ secrets.HUBSPOT_LIST_ID }}
+          GDRIVE_SERVICE_ACCOUNT: ${{ secrets.GDRIVE_SERVICE_ACCOUNT }}
+          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
