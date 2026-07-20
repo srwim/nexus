@@ -19,6 +19,8 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      FTP_SERVER: ${{ secrets.FTP_SERVER }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -40,6 +42,18 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out
+      # Mirrors each fresh build to your own web host (e.g. arok.ai/nexus).
+      # Runs only when the FTP_* secrets are set; harmless otherwise.
+      - name: Publish to web host via FTP
+        if: ${{ env.FTP_SERVER != '' }}
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ftps
+          local-dir: out/
+          server-dir: ./
 
   deploy:
     needs: build
