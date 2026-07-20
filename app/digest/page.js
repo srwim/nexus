@@ -4,6 +4,7 @@ import { usePrefs } from "@/lib/usePrefs";
 import { assembleDigest } from "@/lib/clientDigest";
 import { BASE } from "@/lib/data";
 import { ArticleList, WeatherBlock } from "@/components/Articles";
+import { SignupForm } from "@/components/SignupForm";
 
 export default function DigestPage() {
   const { prefs, ready } = usePrefs();
@@ -52,6 +53,7 @@ export default function DigestPage() {
           )}
         </div>
       ))}
+      <SignupForm />
     </div>
   );
 }
