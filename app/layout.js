@@ -21,7 +21,18 @@ export default function RootLayout({ children }) {
           </nav>
         </header>
         <main>{children}</main>
-        <footer className="footer">Syndicated from trusted public feeds · Ranked by your ratings</footer>
+        <footer className="footer">
+          <div>Syndicated from trusted public feeds · Ranked by your ratings</div>
+          <div className="footer-site">
+            <span>
+              Designed by{" "}
+              <a href="http://sol-tek.us/" target="_blank" rel="noopener noreferrer">Sol-Tek</a>
+            </span>
+            <span>
+              Copyright © <a href="https://arok.ai">Arok.ai</a> {new Date().getFullYear()}
+            </span>
+          </div>
+        </footer>
       </body>
     </html>
   );
