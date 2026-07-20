@@ -6,6 +6,7 @@ const basePath = process.env.PAGES_BASE_PATH || "";
 const nextConfig = {
   output: "export",
   basePath,
+  trailingSlash: true, // emits folder/index.html so plain Apache hosting serves clean URLs
   images: { unoptimized: true },
   reactStrictMode: true,
   env: {
