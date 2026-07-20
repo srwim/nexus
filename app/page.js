@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePrefs } from "@/lib/usePrefs";
 import { assembleDigest } from "@/lib/clientDigest";
 import { ArticleList, WeatherBlock } from "@/components/Articles";
+import { SignupForm } from "@/components/SignupForm";
 
 export default function Home() {
   const { prefs, ready } = usePrefs();
@@ -46,6 +47,7 @@ export default function Home() {
           {s.type === "weather" ? <WeatherBlock weather={s.weather} /> : <ArticleList items={s.items} />}
         </section>
       ))}
+      <SignupForm />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { usePrefs } from "@/lib/usePrefs";
+import { usePrefs, shareLink } from "@/lib/usePrefs";
 import { BASE } from "@/lib/data";
 import { TOPICS, SPORTS_LEAGUES } from "@/lib/topics";
 
@@ -26,6 +26,7 @@ export default function SettingsPage() {
   const [savedNote, setSavedNote] = useState("");
   const [showConfig, setShowConfig] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [shared, setShared] = useState(false);
 
   if (!ready) return <div className="loading"><div className="spinner" />Loading…</div>;
 
@@ -128,12 +129,24 @@ export default function SettingsPage() {
           />
         </div>
         <div className="hint" style={{ marginTop: 14 }}>
-          Ratings and leagues apply instantly in your browser. Zipcode and email power the
-          <b> published site and daily newsletter</b>, which are built from <code>nexus.config.json</code> in
-          your GitHub repository — use the button below to sync your settings there.
+          Ratings, leagues, and zipcode apply instantly in your browser — weather and local news are fetched
+          live for your zip. The <b>daily email newsletter</b> is built from <code>nexus.config.json</code> in
+          the GitHub repository — use "Copy my nexus.config.json" to sync your settings there.
         </div>
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          <button className="btn" onClick={copyConfig}>
+          <button
+            className="btn"
+            onClick={async () => {
+              try {
+                await navigator.clipboard.writeText(shareLink(prefs));
+                setShared(true);
+                setTimeout(() => setShared(false), 2000);
+              } catch {}
+            }}
+          >
+            {shared ? "Link copied ✓" : "Copy share link"}
+          </button>
+          <button className="btn ghost" onClick={copyConfig}>
             {copied ? "Copied ✓" : "Copy my nexus.config.json"}
           </button>
           <button className="btn ghost" onClick={() => window.open(`${BASE}/newsletter.html`, "_blank")}>

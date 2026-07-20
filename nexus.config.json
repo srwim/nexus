@@ -16,5 +16,10 @@
   },
   "newsletter": {
     "to": ""
+  },
+  "localNewsProxy": "",
+  "hubspot": {
+    "portalId": "",
+    "formId": ""
   }
 }

@@ -52,6 +52,18 @@ Set your own address in `nexus.config.json` → `newsletter.to`. The email goes 
 
 Newsletter format: every headline includes a paragraph snippet, and weather appears as forecast cards matching the site. Preview at `/newsletter.html` on your site or via Settings → Preview newsletter.
 
+## Going public
+
+The site is built to be shared. Every visitor gets their own experience with no accounts and no server:
+
+- **Personal ratings** — stars, leagues, and zipcode live in each visitor's browser.
+- **Live per-visitor weather** — when a visitor sets their zip, their forecast comes straight from the National Weather Service in their browser.
+- **Live per-visitor local news** — needs a tiny free proxy because Google News blocks browser requests. Deploy `workers/local-news-proxy.js` to Cloudflare (instructions are at the top of that file, ~3 minutes), then paste the worker URL into `localNewsProxy` in `nexus.config.json`. Until then, visitors see the site-default city from your config.
+- **Share links** — Settings → "Copy share link" produces a URL that carries your exact ratings/leagues/zip to whoever opens it (email is never included).
+- **Newsletter signups** — create a plain email form in HubSpot (Marketing → Forms), put its `portalId` and `formId` in `nexus.config.json` under `hubspot`, and a "Get the Daily Brief" signup box appears on the site. Submissions land in HubSpot; add them to the contact list your `HUBSPOT_LIST_ID` secret points at and they'll receive the daily email automatically. Note: subscribers all receive the same edition, built from the ratings in `nexus.config.json`.
+
+If the newsletter grows beyond ~50 recipients, mind Resend's free-tier limits and add a verified sending domain (`NEWSLETTER_FROM`) — deliverability is much better than the shared onboarding address.
+
 ## Run locally
 
 ```
