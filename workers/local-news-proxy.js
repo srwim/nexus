@@ -38,14 +38,23 @@ export default {
       const zipData = await zipRes.json();
       const p = zipData.places?.[0];
       const place = { city: p["place name"], state: p["state abbreviation"] };
+      const stateFull = p["state"] || place.state; // "Utah", not "UT"
 
-      const q = encodeURIComponent(`"${place.city}" "${place.state}"`);
-      const feedUrl = `https://news.google.com/rss/search?q=${q}&hl=en-US&gl=US&ceid=US:en`;
-      const feedRes = await fetch(feedUrl, {
-        headers: { "User-Agent": "NEXUS/1.0 (personal news reader)" },
-        cf: { cacheTtl: 600, cacheEverything: true },
-      });
-      const xml = await feedRes.text();
+      // Quote the city (keeps results local) with the UNQUOTED full state name —
+      // requiring the quoted abbreviation "UT" returns almost nothing, since
+      // articles say "Utah". If that's still empty (small towns), fall back to
+      // the bare quoted city so visitors always get something.
+      const queries = [`"${place.city}" ${stateFull}`, `"${place.city}"`];
+      let xml = "";
+      for (const query of queries) {
+        const feedUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
+        const feedRes = await fetch(feedUrl, {
+          headers: { "User-Agent": "NEXUS/1.0 (personal news reader)" },
+          cf: { cacheTtl: 600, cacheEverything: true },
+        });
+        xml = await feedRes.text();
+        if (xml.includes("<item>")) break; // got results — stop
+      }
 
       return new Response(JSON.stringify({ place, xml }), { headers: cors });
     } catch (e) {
