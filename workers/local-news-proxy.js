@@ -1,25 +1,27 @@
 // NEXUS local-news proxy — a Cloudflare Worker (free tier is plenty).
 //
-// Why this exists: visitors' browsers can fetch weather directly from the
-// National Weather Service, but Google News RSS blocks cross-origin browser
-// requests. This tiny proxy fetches the local-news feed server-side and
-// returns it with CORS enabled, so every visitor can get local news for
-// THEIR zipcode on a fully static site.
+// Why this exists: visitors' browsers can't call a news API with a hidden key,
+// and Google News RSS blocks Cloudflare/datacenter IPs outright. This worker
+// calls the GNews API server-side (key stays secret here) and returns clean,
+// CORS-enabled JSON, so every visitor gets local news for THEIR zipcode on a
+// fully static site.
 //
-// Deploy (~3 minutes):
-//   1. dash.cloudflare.com → Workers & Pages → Create → Worker
-//   2. Name it (e.g. "nexus-local"), deploy the hello-world, then Edit Code
-//   3. Replace everything with this file → Deploy
-//   4. Copy the worker URL (https://nexus-local.YOUR-SUBDOMAIN.workers.dev)
-//      into "localNewsProxy" in nexus.config.json and commit.
+// SETUP (~5 minutes):
+//   1. Get a free API key at https://gnews.io  (100 requests/day free).
+//   2. Cloudflare dashboard → your worker → Settings → Variables and Secrets →
+//      add a variable named  GNEWS_KEY  with your key as the value → Save.
+//      (Alternative provider: NewsData.io — see the commented block below.)
+//   3. Edit code → paste this file → Deploy.
+//   4. The worker URL is already wired into the site via the LOCAL_NEWS_PROXY
+//      repo variable; nothing else to change.
 
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     const cors = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, OPTIONS",
       "Content-Type": "application/json",
-      "Cache-Control": "public, max-age=600", // 10-minute edge cache
+      "Cache-Control": "public, max-age=900", // 15-min edge cache — conserves the daily API quota
     };
     if (request.method === "OPTIONS") return new Response(null, { headers: cors });
 
@@ -27,47 +29,60 @@ export default {
     if (!/^\d{5}$/.test(zip)) {
       return new Response(JSON.stringify({ error: "zip must be 5 digits" }), { status: 400, headers: cors });
     }
+    if (!env.GNEWS_KEY) {
+      return new Response(
+        JSON.stringify({ error: "GNEWS_KEY not set — add it in the worker's Variables and Secrets settings." }),
+        { status: 500, headers: cors }
+      );
+    }
 
     try {
+      // Zipcode -> city / state (cached a day).
       const zipRes = await fetch(`https://api.zippopotam.us/us/${zip}`, {
         cf: { cacheTtl: 86400, cacheEverything: true },
       });
       if (!zipRes.ok) {
         return new Response(JSON.stringify({ error: "unknown zip" }), { status: 404, headers: cors });
       }
-      const zipData = await zipRes.json();
-      const p = zipData.places?.[0];
+      const p = (await zipRes.json()).places?.[0];
       const place = { city: p["place name"], state: p["state abbreviation"] };
-      const stateFull = p["state"] || place.state; // "Utah", not "UT"
+      const stateFull = p["state"] || place.state;
 
-      // Quote the city (keeps results local) with the UNQUOTED full state name —
-      // requiring the quoted abbreviation "UT" returns almost nothing, since
-      // articles say "Utah". If that's still empty (small towns), fall back to
-      // the bare quoted city so visitors always get something.
-      // Google News RSS returns a "Sorry" block page to non-browser User-Agents
-      // from datacenter IPs, so we must present a realistic desktop browser UA.
-      const BROWSER_HEADERS = {
-        "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-        "Accept-Language": "en-US,en;q=0.9",
-      };
+      // Quoted city keeps results local; the full state name disambiguates
+      // common city names without over-restricting.
+      const q = `"${place.city}" ${stateFull}`;
+      const apiUrl =
+        `https://gnews.io/api/v4/search?q=${encodeURIComponent(q)}` +
+        `&country=us&lang=en&max=10&apikey=${env.GNEWS_KEY}`;
 
-      const queries = [`"${place.city}" ${stateFull}`, `"${place.city}"`];
-      let xml = "";
-      for (const query of queries) {
-        const feedUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
-        const feedRes = await fetch(feedUrl, {
-          headers: BROWSER_HEADERS,
-          cf: { cacheTtl: 600, cacheEverything: true },
+      const res = await fetch(apiUrl, { cf: { cacheTtl: 900, cacheEverything: true } });
+      if (!res.ok) {
+        return new Response(JSON.stringify({ error: `news api ${res.status}`, place, items: [] }), {
+          status: 200,
+          headers: cors,
         });
-        xml = await feedRes.text();
-        if (xml.includes("<item>")) break; // got results — stop
       }
+      const data = await res.json();
+      const items = (data.articles || []).map((a) => ({
+        title: a.title || "",
+        link: a.url || "",
+        source: a.source?.name || "",
+        date: a.publishedAt || null,
+        summary: a.description || "",
+      }));
 
-      return new Response(JSON.stringify({ place, xml }), { headers: cors });
+      return new Response(JSON.stringify({ place, items }), { headers: cors });
     } catch (e) {
       return new Response(JSON.stringify({ error: e.message }), { status: 502, headers: cors });
     }
   },
 };
+
+// ── Using NewsData.io instead? (free 200 credits/day) ────────────────────────
+// Swap the apiUrl + parsing for:
+//   const apiUrl = `https://newsdata.io/api/1/latest?apikey=${env.GNEWS_KEY}` +
+//     `&q=${encodeURIComponent(`"${place.city}"`)}&country=us&language=en`;
+//   const items = (data.results || []).map((a) => ({
+//     title: a.title || "", link: a.link || "", source: a.source_id || "",
+//     date: a.pubDate || null, summary: a.description || "",
+//   }));
