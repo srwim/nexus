@@ -10,6 +10,14 @@ import { renderEmailHtml } from "../lib/email.js";
 const OUT = new URL("../public/data/", import.meta.url);
 const updatedAt = new Date().toISOString();
 
+// Absolute backstop: if the whole fetch somehow exceeds 5 minutes, exit
+// successfully with whatever was written so the build never hangs the runner.
+const HARD_CAP = setTimeout(() => {
+  console.warn("Data build hit 5-minute cap — exiting with partial data.");
+  process.exit(0);
+}, 5 * 60 * 1000);
+HARD_CAP.unref();
+
 async function readConfig() {
   try {
     return JSON.parse(await readFile(new URL("../nexus.config.json", import.meta.url), "utf8"));
