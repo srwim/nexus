@@ -11,6 +11,10 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body>
         <header className="topbar">
+          <a href="https://arok.ai" className="topbar-logo" aria-label="AROK — arok.ai">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://arok.ai/wp-content/uploads/2026/07/orb-128.png" alt="AROK" width={44} height={44} />
+          </a>
           <Link href="/" className="brand">
             <span>NEXUS</span>
           </Link>
