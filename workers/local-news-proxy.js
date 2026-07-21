@@ -44,12 +44,21 @@ export default {
       // requiring the quoted abbreviation "UT" returns almost nothing, since
       // articles say "Utah". If that's still empty (small towns), fall back to
       // the bare quoted city so visitors always get something.
+      // Google News RSS returns a "Sorry" block page to non-browser User-Agents
+      // from datacenter IPs, so we must present a realistic desktop browser UA.
+      const BROWSER_HEADERS = {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+      };
+
       const queries = [`"${place.city}" ${stateFull}`, `"${place.city}"`];
       let xml = "";
       for (const query of queries) {
         const feedUrl = `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`;
         const feedRes = await fetch(feedUrl, {
-          headers: { "User-Agent": "NEXUS/1.0 (personal news reader)" },
+          headers: BROWSER_HEADERS,
           cf: { cacheTtl: 600, cacheEverything: true },
         });
         xml = await feedRes.text();
