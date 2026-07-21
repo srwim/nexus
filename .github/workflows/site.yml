@@ -19,6 +19,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10 # a hung network call can never stall the runner for hours
     env:
       FTP_SERVER: ${{ secrets.FTP_SERVER }}
     steps:
