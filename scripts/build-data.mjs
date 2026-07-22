@@ -2,7 +2,7 @@
 // rendered newsletter preview at public/newsletter.html.
 // Run by GitHub Actions on a schedule; run locally with `npm run data`.
 import { mkdir, writeFile, readFile } from "node:fs/promises";
-import { TOPICS, SPORTS_LEAGUES } from "../lib/topics.js";
+import { TOPICS } from "../lib/topics.js";
 import { fetchFeeds } from "../lib/rss.js";
 import { getWeather, getLocalNews, buildDigest } from "../lib/digest.js";
 import { renderEmailHtml } from "../lib/email.js";
@@ -42,10 +42,8 @@ for (const [key, topic] of Object.entries(TOPICS)) {
   jobs.push(fetchFeeds(topic.feeds, 20).then((items) => writeJson(key, { items })));
 }
 
-// Every sports league (the browser filters to the visitor's picks)
-for (const [key, league] of Object.entries(SPORTS_LEAGUES)) {
-  jobs.push(fetchFeeds(league.feeds, 12).then((items) => writeJson(`sports-${key}`, { items })));
-}
+// Sports is fetched live in the browser from the ESPN JSON API (lib/espn.js),
+// so nothing to prebuild here.
 
 // Zipcode-driven data
 jobs.push(getLocalNews(config.zip, 20).then((d) => writeJson("local", d)));
