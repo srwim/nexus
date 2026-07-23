@@ -8,6 +8,7 @@ import config from "../nexus.config.json";
 export function SignupForm() {
   const hs = config.hubspot || {};
   const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [status, setStatus] = useState("idle"); // idle | sending | done | error
 
   if (!hs.portalId || !hs.formId) return null;
@@ -17,13 +18,15 @@ export function SignupForm() {
     if (!/.+@.+\..+/.test(email)) return;
     setStatus("sending");
     try {
+      const fields = [{ objectTypeId: "0-1", name: "email", value: email }];
+      if (name.trim()) fields.push({ objectTypeId: "0-1", name: "firstname", value: name.trim() });
       const res = await fetch(
         `https://api.hsforms.com/submissions/v3/integration/submit/${hs.portalId}/${hs.formId}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            fields: [{ objectTypeId: "0-1", name: "email", value: email }],
+            fields,
             context: { pageUri: window.location.href, pageName: "NEXUS" },
           }),
         }
@@ -50,12 +53,19 @@ export function SignupForm() {
       <div className="section-head"><h2>✉️ Get the Daily Brief by email</h2></div>
       <form onSubmit={submit} style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}>
         <input
+          type="text"
+          placeholder="First name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          style={{ flex: "1 1 140px" }}
+        />
+        <input
           type="email"
           required
           placeholder="you@example.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{ flex: "1 1 220px" }}
+          style={{ flex: "1 1 200px" }}
         />
         <button className="btn" disabled={status === "sending"}>
           {status === "sending" ? "Signing you up…" : "Subscribe free"}
