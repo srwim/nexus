@@ -6,3 +6,5 @@ out
 .DS_Store
 public/data/
 public/newsletter.html
+.hf-cache/
+.embed-cache.json

@@ -11,13 +11,15 @@ import { renderEmailHtml } from "../lib/email.js";
 const OUT = new URL("../public/data/", import.meta.url);
 const updatedAt = new Date().toISOString();
 
-// Absolute backstop: if the whole run somehow exceeds 8 minutes (fetching plus
-// the semantic model), exit successfully with whatever was written so the build
-// never hangs the runner. Job timeout is 10 minutes.
+// Absolute backstop: if the whole run somehow exceeds 12 minutes, exit
+// successfully with whatever was written so the build never hangs the runner.
+// The first (cold-cache) build downloads the model and embeds every headline;
+// warm builds only embed new ones and finish in a couple of minutes. Job
+// timeout is 15 minutes.
 const HARD_CAP = setTimeout(() => {
-  console.warn("Data build hit 8-minute cap — exiting with partial data.");
+  console.warn("Data build hit 12-minute cap — exiting with partial data.");
   process.exit(0);
-}, 8 * 60 * 1000);
+}, 12 * 60 * 1000);
 HARD_CAP.unref();
 
 async function readConfig() {
@@ -52,7 +54,7 @@ const fetched = await Promise.all(
   topicEntries.map(([key, topic]) => fetchFeeds(topic.feeds, 20).then((items) => [key, items]))
 );
 for (const [key, items] of fetched) {
-  const deduped = await semanticDedupe(items);
+  const deduped = await semanticDedupe(items, key);
   if (deduped.length < items.length) {
     console.log(`  semantic dedup: ${key} ${items.length} → ${deduped.length}`);
   }

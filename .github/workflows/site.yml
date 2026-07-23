@@ -19,7 +19,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10 # a hung network call can never stall the runner for hours
+    timeout-minutes: 15 # cold-cache build downloads the model; warm builds are ~2-3 min
     env:
       FTP_SERVER: ${{ secrets.FTP_SERVER }}
     steps:
@@ -36,6 +36,17 @@ jobs:
             echo "PAGES_BASE_PATH=/${{ github.event.repository.name }}" >> "$GITHUB_ENV"
           fi
       - run: npm ci
+      # Persist the embedding model (~23MB) and the per-headline vector cache
+      # between builds so warm builds don't re-download or re-embed everything.
+      - name: Restore semantic caches
+        uses: actions/cache@v4
+        with:
+          path: |
+            .hf-cache
+            .embed-cache.json
+          key: semantic-${{ github.run_id }}
+          restore-keys: |
+            semantic-
       # Semantic de-dup model, installed OUTSIDE npm ci so a failure here can
       # never break the site build — scripts/build-data.mjs falls back to
       # lexical de-dup if the package isn't present.
