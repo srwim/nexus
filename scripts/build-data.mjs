@@ -5,7 +5,7 @@ import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { TOPICS } from "../lib/topics.js";
 import { fetchFeeds } from "../lib/rss.js";
 import { getWeather, getLocalNews, buildDigest } from "../lib/digest.js";
-import { semanticDedupe } from "../lib/semantic.js";
+import { semanticDedupe, report as dedupReport } from "../lib/semantic.js";
 import { renderEmailHtml } from "../lib/email.js";
 
 const OUT = new URL("../public/data/", import.meta.url);
@@ -60,6 +60,9 @@ for (const [key, items] of fetched) {
   }
   jobs.push(writeJson(key, { items: deduped }));
 }
+
+// Publish the tuning telemetry so thresholds can be set from real scores.
+jobs.push(writeJson("_dedup-report", { pairs: dedupReport }));
 
 await Promise.all(jobs);
 
