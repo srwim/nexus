@@ -5,17 +5,19 @@ import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { TOPICS } from "../lib/topics.js";
 import { fetchFeeds } from "../lib/rss.js";
 import { getWeather, getLocalNews, buildDigest } from "../lib/digest.js";
+import { semanticDedupe } from "../lib/semantic.js";
 import { renderEmailHtml } from "../lib/email.js";
 
 const OUT = new URL("../public/data/", import.meta.url);
 const updatedAt = new Date().toISOString();
 
-// Absolute backstop: if the whole fetch somehow exceeds 5 minutes, exit
-// successfully with whatever was written so the build never hangs the runner.
+// Absolute backstop: if the whole run somehow exceeds 8 minutes (fetching plus
+// the semantic model), exit successfully with whatever was written so the build
+// never hangs the runner. Job timeout is 10 minutes.
 const HARD_CAP = setTimeout(() => {
-  console.warn("Data build hit 5-minute cap — exiting with partial data.");
+  console.warn("Data build hit 8-minute cap — exiting with partial data.");
   process.exit(0);
-}, 5 * 60 * 1000);
+}, 8 * 60 * 1000);
 HARD_CAP.unref();
 
 async function readConfig() {
@@ -36,18 +38,26 @@ await mkdir(OUT, { recursive: true });
 
 const jobs = [];
 
-// Static topics
-for (const [key, topic] of Object.entries(TOPICS)) {
-  if (!topic.feeds.length) continue;
-  jobs.push(fetchFeeds(topic.feeds, 20).then((items) => writeJson(key, { items })));
-}
-
 // Sports is fetched live in the browser from the ESPN JSON API (lib/espn.js),
 // so nothing to prebuild here.
 
-// Zipcode-driven data
+// Zipcode-driven data (no model needed) runs in parallel with topic fetching.
 jobs.push(getLocalNews(config.zip, 20).then((d) => writeJson("local", d)));
 jobs.push(getWeather(config.zip).then((w) => writeJson("weather", w)));
+
+// Static topics: fetch all feeds in parallel, then run semantic de-dup
+// SEQUENTIALLY so the single embedding model is reused (and never overlapped).
+const topicEntries = Object.entries(TOPICS).filter(([, t]) => t.feeds.length);
+const fetched = await Promise.all(
+  topicEntries.map(([key, topic]) => fetchFeeds(topic.feeds, 20).then((items) => [key, items]))
+);
+for (const [key, items] of fetched) {
+  const deduped = await semanticDedupe(items);
+  if (deduped.length < items.length) {
+    console.log(`  semantic dedup: ${key} ${items.length} → ${deduped.length}`);
+  }
+  jobs.push(writeJson(key, { items: deduped }));
+}
 
 await Promise.all(jobs);
 
