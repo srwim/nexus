@@ -29,7 +29,7 @@ if (!apiKey) {
     method: "POST",
     headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
     body: JSON.stringify({
-      from: process.env.NEWSLETTER_FROM || "NEXUS <onboarding@resend.dev>",
+      from: config.newsletter?.from || process.env.NEWSLETTER_FROM || "NEXUS <onboarding@resend.dev>",
       to: recipients.slice(0, 50),
       subject: `Your Daily Brief — ${digest.dateLabel}`,
       html,
