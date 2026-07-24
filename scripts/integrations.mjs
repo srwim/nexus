@@ -30,22 +30,20 @@ export async function fetchSponsor() {
   const pub = process.env.SPONSY_PUBLICATION_ID;
   if (!key || !pub) return null;
 
-  // TEMP DEBUG: discover the real API shape (auth header + endpoints + fields)
-  // so the sponsor mapping can be written from actual data. Remove after.
-  const probes = [
-    ["pubs / X-API-KEY", "https://api.getsponsy.com/v1/publications", { "X-API-KEY": key }],
-    ["pubs / Bearer", "https://api.getsponsy.com/v1/publications", { Authorization: `Bearer ${key}` }],
-    ["placements / X-API-KEY", `https://api.getsponsy.com/v1/publications/${pub}/placements`, { "X-API-KEY": key }],
-    ["slots / X-API-KEY", `https://api.getsponsy.com/v1/publications/${pub}/slots`, { "X-API-KEY": key }],
-  ];
-  for (const [label, url, headers] of probes) {
-    try {
-      const r = await fetch(url, { headers: { ...headers, Accept: "application/json" } });
-      const body = (await r.text()).slice(0, 700);
-      console.log(`SPONSY_DEBUG [${label}] status=${r.status} body=${body}`);
-    } catch (e) {
-      console.log(`SPONSY_DEBUG [${label}] error=${e.message}`);
+  // TEMP DEBUG: dump full slot objects to find where the sponsor copy/link live.
+  try {
+    const r = await fetch(`https://api.getsponsy.com/v1/publications/${pub}/slots`, {
+      headers: { "X-API-KEY": key, Accept: "application/json" },
+    });
+    const data = await r.json();
+    const slots = data.data || data.slots || (Array.isArray(data) ? data : []);
+    console.log(`SPONSY_DEBUG slots count=${slots.length}`);
+    for (const s of slots.slice(0, 3)) {
+      console.log(`SPONSY_DEBUG slot keys=${Object.keys(s).join(",")}`);
+      console.log(`SPONSY_DEBUG slot=${JSON.stringify(s).slice(0, 1800)}`);
     }
+  } catch (e) {
+    console.log(`SPONSY_DEBUG slots error=${e.message}`);
   }
   return null; // no sponsor rendered during the debug pass
 }
