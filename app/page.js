@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePrefs } from "@/lib/usePrefs";
 import { assembleDigest } from "@/lib/clientDigest";
+import { buildTeaser } from "@/lib/teaser";
 import { ArticleList, WeatherBlock } from "@/components/Articles";
 import { SignupForm } from "@/components/SignupForm";
 
@@ -26,6 +27,8 @@ export default function Home() {
   }
   if (error) return <div className="loading">Couldn&apos;t load feeds. Check your connection and refresh.</div>;
 
+  const teaser = buildTeaser(digest.sections);
+
   return (
     <div>
       <h1>Your Feed</h1>
@@ -35,6 +38,17 @@ export default function Home() {
           <span> · updated {new Date(digest.updatedAt).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}</span>
         ) : null}
       </p>
+      {teaser.length > 0 && (
+        <div className="tldr">
+          <span className="tldr-label">TL;DR</span>
+          {teaser.map((t, i) => (
+            <span key={i}>
+              {i > 0 && <span className="tldr-sep">, </span>}
+              <a href={t.link} target="_blank" rel="noopener noreferrer" className="tldr-link">{t.title}</a>
+            </span>
+          ))}
+        </div>
+      )}
       {digest.sections.map((s) => (
         <section key={s.key} className="section">
           <div className="section-head">
