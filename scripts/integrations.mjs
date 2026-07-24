@@ -39,21 +39,6 @@ export async function fetchSponsor() {
 
     const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Denver" }).format(new Date()); // YYYY-MM-DD
 
-    // TEMP DEBUG: show where the demo content landed (standard vs custom fields).
-    for (const s of slots) {
-      console.log(
-        `SPONSY_DEBUG ${JSON.stringify({
-          date: s.date,
-          customer: s.customer?.name,
-          copy: s.copy,
-          links: s.links,
-          parsedUrls: s.parsedUrls,
-          placementFieldValues: s.placementFieldValues,
-          publicationFieldValues: s.publicationFieldValues,
-        }).slice(0, 1500)}`
-      );
-    }
-
     const slot = slots.find((s) => {
       const d = String(s.date || "").slice(0, 10);
       const hasCopy = (s.copy?.html || "").trim() || (s.copy?.markdown || "").trim();
