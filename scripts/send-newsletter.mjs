@@ -30,7 +30,7 @@ if (process.env.GITHUB_EVENT_NAME === "schedule") {
 console.log("Building digest from published site data…");
 const digest = await buildPublishedDigest(prefs, config.siteUrl);
 
-const sponsors = await fetchSponsors();
+const sponsors = await fetchSponsors({ debug: !!config.dryRun });
 // Publication default, overridable per run (workflow_dispatch "theme" input)
 // for testing without editing nexus.config.json. Individual subscribers can
 // still override it via their HubSpot "nexus_theme" property.
@@ -65,7 +65,15 @@ for (const person of await hubspotRecipients()) {
 }
 const recipients = [...byEmail.values()];
 
-if (!apiKey) {
+// Safety valve: set "dryRun": true in nexus.config.json to build and log the
+// whole run without mailing anyone — useful for checking sponsor copy before
+// spending a day's idempotency key on a real send.
+if (config.dryRun) {
+  console.log(
+    `DRY RUN — no email sent. Would send to ${recipients.length} recipient(s): ` +
+      JSON.stringify(recipients.map((r) => `${r.email}:${r.theme || defaultTheme}`))
+  );
+} else if (!apiKey) {
   console.log("Email: skipped (no RESEND_API_KEY secret)");
 } else if (!recipients.length) {
   console.log("Email: skipped (no recipients — set newsletter.to in nexus.config.json or HUBSPOT_* secrets)");

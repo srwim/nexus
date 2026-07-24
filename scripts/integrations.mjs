@@ -67,7 +67,8 @@ function slotToSponsor(slot) {
 }
 
 // Returns { top, primary, footer } — any of which may be null.
-export async function fetchSponsors() {
+// Pass { debug: true } to dump each placement's raw field values.
+export async function fetchSponsors({ debug = false } = {}) {
   const key = process.env.SPONSY_API_KEY;
   const pub = process.env.SPONSY_PUBLICATION_ID;
   const empty = { top: null, primary: null, footer: null };
@@ -93,6 +94,18 @@ export async function fetchSponsors() {
     // "footer", etc. all land in the right slot.
     const nameOf = (s) => (s.placement?.name || s.placement?.title || "").toLowerCase();
     console.log(`Sponsy: today's placements → ${JSON.stringify(todays.map(nameOf))}`);
+
+    if (debug) {
+      for (const s of todays) {
+        for (const f of s.placementFieldValues || []) {
+          console.log(
+            `  FIELD [${nameOf(s)}] "${f.placementField?.label}" (${f.placementField?.type}) = ${JSON.stringify(
+              String(f.value || "")
+            ).slice(0, 400)}`
+          );
+        }
+      }
+    }
 
     const pick = (match) => {
       const s = todays.find((x) => match(nameOf(x)));
