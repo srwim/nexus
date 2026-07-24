@@ -2,7 +2,9 @@ name: Daily newsletter
 
 on:
   schedule:
-    - cron: "0 13 * * *" # 13:00 UTC daily — adjust to taste
+    # Fires at 10:15 and 11:15 UTC; send-newsletter.mjs runs only the slot that
+    # is 4:15 AM in Denver (handles daylight saving without changing the cron).
+    - cron: "15 10,11 * * *"
   workflow_dispatch: # lets you send a test run from the Actions tab
 
 jobs:
