@@ -40,10 +40,10 @@ export default function Home() {
       </p>
       {teaser.length > 0 && (
         <div className="tldr">
-          <span className="tldr-label">TL;DR</span>
+          <span className="tldr-label">Digest</span>
           {teaser.map((t, i) => (
             <span key={i}>
-              {i > 0 && <span className="tldr-sep">, </span>}
+              {i > 0 && " "}
               <a href={t.link} target="_blank" rel="noopener noreferrer" className="tldr-link">{t.title}</a>
             </span>
           ))}
