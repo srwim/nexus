@@ -9,15 +9,20 @@ import { postSlack, fetchSponsor, hubspotRecipients, uploadToDrive } from "./int
 const config = JSON.parse(await readFile(new URL("../nexus.config.json", import.meta.url), "utf8"));
 const prefs = { zip: config.zip, ratings: config.ratings, leagues: config.leagues };
 
-// The schedule fires at two UTC times (10:15 & 11:15) so that exactly one of
-// them is 4:15 AM in Denver year-round despite daylight saving. On a SCHEDULED
-// run, proceed only when it's the 4 AM Mountain hour; manual runs always send.
+// The schedule fires at two UTC times (10:15 & 11:15) so one of them is 4:15 AM
+// in Denver year-round despite daylight saving. GitHub's scheduled runs are
+// best-effort though — they get delayed and sometimes dropped entirely — so we
+// accept ANY slot in the 4-8 AM Denver window instead of demanding hour === 4.
+// (An exact-hour guard meant a dropped 4 AM slot = no newsletter that day.)
+// Sending twice is prevented by the per-day Idempotency-Key below, not by the
+// clock. Manual runs always send.
+const denverDate = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Denver" }).format(new Date());
 if (process.env.GITHUB_EVENT_NAME === "schedule") {
   const denverHour = Number(
     new Intl.DateTimeFormat("en-US", { timeZone: "America/Denver", hour: "numeric", hour12: false }).format(new Date())
   );
-  if (denverHour !== 4) {
-    console.log(`Not 4 AM Mountain (Denver hour ${denverHour}) — skipping this scheduled slot.`);
+  if (denverHour < 4 || denverHour > 8) {
+    console.log(`Denver hour ${denverHour} is outside the 4-8 AM send window — skipping this slot.`);
     process.exit(0);
   }
 }
@@ -53,6 +58,7 @@ if (!apiKey) {
   // gets its own signed unsubscribe link.
   let ok = 0;
   let fail = 0;
+  let already = 0;
   for (const to of recipients.slice(0, 200)) {
     const unsubscribeUrl = unsubscribeFor(to);
     const html = renderEmailHtml(digest, { sponsor, siteUrl: config.siteUrl, unsubscribeUrl });
@@ -61,16 +67,24 @@ if (!apiKey) {
       : { "List-Unsubscribe": `<${unsubscribeUrl}>` };
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+        // One key per recipient per Denver day (Resend keeps keys 24h). If a
+        // second scheduled slot fires, Resend rejects the repeat instead of
+        // mailing twice — so the window above can stay generous.
+        "Idempotency-Key": `nexus-${denverDate}-${to}`,
+      },
       body: JSON.stringify({ from, to: [to], subject: `Your Daily Brief — ${digest.dateLabel}`, html, headers }),
     });
     if (res.ok) ok++;
+    else if (res.status === 409) already++; // same key today — already sent
     else {
       fail++;
       if (fail <= 2) console.warn(`  email to ${to} failed (${res.status}: ${(await res.text()).slice(0, 120)})`);
     }
   }
-  console.log(`Email: sent ${ok}, failed ${fail}`);
+  console.log(`Email: sent ${ok}, already sent today ${already}, failed ${fail}`);
 }
 
 console.log("Slack:", await postSlack(digest, config));
