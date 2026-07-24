@@ -21,41 +21,48 @@ export async function postSlack(digest, config) {
   return res.ok ? "posted" : `failed (${res.status})`;
 }
 
-// ---------- Sponsy: pull today's sponsor placement into the email ----------
-// Uses SPONSY_API_KEY and SPONSY_PUBLICATION_ID. Field names in Sponsy's API
-// vary by setup — the mapping below is defensive; adjust to match your
-// publication if your placements don't appear (see docs.getsponsy.com).
+// ---------- Sponsy: pull today's sponsor into the email ----------
+// In Sponsy a "publication" is your newsletter, and each "slot" is a sponsor
+// booking on a given date. We take today's slot that actually has ad copy and
+// render it. Auth is the X-API-KEY header (verified against the live API).
 export async function fetchSponsor() {
   const key = process.env.SPONSY_API_KEY;
   const pub = process.env.SPONSY_PUBLICATION_ID;
   if (!key || !pub) return null;
-
-  // TEMP DEBUG: dump the content-bearing fields of each slot.
   try {
-    const r = await fetch(`https://api.getsponsy.com/v1/publications/${pub}/slots`, {
+    const res = await fetch(`https://api.getsponsy.com/v1/publications/${pub}/slots`, {
       headers: { "X-API-KEY": key, Accept: "application/json" },
     });
-    const data = await r.json();
-    const slots = data.data || data.slots || (Array.isArray(data) ? data : []);
-    console.log(`SPONSY_DEBUG slots count=${slots.length}`);
-    for (const s of slots.slice(0, 3)) {
-      console.log(
-        `SPONSY_DEBUG fields ${JSON.stringify({
-          date: s.date,
-          status: s.status,
-          placement: s.placement,
-          customer: s.customer,
-          copy: s.copy,
-          links: s.links,
-          parsedUrls: s.parsedUrls,
-          placementFieldValues: s.placementFieldValues,
-        }).slice(0, 1600)}`
-      );
-    }
-  } catch (e) {
-    console.log(`SPONSY_DEBUG slots error=${e.message}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const slots = data.data || (Array.isArray(data) ? data : []);
+
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Denver" }).format(new Date()); // YYYY-MM-DD
+    const slot = slots.find((s) => {
+      const d = String(s.date || "").slice(0, 10);
+      const hasCopy = (s.copy?.html || "").trim() || (s.copy?.markdown || "").trim();
+      return d === today && hasCopy;
+    });
+    if (!slot) return null;
+
+    const bodyHtml = (slot.copy?.html || "").trim();
+    const bodyText = (slot.copy?.markdown || "").trim();
+    const firstLink = slot.links?.[0];
+    const url =
+      (typeof firstLink === "string" ? firstLink : firstLink?.url) ||
+      slot.parsedUrls?.[0] ||
+      slot.customer?.website ||
+      "";
+    return {
+      title: slot.customer?.name || slot.placement?.name || "Our sponsor",
+      bodyHtml, // rendered as-is when present
+      body: bodyHtml ? "" : bodyText, // otherwise plain text (escaped)
+      url: typeof url === "string" ? url : "",
+      cta: "Learn more",
+    };
+  } catch {
+    return null;
   }
-  return null; // no sponsor rendered during the debug pass
 }
 
 // ---------- HubSpot: use a contact list as the mailing list ----------
