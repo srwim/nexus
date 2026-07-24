@@ -46,34 +46,44 @@ export async function fetchSponsor() {
     });
     if (!slot) return null;
 
-    // TEMP DEBUG: locate the custom "Title" field so we can map it.
-    console.log("SPONSY_FIELDS " + JSON.stringify(slot.placementFieldValues || []).slice(0, 2000));
-    for (const ep of ["placement-fields", "fields"]) {
-      try {
-        const fr = await fetch(`https://api.getsponsy.com/v1/publications/${pub}/${ep}`, {
-          headers: { "X-API-KEY": key, Accept: "application/json" },
-        });
-        console.log(`SPONSY_DEF ${ep} ${fr.status} ` + (fr.ok ? JSON.stringify(await fr.json()).slice(0, 1500) : ""));
-      } catch (e) {
-        console.log(`SPONSY_DEF ${ep} error ${e?.message || e}`);
-      }
-    }
+    // Sponsor content lives in custom "placement fields", each carrying a
+    // human label (e.g. "Title", "CTA", "Link", "Ad Copy"). Look values up by
+    // label so we're not tied to field IDs, and fall back to standard fields.
+    const fieldByLabel = (label) => {
+      const want = label.toLowerCase();
+      const entry = (slot.placementFieldValues || []).find(
+        (f) => (f.placementField?.label || "").toLowerCase() === want
+      );
+      return String(entry?.value || "").trim();
+    };
+    const stripTags = (s) => s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
-    const bodyHtml = (slot.copy?.html || "").trim();
+    // TEMP DEBUG: confirm which custom fields resolved.
+    console.log(
+      "SPONSY_LABELS " +
+        JSON.stringify((slot.placementFieldValues || []).map((f) => f.placementField?.label))
+    );
+
+    const bodyHtml = (fieldByLabel("Ad Copy") || slot.copy?.html || "").trim();
     const bodyText = (slot.copy?.markdown || "").trim();
+    const titleField = stripTags(fieldByLabel("Title"));
+    const ctaField = stripTags(fieldByLabel("CTA"));
     const firstLink = slot.links?.[0];
     const url =
+      fieldByLabel("Link") ||
       (typeof firstLink === "string" ? firstLink : firstLink?.url) ||
       slot.parsedUrls?.[0] ||
       slot.customer?.website ||
       "";
-    return {
-      title: slot.customer?.name || slot.placement?.name || "Our sponsor",
+    const sponsor = {
+      title: titleField || slot.customer?.name || slot.placement?.name || "Our sponsor",
       bodyHtml, // rendered as-is when present
       body: bodyHtml ? "" : bodyText, // otherwise plain text (escaped)
       url: typeof url === "string" ? url : "",
-      cta: "Learn more",
+      cta: ctaField || "Learn more",
     };
+    console.log(`SPONSY_RESOLVED ${JSON.stringify({ title: sponsor.title, cta: sponsor.cta, url: sponsor.url })}`);
+    return sponsor;
   } catch {
     return null;
   }
