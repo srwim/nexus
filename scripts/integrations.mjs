@@ -29,26 +29,25 @@ export async function fetchSponsor() {
   const key = process.env.SPONSY_API_KEY;
   const pub = process.env.SPONSY_PUBLICATION_ID;
   if (!key || !pub) return null;
-  try {
-    const res = await fetch(`https://api.getsponsy.com/v1/publications/${pub}/placements?status=scheduled`, {
-      headers: { "X-Api-Key": key, Accept: "application/json" },
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    const list = data.placements || data.data || (Array.isArray(data) ? data : []);
-    const today = new Date().toISOString().slice(0, 10);
-    const p =
-      list.find((x) => (x.date || x.scheduledFor || x.publishDate || "").slice(0, 10) === today) || null;
-    if (!p) return null;
-    return {
-      title: p.title || p.name || p.sponsor?.name || "Today's sponsor",
-      body: p.copy || p.description || p.body || "",
-      url: p.url || p.link || p.sponsor?.url || "",
-      cta: p.cta || "Learn more",
-    };
-  } catch {
-    return null;
+
+  // TEMP DEBUG: discover the real API shape (auth header + endpoints + fields)
+  // so the sponsor mapping can be written from actual data. Remove after.
+  const probes = [
+    ["pubs / X-API-KEY", "https://api.getsponsy.com/v1/publications", { "X-API-KEY": key }],
+    ["pubs / Bearer", "https://api.getsponsy.com/v1/publications", { Authorization: `Bearer ${key}` }],
+    ["placements / X-API-KEY", `https://api.getsponsy.com/v1/publications/${pub}/placements`, { "X-API-KEY": key }],
+    ["slots / X-API-KEY", `https://api.getsponsy.com/v1/publications/${pub}/slots`, { "X-API-KEY": key }],
+  ];
+  for (const [label, url, headers] of probes) {
+    try {
+      const r = await fetch(url, { headers: { ...headers, Accept: "application/json" } });
+      const body = (await r.text()).slice(0, 700);
+      console.log(`SPONSY_DEBUG [${label}] status=${r.status} body=${body}`);
+    } catch (e) {
+      console.log(`SPONSY_DEBUG [${label}] error=${e.message}`);
+    }
   }
+  return null; // no sponsor rendered during the debug pass
 }
 
 // ---------- HubSpot: use a contact list as the mailing list ----------
