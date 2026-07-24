@@ -58,10 +58,29 @@ export async function fetchSponsor() {
     };
     const stripTags = (s) => s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
+    // Image fields carry the file differently than text fields — the URL may be
+    // on the value itself, on an attached workspaceFile, or embedded in HTML.
+    const imageByLabel = (label) => {
+      const want = label.toLowerCase();
+      const entry = (slot.placementFieldValues || []).find(
+        (f) => (f.placementField?.label || "").toLowerCase() === want
+      );
+      if (!entry) return "";
+      const wf = entry.workspaceFile || {};
+      const fromHtml = String(entry.value || "").match(/https?:\/\/[^"')\s]+\.(?:png|jpe?g|gif|webp)/i)?.[0];
+      const cand =
+        wf.url || wf.publicUrl || wf.downloadUrl || wf.src ||
+        (typeof entry.value === "string" && /^https?:\/\//.test(entry.value.trim()) ? entry.value.trim() : "") ||
+        fromHtml ||
+        "";
+      return String(cand).trim();
+    };
+
     const bodyHtml = (fieldByLabel("Ad Copy") || slot.copy?.html || "").trim();
     const bodyText = (slot.copy?.markdown || "").trim();
     const titleField = stripTags(fieldByLabel("Title"));
     const ctaField = stripTags(fieldByLabel("CTA"));
+    const image = imageByLabel("Ad Image");
     const firstLink = slot.links?.[0];
     const url =
       fieldByLabel("Link") ||
@@ -71,11 +90,13 @@ export async function fetchSponsor() {
       "";
     const sponsor = {
       title: titleField || slot.customer?.name || slot.placement?.name || "Our sponsor",
+      image, // optional sponsor image URL
       bodyHtml, // rendered as-is when present
       body: bodyHtml ? "" : bodyText, // otherwise plain text (escaped)
       url: typeof url === "string" ? url : "",
       cta: ctaField || "Learn more",
     };
+    console.log(`SPONSY_IMG ${JSON.stringify({ image, rawAdImage: (slot.placementFieldValues || []).find((f) => (f.placementField?.label || "").toLowerCase() === "ad image") }).slice(0, 1200)}`);
     return sponsor;
   } catch {
     return null;
