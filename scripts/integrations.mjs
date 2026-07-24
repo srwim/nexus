@@ -116,6 +116,9 @@ export async function fetchSponsors() {
 // Reads emails from list HUBSPOT_LIST_ID using a private-app token
 // (HUBSPOT_TOKEN). Delivery still goes through Resend, so no paid
 // Marketing Hub tier is needed.
+// Returns [{ email, theme }] — theme comes from the optional "nexus_theme"
+// contact property ("light"/"dark") and is null when unset, in which case the
+// caller falls back to the publication default.
 export async function hubspotRecipients() {
   const token = process.env.HUBSPOT_TOKEN;
   const listId = process.env.HUBSPOT_LIST_ID;
@@ -139,19 +142,38 @@ export async function hubspotRecipients() {
       console.log("HubSpot list: 0 members on the list yet");
       return [];
     }
-    const batchRes = await fetch("https://api.hubapi.com/crm/v3/objects/contacts/batch/read", {
-      method: "POST",
-      headers: { ...auth, "Content-Type": "application/json" },
-      body: JSON.stringify({ inputs: ids, properties: ["email"] }),
-    });
+    // Ask for the optional per-subscriber theme. HubSpot 400s on unknown
+    // properties, so if "nexus_theme" hasn't been created yet we quietly retry
+    // with just the email and everyone gets the publication default.
+    const readContacts = (properties) =>
+      fetch("https://api.hubapi.com/crm/v3/objects/contacts/batch/read", {
+        method: "POST",
+        headers: { ...auth, "Content-Type": "application/json" },
+        body: JSON.stringify({ inputs: ids, properties }),
+      });
+
+    let batchRes = await readContacts(["email", "nexus_theme"]);
+    let themed = true;
+    if (!batchRes.ok) {
+      themed = false;
+      batchRes = await readContacts(["email"]);
+    }
     if (!batchRes.ok) {
       console.warn(`HubSpot list: contact read failed (${batchRes.status}: ${(await batchRes.text()).slice(0, 160)})`);
       return [];
     }
     const contacts = await batchRes.json();
-    const emails = (contacts.results || []).map((c) => c.properties?.email).filter(Boolean);
-    console.log(`HubSpot list: ${emails.length} subscriber(s) pulled`);
-    return emails;
+    const people = (contacts.results || [])
+      .map((c) => {
+        const t = String(c.properties?.nexus_theme || "").toLowerCase();
+        return { email: c.properties?.email, theme: t === "dark" || t === "light" ? t : null };
+      })
+      .filter((p) => p.email);
+    console.log(
+      `HubSpot list: ${people.length} subscriber(s) pulled` +
+        (themed ? "" : ' (no "nexus_theme" property — using default theme)')
+    );
+    return people;
   } catch (e) {
     console.warn("HubSpot list: errored —", e?.message || e);
     return [];

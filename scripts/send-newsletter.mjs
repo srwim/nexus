@@ -31,7 +31,12 @@ console.log("Building digest from published site data…");
 const digest = await buildPublishedDigest(prefs, config.siteUrl);
 
 const sponsors = await fetchSponsors();
-const theme = config.theme === "dark" ? "dark" : "light";
+// Publication default, overridable per run (workflow_dispatch "theme" input)
+// for testing without editing nexus.config.json. Individual subscribers can
+// still override it via their HubSpot "nexus_theme" property.
+const envTheme = String(process.env.NEWSLETTER_THEME || "").toLowerCase();
+const defaultTheme =
+  envTheme === "dark" || envTheme === "light" ? envTheme : config.theme === "dark" ? "dark" : "light";
 console.log(
   "Sponsy:",
   ["top", "primary", "footer"].map((k) => `${k}=${sponsors[k] ? `"${sponsors[k].title}"` : "—"}`).join(" ")
@@ -50,7 +55,15 @@ function unsubscribeFor(email) {
 
 // ---- Email via Resend ----
 const apiKey = process.env.RESEND_API_KEY;
-const recipients = [...new Set([config.newsletter?.to, ...(await hubspotRecipients())].filter(Boolean))];
+// Merge the configured address with the HubSpot list, de-duped by email. List
+// entries win because they carry the subscriber's theme preference.
+const byEmail = new Map();
+if (config.newsletter?.to) byEmail.set(config.newsletter.to.toLowerCase(), { email: config.newsletter.to, theme: null });
+for (const person of await hubspotRecipients()) {
+  const k = String(person.email || "").toLowerCase();
+  if (k) byEmail.set(k, person);
+}
+const recipients = [...byEmail.values()];
 
 if (!apiKey) {
   console.log("Email: skipped (no RESEND_API_KEY secret)");
@@ -63,7 +76,9 @@ if (!apiKey) {
   let ok = 0;
   let fail = 0;
   let already = 0;
-  for (const to of recipients.slice(0, 200)) {
+  for (const person of recipients.slice(0, 200)) {
+    const to = person.email;
+    const theme = person.theme || defaultTheme; // subscriber preference wins
     const unsubscribeUrl = unsubscribeFor(to);
     const html = renderEmailHtml(digest, { sponsors, theme, siteUrl: config.siteUrl, unsubscribeUrl });
     const headers = unsubscribeUrl.startsWith("http")
@@ -88,9 +103,12 @@ if (!apiKey) {
       if (fail <= 2) console.warn(`  email to ${to} failed (${res.status}: ${(await res.text()).slice(0, 120)})`);
     }
   }
-  console.log(`Email: sent ${ok}, already sent today ${already}, failed ${fail}`);
+  console.log(`Email: sent ${ok}, already sent today ${already}, failed ${fail} (default theme: ${defaultTheme})`);
 }
 
 console.log("Slack:", await postSlack(digest, config));
-console.log("Drive:", await uploadToDrive(renderEmailHtml(digest, { sponsors, theme, siteUrl: config.siteUrl }), digest));
+console.log(
+  "Drive:",
+  await uploadToDrive(renderEmailHtml(digest, { sponsors, theme: defaultTheme, siteUrl: config.siteUrl }), digest)
+);
 console.log("Newsletter run complete.");
