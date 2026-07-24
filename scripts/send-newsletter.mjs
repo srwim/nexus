@@ -64,6 +64,11 @@ for (const person of await hubspotRecipients()) {
   if (k) byEmail.set(k, person);
 }
 const recipients = [...byEmail.values()];
+console.log(
+  `Recipients: ${recipients
+    .map((r) => `${r.email}=${r.theme ? `${r.theme} (own)` : `${defaultTheme} (default)`}`)
+    .join(", ")}`
+);
 
 // Safety valve: set "dryRun": true in nexus.config.json to build and log the
 // whole run without mailing anyone — useful for checking sponsor copy before
