@@ -1,6 +1,7 @@
 // Daily newsletter run: build the digest, render the email, deliver it, and
 // fan out to the optional integrations. Run by .github/workflows/newsletter.yml.
 import { readFile } from "node:fs/promises";
+import { createHmac } from "node:crypto";
 import { buildDigest } from "../lib/digest.js";
 import { renderEmailHtml } from "../lib/email.js";
 import { postSlack, fetchSponsor, hubspotRecipients, uploadToDrive } from "./integrations.mjs";
@@ -27,8 +28,16 @@ const digest = await buildDigest(prefs);
 const sponsor = await fetchSponsor();
 console.log("Sponsy:", sponsor ? `placement "${sponsor.title}"` : "none");
 
-const unsubscribeUrl = config.newsletter?.unsubscribeUrl || "";
-const html = renderEmailHtml(digest, { sponsor, siteUrl: config.siteUrl, unsubscribeUrl });
+// Per-recipient one-click unsubscribe link, signed so it can't be forged.
+// The worker verifies the same HMAC using HUBSPOT_TOKEN. Falls back to a mailto
+// if the worker URL or token isn't set.
+const workerBase = (config.localNewsProxy || "").replace(/\/+$/, "");
+const signKey = process.env.HUBSPOT_TOKEN || "";
+function unsubscribeFor(email) {
+  if (!workerBase || !signKey) return config.newsletter?.unsubscribeUrl || "mailto:unsubscribe@arok.ai";
+  const t = createHmac("sha256", signKey).update(email.toLowerCase()).digest("hex");
+  return `${workerBase}/unsubscribe?e=${encodeURIComponent(email)}&t=${t}`;
+}
 
 // ---- Email via Resend ----
 const apiKey = process.env.RESEND_API_KEY;
@@ -40,23 +49,20 @@ if (!apiKey) {
   console.log("Email: skipped (no recipients — set newsletter.to in nexus.config.json or HUBSPOT_* secrets)");
 } else {
   const from = config.newsletter?.from || process.env.NEWSLETTER_FROM || "NEXUS <onboarding@resend.dev>";
-  const unsubHeader = unsubscribeUrl
-    ? { "List-Unsubscribe": `<${unsubscribeUrl}>` }
-    : { "List-Unsubscribe": "<mailto:unsubscribe@arok.ai>" };
-  // One email per recipient so addresses aren't exposed to each other.
+  // One email per recipient: addresses aren't exposed to each other, and each
+  // gets its own signed unsubscribe link.
   let ok = 0;
   let fail = 0;
   for (const to of recipients.slice(0, 200)) {
+    const unsubscribeUrl = unsubscribeFor(to);
+    const html = renderEmailHtml(digest, { sponsor, siteUrl: config.siteUrl, unsubscribeUrl });
+    const headers = unsubscribeUrl.startsWith("http")
+      ? { "List-Unsubscribe": `<${unsubscribeUrl}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" }
+      : { "List-Unsubscribe": `<${unsubscribeUrl}>` };
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        from,
-        to: [to],
-        subject: `Your Daily Brief — ${digest.dateLabel}`,
-        html,
-        headers: unsubHeader,
-      }),
+      body: JSON.stringify({ from, to: [to], subject: `Your Daily Brief — ${digest.dateLabel}`, html, headers }),
     });
     if (res.ok) ok++;
     else {
@@ -68,5 +74,5 @@ if (!apiKey) {
 }
 
 console.log("Slack:", await postSlack(digest, config));
-console.log("Drive:", await uploadToDrive(html, digest));
+console.log("Drive:", await uploadToDrive(renderEmailHtml(digest, { sponsor, siteUrl: config.siteUrl }), digest));
 console.log("Newsletter run complete.");

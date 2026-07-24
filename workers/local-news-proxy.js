@@ -14,9 +14,21 @@
 //   3. Edit code → paste this file → Deploy.
 //   4. The worker URL is already wired into the site via the LOCAL_NEWS_PROXY
 //      repo variable; nothing else to change.
+//
+// NEWSLETTER UNSUBSCRIBE (/unsubscribe route):
+//   The newsletter footer links here to unsubscribe people in one click. For it
+//   to work, also add a  HUBSPOT_TOKEN  variable (same HubSpot service key used
+//   by GitHub) with these scopes: communication_preferences.read_write. The link
+//   carries a signed token (HMAC of the email using HUBSPOT_TOKEN) so nobody can
+//   unsubscribe anyone else.
 
 export default {
   async fetch(request, env) {
+    const url = new URL(request.url);
+    if (url.pathname.replace(/\/+$/, "").endsWith("/unsubscribe")) {
+      return handleUnsubscribe(url, env);
+    }
+
     const cors = {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, OPTIONS",
@@ -25,7 +37,7 @@ export default {
     };
     if (request.method === "OPTIONS") return new Response(null, { headers: cors });
 
-    const zip = new URL(request.url).searchParams.get("zip") || "";
+    const zip = url.searchParams.get("zip") || "";
     if (!/^\d{5}$/.test(zip)) {
       return new Response(JSON.stringify({ error: "zip must be 5 digits" }), { status: 400, headers: cors });
     }
@@ -77,6 +89,71 @@ export default {
     }
   },
 };
+
+// ── One-click unsubscribe ────────────────────────────────────────────────────
+// GET or POST /unsubscribe?e=<email>&t=<hmac>. Verifies the signed token, then
+// opts the address out of the marketing subscription in HubSpot so the daily
+// send (which reads a list that excludes opt-outs) stops emailing them.
+async function handleUnsubscribe(url, env) {
+  const email = (url.searchParams.get("e") || "").trim().toLowerCase();
+  const token = url.searchParams.get("t") || "";
+
+  if (!email || !token || !env.HUBSPOT_TOKEN) {
+    return page("This unsubscribe link is incomplete. Email unsubscribe@arok.ai and we'll remove you.", 400);
+  }
+  const expected = await hmacHex(email, env.HUBSPOT_TOKEN);
+  if (token !== expected) {
+    return page("This unsubscribe link isn't valid. Email unsubscribe@arok.ai and we'll remove you.", 400);
+  }
+
+  try {
+    const auth = { Authorization: `Bearer ${env.HUBSPOT_TOKEN}`, "Content-Type": "application/json" };
+    // Find the marketing subscription type id.
+    const defsRes = await fetch("https://api.hubapi.com/communication-preferences/v3/definitions", {
+      headers: auth,
+    });
+    if (!defsRes.ok) return page("We couldn't reach the subscription service. Please email unsubscribe@arok.ai.", 502);
+    const defs = await defsRes.json();
+    const subs = defs.subscriptionDefinitions || [];
+    const sub = subs.find((s) => /market/i.test(s.name || "")) || subs[0];
+    if (!sub) return page("No subscription type is configured. Please email unsubscribe@arok.ai.", 500);
+
+    const res = await fetch("https://api.hubapi.com/communication-preferences/v3/unsubscribe", {
+      method: "POST",
+      headers: auth,
+      body: JSON.stringify({ emailAddress: email, subscriptionId: String(sub.id) }),
+    });
+    // 200 = unsubscribed; 400/409 often means "already unsubscribed" — treat as success.
+    if (res.ok || res.status === 400 || res.status === 409) {
+      return page(`You're unsubscribed. ${escapeHtml(email)} will no longer receive the NEXUS Daily Brief.`, 200);
+    }
+    return page("Something went wrong unsubscribing. Please email unsubscribe@arok.ai.", 502);
+  } catch {
+    return page("Something went wrong. Please email unsubscribe@arok.ai.", 502);
+  }
+}
+
+async function hmacHex(message, secret) {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const sig = await crypto.subtle.sign("HMAC", key, enc.encode(message));
+  return [...new Uint8Array(sig)].map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+function page(msg, status) {
+  const html =
+    `<!doctype html><html lang="en"><head><meta charset="utf-8">` +
+    `<meta name="viewport" content="width=device-width, initial-scale=1"><title>NEXUS</title></head>` +
+    `<body style="margin:0;background:#0b0b0f;color:#e7e7ee;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;text-align:center;padding:64px 20px;">` +
+    `<div style="font-size:24px;font-weight:800;letter-spacing:2px;color:#6ee7b7;margin-bottom:18px;">NEXUS</div>` +
+    `<p style="font-size:15px;line-height:1.6;max-width:460px;margin:0 auto;">${msg}</p>` +
+    `</body></html>`;
+  return new Response(html, { status, headers: { "Content-Type": "text/html; charset=utf-8" } });
+}
 
 // ── Using NewsData.io instead? (free 200 credits/day) ────────────────────────
 // Swap the apiUrl + parsing for:
