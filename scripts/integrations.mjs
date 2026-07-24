@@ -50,19 +50,19 @@ function slotToSponsor(slot) {
 
   const bodyHtml = (field("Ad Copy", "Text", "Body") || slot.copy?.html || "").trim();
   const bodyText = (slot.copy?.markdown || "").trim();
+  // Sponsy's link picker stores each custom link as { title, url } on the slot,
+  // where `title` is the anchor text the advertiser chose. Prefer that over the
+  // plain "Link" field so the plug reads as intended instead of a bare URL.
   const firstLink = slot.links?.[0];
-  const url =
-    field("Link", "URL") ||
-    (typeof firstLink === "string" ? firstLink : firstLink?.url) ||
-    slot.parsedUrls?.[0] ||
-    slot.customer?.website ||
-    "";
+  const linkObj = typeof firstLink === "string" ? { url: firstLink } : firstLink || {};
+  const url = linkObj.url || field("Link", "URL") || slot.parsedUrls?.[0] || slot.customer?.website || "";
   return {
     title: strip(field("Title")) || slot.customer?.name || "Our sponsor",
     bodyHtml, // rendered as-is when present
     body: bodyHtml ? "" : bodyText, // otherwise plain text (escaped)
     url: typeof url === "string" ? url : "",
-    cta: strip(field("CTA", "Call to Action")) || "Learn more",
+    cta: strip(field("CTA", "Call to Action")), // may be empty
+    linkText: strip(String(linkObj.title || "")), // anchor text, may be empty
   };
 }
 
@@ -97,17 +97,7 @@ export async function fetchSponsors({ debug = false } = {}) {
 
     if (debug) {
       for (const s of todays) {
-        console.log(
-          `  COPY [${nameOf(s)}] html=${JSON.stringify(String(s.copy?.html || "")).slice(0, 500)} ` +
-            `links=${JSON.stringify(s.links || [])} parsedUrls=${JSON.stringify(s.parsedUrls || [])}`
-        );
-        for (const f of s.placementFieldValues || []) {
-          console.log(
-            `  FIELD [${nameOf(s)}] "${f.placementField?.label}" (${f.placementField?.type}) = ${JSON.stringify(
-              String(f.value || "")
-            ).slice(0, 400)}`
-          );
-        }
+        console.log(`  [${nameOf(s)}] links=${JSON.stringify(s.links || [])}`);
       }
     }
 

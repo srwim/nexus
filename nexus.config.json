@@ -28,7 +28,7 @@
     "unsubscribeUrl": ""
   },
   "theme": "light",
-  "dryRun": true,
+  "dryRun": false,
   "localNewsProxy": "https://nexus-local.saswannabe17.workers.dev",
   "hubspot": {
     "portalId": "246845808",
