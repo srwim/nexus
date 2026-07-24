@@ -39,6 +39,10 @@ function unsubscribeFor(email) {
   return `${workerBase}/unsubscribe?e=${encodeURIComponent(email)}&t=${t}`;
 }
 
+// TEMP: log a valid signed link for a throwaway address so the unsubscribe flow
+// can be tested end-to-end without touching a real subscriber. Remove after.
+if (signKey) console.log("UNSUB_TEST_LINK", unsubscribeFor("nexus-unsub-test@example.com"));
+
 // ---- Email via Resend ----
 const apiKey = process.env.RESEND_API_KEY;
 const recipients = [...new Set([config.newsletter?.to, ...(await hubspotRecipients())].filter(Boolean))];
