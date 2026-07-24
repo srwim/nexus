@@ -22,6 +22,15 @@ if (process.env.GITHUB_EVENT_NAME === "schedule") {
   }
 }
 
+// TEMP: emit a valid signed test link up front (before the slow feed fetch) so
+// the unsubscribe flow can be verified end-to-end without touching a real
+// subscriber. Remove after testing.
+if (process.env.HUBSPOT_TOKEN && config.localNewsProxy) {
+  const testEmail = "nexus-unsub-test@example.com";
+  const t = createHmac("sha256", process.env.HUBSPOT_TOKEN).update(testEmail).digest("hex");
+  console.log(`UNSUB_TEST_LINK ${config.localNewsProxy.replace(/\/+$/, "")}/unsubscribe?e=${encodeURIComponent(testEmail)}&t=${t}`);
+}
+
 console.log("Building digest…");
 const digest = await buildDigest(prefs);
 
@@ -38,10 +47,6 @@ function unsubscribeFor(email) {
   const t = createHmac("sha256", signKey).update(email.toLowerCase()).digest("hex");
   return `${workerBase}/unsubscribe?e=${encodeURIComponent(email)}&t=${t}`;
 }
-
-// TEMP: log a valid signed link for a throwaway address so the unsubscribe flow
-// can be tested end-to-end without touching a real subscriber. Remove after.
-if (signKey) console.log("UNSUB_TEST_LINK", unsubscribeFor("nexus-unsub-test@example.com"));
 
 // ---- Email via Resend ----
 const apiKey = process.env.RESEND_API_KEY;
