@@ -1,8 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePrefs, shareLink } from "@/lib/usePrefs";
 import { BASE } from "@/lib/data";
+import { isWpAdmin } from "@/lib/wpAdmin";
 import { TOPICS, SPORTS_LEAGUES } from "@/lib/topics";
+import { SignupForm } from "@/components/SignupForm";
 
 function Stars({ value, onChange }) {
   return (
@@ -27,6 +29,12 @@ export default function SettingsPage() {
   const [showConfig, setShowConfig] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
+  const [admin, setAdmin] = useState(false);
+
+  // Reveal admin-only tools when signed into the arok.ai WordPress admin.
+  useEffect(() => {
+    isWpAdmin().then(setAdmin);
+  }, []);
 
   if (!ready) return <div className="loading"><div className="spinner" />Loading…</div>;
 
@@ -52,7 +60,6 @@ export default function SettingsPage() {
       siteUrl: typeof window !== "undefined" ? window.location.origin + BASE : "",
       leagues: prefs.leagues,
       ratings: prefs.ratings,
-      newsletter: { to: prefs.email || "" },
     },
     null,
     2
@@ -101,7 +108,7 @@ export default function SettingsPage() {
       </div>
 
       <div className="card">
-        <div className="section-head"><h2>Location &amp; newsletter</h2></div>
+        <div className="section-head"><h2>Location</h2></div>
         <div className="pref-row">
           <div className="pref-label">📮 Zipcode <small>for local news &amp; weather</small></div>
           <input
@@ -116,24 +123,7 @@ export default function SettingsPage() {
             }}
           />
         </div>
-        <div className="pref-row">
-          <div className="pref-label">✉️ Email my daily brief to <small>(optional)</small></div>
-          <input
-            type="email"
-            placeholder="you@example.com"
-            value={prefs.email}
-            onChange={(e) => {
-              update({ ...prefs, email: e.target.value });
-              flash();
-            }}
-          />
-        </div>
-        <div className="hint" style={{ marginTop: 14 }}>
-          Ratings, leagues, and zipcode apply instantly in your browser — weather and local news are fetched
-          live for your zip. The <b>daily email newsletter</b> is built from <code>nexus.config.json</code> in
-          the GitHub repository — use "Copy my nexus.config.json" to sync your settings there.
-        </div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <div style={{ marginTop: 14, display: "flex", gap: 10, flexWrap: "wrap" }}>
           <button
             className="btn"
             onClick={async () => {
@@ -144,26 +134,41 @@ export default function SettingsPage() {
               } catch {}
             }}
           >
-            {shared ? "Link copied ✓" : "Copy share link"}
-          </button>
-          <button className="btn ghost" onClick={copyConfig}>
-            {copied ? "Copied ✓" : "Copy my nexus.config.json"}
+            {shared ? "Link Copied ✓" : "Copy Share Link"}
           </button>
           <button className="btn ghost" onClick={() => window.open(`${BASE}/newsletter.html`, "_blank")}>
-            Preview newsletter
-          </button>
-          <button className="btn ghost" onClick={() => setShowConfig(!showConfig)}>
-            {showConfig ? "Hide" : "Show"} config
+            Preview Newsletter
           </button>
         </div>
-        {showConfig ? (
-          <div className="hint" style={{ whiteSpace: "pre-wrap", wordBreak: "normal" }}>
-            <b>Paste this into <code>nexus.config.json</code> on GitHub</b> (repo → the file → pencil icon → paste →
-            Commit changes). The next scheduled build picks it up automatically.
-            {"\n\n"}<code style={{ whiteSpace: "pre-wrap" }}>{configJson}</code>
-          </div>
-        ) : null}
       </div>
+
+      {/* Public subscribe box — same HubSpot form as the Feed/Brief pages. */}
+      <SignupForm />
+
+      {admin ? (
+        <div className="card">
+          <div className="section-head"><h2>Admin</h2></div>
+          <div className="hint" style={{ marginTop: 0 }}>
+            The published site and daily newsletter are built from <code>nexus.config.json</code> in the GitHub
+            repository. Copy your current settings below and paste them into that file to sync.
+          </div>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <button className="btn ghost" onClick={copyConfig}>
+              {copied ? "Copied ✓" : "Copy My Config"}
+            </button>
+            <button className="btn ghost" onClick={() => setShowConfig(!showConfig)}>
+              {showConfig ? "Hide Config" : "Show Config"}
+            </button>
+          </div>
+          {showConfig ? (
+            <div className="hint" style={{ whiteSpace: "pre-wrap", wordBreak: "normal" }}>
+              <b>Paste this into <code>nexus.config.json</code> on GitHub</b> (repo → the file → pencil icon → paste →
+              Commit changes). The next scheduled build picks it up automatically.
+              {"\n\n"}<code style={{ whiteSpace: "pre-wrap" }}>{configJson}</code>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

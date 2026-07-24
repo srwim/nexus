@@ -34,7 +34,7 @@ export default function DigestPage() {
           style={{ marginLeft: 10, padding: "6px 14px", fontSize: 12 }}
           onClick={() => window.open(`${BASE}/newsletter.html`, "_blank")}
         >
-          View as email
+          View as Email
         </button>
       </p>
       {digest.sections.map((s) => (

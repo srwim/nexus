@@ -16,7 +16,8 @@
   },
   "newsletter": {
     "to": "saswannabe17@gmail.com",
-    "from": "NEXUS <brief@arok.ai>"
+    "from": "NEXUS <brief@arok.ai>",
+    "unsubscribeUrl": ""
   },
   "localNewsProxy": "",
   "hubspot": {
