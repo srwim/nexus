@@ -9,6 +9,14 @@ import { SignupForm } from "@/components/SignupForm";
 function Stars({ value, onChange }) {
   return (
     <div className="stars" role="radiogroup" aria-label="rating">
+      <button
+        className={`off-btn ${value === 0 ? "on" : ""}`}
+        onClick={() => onChange(0)}
+        aria-label="turn topic off"
+        aria-pressed={value === 0}
+      >
+        Off
+      </button>
       {[1, 2, 3, 4, 5].map((n) => (
         <button
           key={n}
@@ -79,7 +87,7 @@ export default function SettingsPage() {
     <div>
       <h1>Settings</h1>
       <p className="subtitle">
-        Rate each topic 0–5 stars. Higher ratings mean more stories, shown first. Tap a star twice to turn a topic off.
+        Rate each topic 1–5 stars — higher means more stories, shown first. Hit <b>Off</b> (or tap the active star) to hide a topic entirely.
         <span className="saved-note">{savedNote}</span>
       </p>
 

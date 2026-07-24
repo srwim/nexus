@@ -146,6 +146,20 @@ h1 { font-size: 26px; margin-bottom: 6px; }
 .stars button.on { color: var(--star); }
 .stars button:hover { transform: scale(1.2); }
 
+.stars .off-btn {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px 9px;
+  margin-right: 8px;
+  align-self: center;
+}
+.stars .off-btn:hover { transform: none; color: var(--text); border-color: var(--muted); }
+.stars .off-btn.on { color: #fff; background: var(--danger); border-color: var(--danger); }
+
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .chip {
   border: 1px solid var(--border);
