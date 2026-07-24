@@ -4,7 +4,7 @@ import { readFile } from "node:fs/promises";
 import { createHmac } from "node:crypto";
 import { buildPublishedDigest } from "../lib/publishedDigest.js";
 import { renderEmailHtml } from "../lib/email.js";
-import { postSlack, fetchSponsor, hubspotRecipients, uploadToDrive } from "./integrations.mjs";
+import { postSlack, fetchSponsors, hubspotRecipients, uploadToDrive } from "./integrations.mjs";
 
 const config = JSON.parse(await readFile(new URL("../nexus.config.json", import.meta.url), "utf8"));
 const prefs = { zip: config.zip, ratings: config.ratings, leagues: config.leagues };
@@ -30,8 +30,12 @@ if (process.env.GITHUB_EVENT_NAME === "schedule") {
 console.log("Building digest from published site data…");
 const digest = await buildPublishedDigest(prefs, config.siteUrl);
 
-const sponsor = await fetchSponsor();
-console.log("Sponsy:", sponsor ? `placement "${sponsor.title}"` : "none");
+const sponsors = await fetchSponsors();
+const theme = config.theme === "dark" ? "dark" : "light";
+console.log(
+  "Sponsy:",
+  ["top", "primary", "footer"].map((k) => `${k}=${sponsors[k] ? `"${sponsors[k].title}"` : "—"}`).join(" ")
+);
 
 // Per-recipient one-click unsubscribe link, signed so it can't be forged.
 // The worker verifies the same HMAC using HUBSPOT_TOKEN. Falls back to a mailto
@@ -61,7 +65,7 @@ if (!apiKey) {
   let already = 0;
   for (const to of recipients.slice(0, 200)) {
     const unsubscribeUrl = unsubscribeFor(to);
-    const html = renderEmailHtml(digest, { sponsor, siteUrl: config.siteUrl, unsubscribeUrl });
+    const html = renderEmailHtml(digest, { sponsors, theme, siteUrl: config.siteUrl, unsubscribeUrl });
     const headers = unsubscribeUrl.startsWith("http")
       ? { "List-Unsubscribe": `<${unsubscribeUrl}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" }
       : { "List-Unsubscribe": `<${unsubscribeUrl}>` };
@@ -88,5 +92,5 @@ if (!apiKey) {
 }
 
 console.log("Slack:", await postSlack(digest, config));
-console.log("Drive:", await uploadToDrive(renderEmailHtml(digest, { sponsor, siteUrl: config.siteUrl }), digest));
+console.log("Drive:", await uploadToDrive(renderEmailHtml(digest, { sponsors, theme, siteUrl: config.siteUrl }), digest));
 console.log("Newsletter run complete.");

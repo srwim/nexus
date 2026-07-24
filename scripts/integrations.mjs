@@ -21,84 +21,94 @@ export async function postSlack(digest, config) {
   return res.ok ? "posted" : `failed (${res.status})`;
 }
 
-// ---------- Sponsy: pull today's sponsor into the email ----------
+// ---------- Sponsy: pull today's sponsors into the email ----------
 // In Sponsy a "publication" is your newsletter, and each "slot" is a sponsor
-// booking on a given date. We take today's slot that actually has ad copy and
-// render it. Auth is the X-API-KEY header (verified against the live API).
-export async function fetchSponsor() {
+// booking on a given date against a named placement. We support three:
+//   Primary — full block at the top of the story area
+//   Sponsor — one compact line under the NEXUS title
+//   Footer  — title + text + CTA above the sign-off
+// Auth is the X-API-KEY header (verified against the live API).
+
+// Turn one Sponsy slot into the shape lib/email.js renders. Content lives in
+// custom "placement fields" carrying human labels (Title, Ad Copy, Text, CTA,
+// Link), so we match on label rather than field ID — renaming or reordering
+// fields in Sponsy won't break this. Images are deliberately ignored: the
+// newsletter is text-only.
+function slotToSponsor(slot) {
+  const field = (...labels) => {
+    for (const label of labels) {
+      const want = label.toLowerCase();
+      const entry = (slot.placementFieldValues || []).find(
+        (f) => (f.placementField?.label || "").toLowerCase() === want
+      );
+      const v = String(entry?.value || "").trim();
+      if (v) return v;
+    }
+    return "";
+  };
+  const strip = (s) => s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+
+  const bodyHtml = (field("Ad Copy", "Text", "Body") || slot.copy?.html || "").trim();
+  const bodyText = (slot.copy?.markdown || "").trim();
+  const firstLink = slot.links?.[0];
+  const url =
+    field("Link", "URL") ||
+    (typeof firstLink === "string" ? firstLink : firstLink?.url) ||
+    slot.parsedUrls?.[0] ||
+    slot.customer?.website ||
+    "";
+  return {
+    title: strip(field("Title")) || slot.customer?.name || "Our sponsor",
+    bodyHtml, // rendered as-is when present
+    body: bodyHtml ? "" : bodyText, // otherwise plain text (escaped)
+    url: typeof url === "string" ? url : "",
+    cta: strip(field("CTA", "Call to Action")) || "Learn more",
+  };
+}
+
+// Returns { top, primary, footer } — any of which may be null.
+export async function fetchSponsors() {
   const key = process.env.SPONSY_API_KEY;
   const pub = process.env.SPONSY_PUBLICATION_ID;
-  if (!key || !pub) return null;
+  const empty = { top: null, primary: null, footer: null };
+  if (!key || !pub) return empty;
   try {
     const res = await fetch(`https://api.getsponsy.com/v1/publications/${pub}/slots`, {
       headers: { "X-API-KEY": key, Accept: "application/json" },
     });
-    if (!res.ok) return null;
+    if (!res.ok) return empty;
     const data = await res.json();
     const slots = data.data || (Array.isArray(data) ? data : []);
 
     const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Denver" }).format(new Date()); // YYYY-MM-DD
-
-    const slot = slots.find((s) => {
+    const todays = slots.filter((s) => {
       const d = String(s.date || "").slice(0, 10);
-      const hasCopy = (s.copy?.html || "").trim() || (s.copy?.markdown || "").trim();
-      return d === today && hasCopy;
+      if (d !== today) return false;
+      const hasFields = (s.placementFieldValues || []).some((f) => String(f.value || "").trim());
+      return hasFields || (s.copy?.html || "").trim() || (s.copy?.markdown || "").trim();
     });
-    if (!slot) return null;
+    if (!todays.length) return empty;
 
-    // Sponsor content lives in custom "placement fields", each carrying a
-    // human label (e.g. "Title", "CTA", "Link", "Ad Copy"). Look values up by
-    // label so we're not tied to field IDs, and fall back to standard fields.
-    const fieldByLabel = (label) => {
-      const want = label.toLowerCase();
-      const entry = (slot.placementFieldValues || []).find(
-        (f) => (f.placementField?.label || "").toLowerCase() === want
-      );
-      return String(entry?.value || "").trim();
-    };
-    const stripTags = (s) => s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+    // Placement names come from Sponsy; match loosely so "Footer Ad",
+    // "footer", etc. all land in the right slot.
+    const nameOf = (s) => (s.placement?.name || s.placement?.title || "").toLowerCase();
+    console.log(`Sponsy: today's placements → ${JSON.stringify(todays.map(nameOf))}`);
 
-    // Image fields carry the file differently than text fields — the URL may be
-    // on the value itself, on an attached workspaceFile, or embedded in HTML.
-    const imageByLabel = (label) => {
-      const want = label.toLowerCase();
-      const entry = (slot.placementFieldValues || []).find(
-        (f) => (f.placementField?.label || "").toLowerCase() === want
-      );
-      if (!entry) return "";
-      const wf = entry.workspaceFile || {};
-      const fromHtml = String(entry.value || "").match(/https?:\/\/[^"')\s]+\.(?:png|jpe?g|gif|webp)/i)?.[0];
-      const cand =
-        wf.url || wf.publicUrl || wf.downloadUrl || wf.src ||
-        (typeof entry.value === "string" && /^https?:\/\//.test(entry.value.trim()) ? entry.value.trim() : "") ||
-        fromHtml ||
-        "";
-      return String(cand).trim();
+    const pick = (match) => {
+      const s = todays.find((x) => match(nameOf(x)));
+      return s ? slotToSponsor(s) : null;
     };
-
-    const bodyHtml = (fieldByLabel("Ad Copy") || slot.copy?.html || "").trim();
-    const bodyText = (slot.copy?.markdown || "").trim();
-    const titleField = stripTags(fieldByLabel("Title"));
-    const ctaField = stripTags(fieldByLabel("CTA"));
-    const image = imageByLabel("Ad Image");
-    const firstLink = slot.links?.[0];
-    const url =
-      fieldByLabel("Link") ||
-      (typeof firstLink === "string" ? firstLink : firstLink?.url) ||
-      slot.parsedUrls?.[0] ||
-      slot.customer?.website ||
-      "";
-    const sponsor = {
-      title: titleField || slot.customer?.name || slot.placement?.name || "Our sponsor",
-      image, // optional sponsor image URL
-      bodyHtml, // rendered as-is when present
-      body: bodyHtml ? "" : bodyText, // otherwise plain text (escaped)
-      url: typeof url === "string" ? url : "",
-      cta: ctaField || "Learn more",
+    const out = {
+      top: pick((n) => n.includes("sponsor") && !n.includes("footer") && !n.includes("primary")),
+      primary: pick((n) => n.includes("primary")),
+      footer: pick((n) => n.includes("footer")),
     };
-    return sponsor;
+    // If nothing matched by name (single unnamed placement), fall back to
+    // treating the first slot as Primary so an ad is never silently dropped.
+    if (!out.top && !out.primary && !out.footer) out.primary = slotToSponsor(todays[0]);
+    return out;
   } catch {
-    return null;
+    return empty;
   }
 }
 

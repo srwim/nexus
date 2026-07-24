@@ -68,6 +68,7 @@ export default function SettingsPage() {
       siteUrl: typeof window !== "undefined" ? window.location.origin + BASE : "",
       leagues: prefs.leagues,
       ratings: prefs.ratings,
+      theme: prefs.theme || "light",
     },
     null,
     2
@@ -147,6 +148,32 @@ export default function SettingsPage() {
           <button className="btn ghost" onClick={() => window.open(`${BASE}/newsletter.html`, "_blank")}>
             Preview Newsletter
           </button>
+        </div>
+      </div>
+
+      <div className="card">
+        <div className="section-head"><h2>Newsletter appearance</h2></div>
+        <div className="pref-row">
+          <div className="pref-label">
+            🎨 Theme <small>how your daily email looks</small>
+          </div>
+          <div className="chips" style={{ marginTop: 0 }}>
+            {[
+              ["light", "Light"],
+              ["dark", "Dark"],
+            ].map(([key, label]) => (
+              <button
+                key={key}
+                className={`chip ${(prefs.theme || "light") === key ? "on" : ""}`}
+                onClick={() => {
+                  update({ ...prefs, theme: key });
+                  flash();
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
