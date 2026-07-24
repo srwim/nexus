@@ -58,26 +58,41 @@ export async function fetchSponsor() {
 export async function hubspotRecipients() {
   const token = process.env.HUBSPOT_TOKEN;
   const listId = process.env.HUBSPOT_LIST_ID;
-  if (!token || !listId) return [];
+  if (!token || !listId) {
+    console.log("HubSpot list: skipped (no HUBSPOT_TOKEN/HUBSPOT_LIST_ID)");
+    return [];
+  }
   const auth = { Authorization: `Bearer ${token}` };
   try {
     const memRes = await fetch(
       `https://api.hubapi.com/crm/v3/lists/${listId}/memberships?limit=100`,
       { headers: auth }
     );
-    if (!memRes.ok) return [];
+    if (!memRes.ok) {
+      console.warn(`HubSpot list: membership fetch failed (${memRes.status}: ${(await memRes.text()).slice(0, 160)})`);
+      return [];
+    }
     const members = await memRes.json();
     const ids = (members.results || []).map((m) => ({ id: m.recordId || m }));
-    if (!ids.length) return [];
+    if (!ids.length) {
+      console.log("HubSpot list: 0 members on the list yet");
+      return [];
+    }
     const batchRes = await fetch("https://api.hubapi.com/crm/v3/objects/contacts/batch/read", {
       method: "POST",
       headers: { ...auth, "Content-Type": "application/json" },
       body: JSON.stringify({ inputs: ids, properties: ["email"] }),
     });
-    if (!batchRes.ok) return [];
+    if (!batchRes.ok) {
+      console.warn(`HubSpot list: contact read failed (${batchRes.status}: ${(await batchRes.text()).slice(0, 160)})`);
+      return [];
+    }
     const contacts = await batchRes.json();
-    return (contacts.results || []).map((c) => c.properties?.email).filter(Boolean);
-  } catch {
+    const emails = (contacts.results || []).map((c) => c.properties?.email).filter(Boolean);
+    console.log(`HubSpot list: ${emails.length} subscriber(s) pulled`);
+    return emails;
+  } catch (e) {
+    console.warn("HubSpot list: errored —", e?.message || e);
     return [];
   }
 }
