@@ -6,6 +6,12 @@ on:
     # is 4:15 AM in Denver (handles daylight saving without changing the cron).
     - cron: "15 10,11 * * *"
   workflow_dispatch: # lets you send a test run from the Actions tab
+    inputs:
+      theme:
+        description: "Theme for this run (subscribers with their own nexus_theme keep it)"
+        type: choice
+        default: default
+        options: [default, light, dark]
 
 jobs:
   send:
@@ -21,6 +27,7 @@ jobs:
       - name: Build and send
         run: node scripts/send-newsletter.mjs
         env:
+          NEWSLETTER_THEME: ${{ inputs.theme }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           NEWSLETTER_FROM: ${{ secrets.NEWSLETTER_FROM }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
