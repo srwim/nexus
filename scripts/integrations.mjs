@@ -46,6 +46,19 @@ export async function fetchSponsor() {
     });
     if (!slot) return null;
 
+    // TEMP DEBUG: locate the custom "Title" field so we can map it.
+    console.log("SPONSY_FIELDS " + JSON.stringify(slot.placementFieldValues || []).slice(0, 2000));
+    for (const ep of ["placement-fields", "fields"]) {
+      try {
+        const fr = await fetch(`https://api.getsponsy.com/v1/publications/${pub}/${ep}`, {
+          headers: { "X-API-KEY": key, Accept: "application/json" },
+        });
+        console.log(`SPONSY_DEF ${ep} ${fr.status} ` + (fr.ok ? JSON.stringify(await fr.json()).slice(0, 1500) : ""));
+      } catch (e) {
+        console.log(`SPONSY_DEF ${ep} error ${e?.message || e}`);
+      }
+    }
+
     const bodyHtml = (slot.copy?.html || "").trim();
     const bodyText = (slot.copy?.markdown || "").trim();
     const firstLink = slot.links?.[0];
