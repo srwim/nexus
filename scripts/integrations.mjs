@@ -97,6 +97,10 @@ export async function fetchSponsors({ debug = false } = {}) {
 
     if (debug) {
       for (const s of todays) {
+        console.log(
+          `  COPY [${nameOf(s)}] html=${JSON.stringify(String(s.copy?.html || "")).slice(0, 500)} ` +
+            `links=${JSON.stringify(s.links || [])} parsedUrls=${JSON.stringify(s.parsedUrls || [])}`
+        );
         for (const f of s.placementFieldValues || []) {
           console.log(
             `  FIELD [${nameOf(s)}] "${f.placementField?.label}" (${f.placementField?.type}) = ${JSON.stringify(
