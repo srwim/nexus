@@ -58,12 +58,6 @@ export async function fetchSponsor() {
     };
     const stripTags = (s) => s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 
-    // TEMP DEBUG: confirm which custom fields resolved.
-    console.log(
-      "SPONSY_LABELS " +
-        JSON.stringify((slot.placementFieldValues || []).map((f) => f.placementField?.label))
-    );
-
     const bodyHtml = (fieldByLabel("Ad Copy") || slot.copy?.html || "").trim();
     const bodyText = (slot.copy?.markdown || "").trim();
     const titleField = stripTags(fieldByLabel("Title"));
@@ -82,7 +76,6 @@ export async function fetchSponsor() {
       url: typeof url === "string" ? url : "",
       cta: ctaField || "Learn more",
     };
-    console.log(`SPONSY_RESOLVED ${JSON.stringify({ title: sponsor.title, cta: sponsor.cta, url: sponsor.url })}`);
     return sponsor;
   } catch {
     return null;
