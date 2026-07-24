@@ -145,7 +145,15 @@ export default function SettingsPage() {
           >
             {shared ? "Link Copied ✓" : "Copy Share Link"}
           </button>
-          <button className="btn ghost" onClick={() => window.open(`${BASE}/newsletter.html`, "_blank")}>
+          <button
+            className="btn ghost"
+            onClick={() =>
+              window.open(
+                `${BASE}/newsletter${(prefs.theme || "light") === "dark" ? "-dark" : ""}.html?t=${Date.now()}`,
+                "_blank"
+              )
+            }
+          >
             Preview Newsletter
           </button>
         </div>

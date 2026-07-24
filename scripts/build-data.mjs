@@ -81,10 +81,16 @@ const digest = await buildDigest({
   ratings: config.ratings,
   leagues: config.leagues,
 });
-const html = renderEmailHtml(digest, {
-  siteUrl: config.siteUrl,
-  theme: config.theme === "dark" ? "dark" : "light",
-});
-await writeFile(new URL("../public/newsletter.html", import.meta.url), html);
-console.log(`✓ newsletter.html (${secs(tPreview)})`);
+// Both themes are published so Settings → Preview Newsletter can open the one
+// matching the reader's own choice (the static site can't render per-visitor).
+for (const [file, theme] of [
+  ["newsletter.html", "light"],
+  ["newsletter-dark.html", "dark"],
+]) {
+  await writeFile(
+    new URL(`../public/${file}`, import.meta.url),
+    renderEmailHtml(digest, { siteUrl: config.siteUrl, theme })
+  );
+}
+console.log(`✓ newsletter.html + newsletter-dark.html (${secs(tPreview)})`);
 console.log("Data build complete.");
