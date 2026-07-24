@@ -50,9 +50,15 @@ jobs.push(getWeather(config.zip).then((w) => writeJson("weather", w)));
 // Static topics: fetch all feeds in parallel, then run semantic de-dup
 // SEQUENTIALLY so the single embedding model is reused (and never overlapped).
 const topicEntries = Object.entries(TOPICS).filter(([, t]) => t.feeds.length);
+const secs = (t) => `${((Date.now() - t) / 1000).toFixed(1)}s`;
+
+const tFetch = Date.now();
 const fetched = await Promise.all(
   topicEntries.map(([key, topic]) => fetchFeeds(topic.feeds, 20).then((items) => [key, items]))
 );
+console.log(`⏱ fetched ${topicEntries.length} topics in ${secs(tFetch)}`);
+
+const tDedup = Date.now();
 for (const [key, items] of fetched) {
   const deduped = await semanticDedupe(items, key);
   if (deduped.length < items.length) {
@@ -60,13 +66,16 @@ for (const [key, items] of fetched) {
   }
   jobs.push(writeJson(key, { items: deduped }));
 }
+console.log(`⏱ semantic dedup in ${secs(tDedup)}`);
 
 // Publish the tuning telemetry so thresholds can be set from real scores.
 jobs.push(writeJson("_dedup-report", { pairs: dedupReport }));
 
 await Promise.all(jobs);
 
-// Newsletter preview (same renderer the daily email uses)
+// Newsletter preview (same renderer the daily email uses). Topic feeds are
+// served from the in-process cache populated above, so this is nearly free.
+const tPreview = Date.now();
 const digest = await buildDigest({
   zip: config.zip,
   ratings: config.ratings,
@@ -74,5 +83,5 @@ const digest = await buildDigest({
 });
 const html = renderEmailHtml(digest, { siteUrl: config.siteUrl });
 await writeFile(new URL("../public/newsletter.html", import.meta.url), html);
-console.log("✓ newsletter.html");
+console.log(`✓ newsletter.html (${secs(tPreview)})`);
 console.log("Data build complete.");
