@@ -2,7 +2,7 @@
 // fan out to the optional integrations. Run by .github/workflows/newsletter.yml.
 import { readFile } from "node:fs/promises";
 import { createHmac } from "node:crypto";
-import { buildDigest } from "../lib/digest.js";
+import { buildPublishedDigest } from "../lib/publishedDigest.js";
 import { renderEmailHtml } from "../lib/email.js";
 import { postSlack, fetchSponsor, hubspotRecipients, uploadToDrive } from "./integrations.mjs";
 
@@ -22,8 +22,8 @@ if (process.env.GITHUB_EVENT_NAME === "schedule") {
   }
 }
 
-console.log("Building digest…");
-const digest = await buildDigest(prefs);
+console.log("Building digest from published site data…");
+const digest = await buildPublishedDigest(prefs, config.siteUrl);
 
 const sponsor = await fetchSponsor();
 console.log("Sponsy:", sponsor ? `placement "${sponsor.title}"` : "none");
