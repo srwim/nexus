@@ -96,7 +96,6 @@ export async function fetchSponsor() {
       url: typeof url === "string" ? url : "",
       cta: ctaField || "Learn more",
     };
-    console.log(`SPONSY_IMG ${JSON.stringify({ image, rawAdImage: (slot.placementFieldValues || []).find((f) => (f.placementField?.label || "").toLowerCase() === "ad image") }).slice(0, 1200)}`);
     return sponsor;
   } catch {
     return null;
