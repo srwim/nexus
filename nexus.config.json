@@ -27,7 +27,7 @@
     "from": "NEXUS <brief@arok.ai>",
     "unsubscribeUrl": ""
   },
-  "theme": "dark",
+  "theme": "light",
   "localNewsProxy": "https://nexus-local.saswannabe17.workers.dev",
   "hubspot": {
     "portalId": "246845808",
