@@ -2,17 +2,31 @@
 //
 //   node evals/run.js --no-rubric   # deterministic only: free, no API key
 //   node evals/run.js               # also attempts the rubric metric
+//   node evals/run.js --gate        # decide send-vs-review for the daily run
 //
 // Exits non-zero on any must-exclude violation. Recall is reported, not gated —
 // a missed item is a judgment call worth reviewing, a forbidden item is a bug.
-import { readdir, readFile, mkdir, writeFile } from "node:fs/promises";
+//
+// --gate inverts the failure posture: it always exits 0 and reports its verdict
+// through $GITHUB_OUTPUT instead, because a broken eval must route the brief to
+// a human, never silently cancel the day's newsletter.
+import { readdir, readFile, mkdir, writeFile, appendFile } from "node:fs/promises";
 import { execSync } from "node:child_process";
 import { rankFromData } from "../lib/rank.js";
 import { scoreCase, aggregate } from "./score.js";
+import { decide, REVIEW } from "./gate.js";
 
 const CASES = new URL("cases/", import.meta.url);
 const RESULTS = new URL("results/", import.meta.url);
 const noRubric = process.argv.includes("--no-rubric");
+const gateMode = process.argv.includes("--gate");
+
+async function emit(pairs) {
+  const out = process.env.GITHUB_OUTPUT;
+  const text = Object.entries(pairs).map(([k, v]) => `${k}=${v}`).join("\n");
+  console.log(text);
+  if (out) await appendFile(out, `${text}\n`);
+}
 
 const pct = (v) => (v === null ? "  —  " : `${(v * 100).toFixed(0).padStart(3)}%`);
 const sha = () => {
@@ -25,6 +39,11 @@ const sha = () => {
 
 const files = (await readdir(CASES).catch(() => [])).filter((f) => f.endsWith(".json"));
 if (!files.length) {
+  if (gateMode) {
+    console.log("No labeled cases yet — routing the brief to review.");
+    await emit({ gate: REVIEW, score: "", violations: 0, cases: 0 });
+    process.exit(0);
+  }
   console.error("No cases in evals/cases/. Run the 'Capture eval case' workflow first.");
   process.exit(1);
 }
@@ -69,5 +88,18 @@ await writeFile(
   new URL(`${sha()}.json`, RESULTS),
   JSON.stringify({ sha: sha(), ran_at: new Date().toISOString(), aggregate: agg, cases: results }, null, 2)
 );
+
+if (gateMode) {
+  // score stays null until the rubric is wired, which keeps every brief in
+  // review — deliberate: unattended sending is earned by evidence.
+  const score = null;
+  await emit({
+    gate: decide({ score, violations: agg.violations, cases: agg.scored }),
+    score: score ?? "",
+    violations: agg.violations,
+    cases: agg.scored,
+  });
+  process.exit(0);
+}
 
 process.exit(agg.violations ? 1 : 0);
