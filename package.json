@@ -7,7 +7,10 @@
     "data": "node scripts/build-data.mjs",
     "dev": "npm run data && next dev",
     "build": "next build",
-    "newsletter": "node scripts/send-newsletter.mjs"
+    "newsletter": "node scripts/send-newsletter.mjs",
+    "test": "node --test lib/*.test.js evals/*.test.js",
+    "evals": "node evals/run.js --no-rubric",
+    "capture-case": "node scripts/capture-case.js"
   },
   "dependencies": {
     "next": "^16.2.10",
