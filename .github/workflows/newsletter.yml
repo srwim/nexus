@@ -2,9 +2,14 @@ name: Daily newsletter
 
 on:
   schedule:
-    # Fires at 10:15 and 11:15 UTC; send-newsletter.mjs runs only the slot that
-    # is 4:15 AM in Denver (handles daylight saving without changing the cron).
-    - cron: "15 10,11 * * *"
+    # GitHub's scheduler drops or delays scheduled runs under load, and the
+    # popular :15 mark is the worst offender — our 10:15 slot was silently
+    # skipped two days running. So we fire repeatedly on off-peak minutes
+    # across both candidate hours (10:xx UTC = 4:xx AM Denver in MDT,
+    # 11:xx = 4:xx in MST). send-newsletter.mjs only proceeds between 4-8 AM
+    # Denver, and Resend's per-day idempotency key means the first attempt to
+    # land is the only one that mails — every later attempt is a no-op.
+    - cron: "2,17,32,47 10,11 * * *"
   workflow_dispatch: # lets you send a test run from the Actions tab
     inputs:
       theme:
