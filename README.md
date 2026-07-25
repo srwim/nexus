@@ -28,6 +28,41 @@ archive to Google Drive · recipients from HubSpot list
 
 Star ratings and league picks live in your browser and apply instantly. The **zipcode and newsletter email** live in `nexus.config.json` in the repo (Settings has a "Copy my nexus.config.json" button — paste it into the file on GitHub whenever you change things).
 
+## Evals and the autonomy gate
+
+The daily send is two jobs with a measurement between them:
+
+```
+build-brief  ──►  [ eval gate ]  ──►  send
+                                      Resend · Slack · Drive · HubSpot
+   builds and freezes        clean suite + score ≥ threshold
+   today's brief,            └─► environment: auto        (sends unattended)
+   uploads it as an          otherwise
+   artifact to read          └─► environment: digest-send (blocks for review)
+```
+
+`build-brief` produces the brief, freezes it to `brief.json`, and uploads it as
+an artifact. `evals/run.js --gate` then scores it and emits a verdict, which the
+`send` job consumes as its GitHub Environment name. Sending the *frozen* brief
+rather than rebuilding is deliberate: what ships is what was approved.
+
+Autonomy scales with measured confidence rather than being assumed. The gate
+starts fully closed — `THRESHOLD` is 5 and the rubric metric isn't wired, so
+`score` is `null` and every brief routes to a human. As eval history
+accumulates and the rubric earns trust, the threshold comes down and more sends
+go unattended; a must-exclude violation always pulls it back to review,
+regardless of score. The policy is one function in
+[`evals/gate.js`](evals/gate.js), and every threshold change is logged in
+[`docs/EVALS.md`](docs/EVALS.md).
+
+```bash
+npm test         # ranking + scorer + gate
+npm run evals    # deterministic metrics — free, no API key
+```
+
+See [docs/EVALS.md](docs/EVALS.md) for the three metrics, why those three, and
+how to capture and label a case.
+
 ## Deploy (one-time, ~5 minutes)
 
 1. Create a **public** repository on github.com (public = free Pages + unlimited Action minutes) and push this folder to it. Easiest way without git experience: install [GitHub Desktop](https://desktop.github.com), Add local repository → this folder → Publish.
@@ -79,15 +114,26 @@ This fetches fresh data first, then serves at http://localhost:3000.
 nexus.config.json         Zipcode, ratings, leagues, newsletter recipient (drives the published site + email)
 .github/workflows/
   site.yml                Fetch news + rebuild + publish every 30 min
-  newsletter.yml          Daily email/Slack/Sponsy/Drive/HubSpot run
+  newsletter.yml          build-brief → eval gate → send
+  evals.yml               Tests + deterministic evals on PRs
+  capture-case.yml        Snapshot live data into a new eval case
 scripts/
   build-data.mjs          Fetches feeds → public/data/*.json + newsletter.html
-  send-newsletter.mjs     Builds + delivers the daily brief
+  build-brief.js          Builds + freezes today's brief for the gate to review
+  send-newsletter.mjs     Delivers the approved brief
+  capture-case.js         Snapshots live data into evals/cases/
   integrations.mjs        Slack, Sponsy, HubSpot, Google Drive (all secret-gated)
+evals/
+  gate.js                 The autonomy policy: send unattended, or route to review
+  run.js                  Eval runner (--no-rubric | --gate)
+  score.js                Recall + must-exclude scoring
+  rubric.md               What "good" means, for the model grader
+  cases/                  Frozen labeled snapshots
 app/                      Feed, Daily Brief, Settings pages
 lib/
   topics.js               Topic → feed registry (add/remove sources here)
   rss.js                  Fetching, caching, dedup, entity decoding, obituary filter
+  rank.js                 Star-weighted selection — what the evals grade
   digest.js               Digest builder + weather/local logic
   email.js                Email HTML template
   clientDigest.js         Browser-side feed assembly from static JSON
