@@ -1,0 +1,31 @@
+name: Capture eval case
+
+# public/data is gitignored and overwritten every 30 minutes, so eval cases can
+# only be taken while their news is live. Run this from the Actions tab on a day
+# worth grading; it commits an unlabeled case for you to hand-label.
+# ponytail: manual dispatch only — add a `schedule:` here if you'd rather bank a
+# case automatically every day and label the good ones later.
+on: workflow_dispatch
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # No `npm ci` — capture-case.js only touches Node built-ins and two
+      # dependency-free lib modules.
+      - run: node scripts/capture-case.js
+      - name: Commit the case
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add evals/cases
+          git diff --staged --quiet && echo "nothing captured" && exit 0
+          git commit -m "Capture eval case"
+          git push
