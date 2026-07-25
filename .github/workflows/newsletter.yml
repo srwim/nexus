@@ -1,16 +1,23 @@
 name: Daily newsletter
 
+# build-brief → [eval gate] → send
+#
+# The gate is a GitHub Environment, not code: `send` targets `auto` (no
+# reviewers, runs straight through) or `digest-send` (required reviewer, job
+# blocks until approved). Autonomy is a function of measured confidence — see
+# evals/gate.js for the policy and docs/EVALS.md for the threshold changelog.
+
 on:
   schedule:
     # GitHub's scheduler drops or delays scheduled runs under load, and the
     # popular :15 mark is the worst offender — our 10:15 slot was silently
     # skipped two days running. So we fire repeatedly on off-peak minutes
     # across both candidate hours (10:xx UTC = 4:xx AM Denver in MDT,
-    # 11:xx = 4:xx in MST). send-newsletter.mjs only proceeds between 4-8 AM
-    # Denver, and Resend's per-day idempotency key means the first attempt to
-    # land is the only one that mails — every later attempt is a no-op.
+    # 11:xx = 4:xx in MST). build-brief skips outside 4-8 AM Denver, and
+    # Resend's per-day idempotency key means the first attempt to land is the
+    # only one that mails — every later attempt is a no-op.
     - cron: "2,17,32,47 10,11 * * *"
-  workflow_dispatch: # lets you send a test run from the Actions tab
+  workflow_dispatch:
     inputs:
       theme:
         description: "Theme for this run (subscribers with their own nexus_theme keep it)"
@@ -18,10 +25,22 @@ on:
         default: default
         options: [default, light, dark]
 
+# Collapse the retry slots to a single pending approval instead of one per slot.
+# Cancelling mid-send is safe: the per-recipient idempotency key makes the send
+# resumable, so the next slot mails exactly whoever hasn't been mailed yet.
+concurrency:
+  group: daily-digest
+  cancel-in-progress: true
+
 jobs:
-  send:
+  build-brief:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      gate: ${{ steps.gate.outputs.gate }}
+      score: ${{ steps.gate.outputs.score }}
+      violations: ${{ steps.gate.outputs.violations }}
+      skip: ${{ steps.build.outputs.skip }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -29,7 +48,47 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - name: Build and send
+      - name: Build brief
+        id: build
+        run: node scripts/build-brief.js
+        env:
+          NEWSLETTER_THEME: ${{ inputs.theme }}
+          SPONSY_API_KEY: ${{ secrets.SPONSY_API_KEY }}
+          SPONSY_PUBLICATION_ID: ${{ secrets.SPONSY_PUBLICATION_ID }}
+      # Uploaded BEFORE the gate so there is something concrete to read when the
+      # approval request arrives.
+      - name: Upload brief for review
+        if: steps.build.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: brief-${{ github.run_number }}
+          path: |
+            brief.html
+            brief.json
+      - name: Evaluate
+        id: gate
+        if: steps.build.outputs.skip != 'true'
+        run: node evals/run.js --gate
+
+  send:
+    needs: build-brief
+    if: needs.build-brief.outputs.skip != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # ponytail: GitHub Environments is the approval system — no code to write.
+    environment: ${{ needs.build-brief.outputs.gate }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      # Send exactly the brief that was approved, not a fresh rebuild.
+      - uses: actions/download-artifact@v4
+        with:
+          name: brief-${{ github.run_number }}
+      - name: Send
         run: node scripts/send-newsletter.mjs
         env:
           NEWSLETTER_THEME: ${{ inputs.theme }}

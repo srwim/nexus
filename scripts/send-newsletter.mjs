@@ -27,16 +27,26 @@ if (process.env.GITHUB_EVENT_NAME === "schedule") {
   }
 }
 
-console.log("Building digest from published site data…");
-const digest = await buildPublishedDigest(prefs, config.siteUrl);
+// Prefer the brief the gate already reviewed. Rebuilding here would mean the
+// mail could differ from what was approved — the whole point of the gate is
+// that what ships is what a human signed off on.
+let prebuilt = null;
+try {
+  prebuilt = JSON.parse(await readFile(new URL("../brief.json", import.meta.url), "utf8"));
+} catch {
+  /* no gated brief (manual/local run) — build it fresh below */
+}
 
-const sponsors = await fetchSponsors({ debug: !!config.dryRun });
+const digest = prebuilt?.digest ?? (console.log("Building digest from published site data…"), await buildPublishedDigest(prefs, config.siteUrl));
+const sponsors = prebuilt?.sponsors ?? (await fetchSponsors({ debug: !!config.dryRun }));
+if (prebuilt) console.log(`Using approved brief built at ${prebuilt.generated_at}`);
+
 // Publication default, overridable per run (workflow_dispatch "theme" input)
 // for testing without editing nexus.config.json. Individual subscribers can
 // still override it via their HubSpot "nexus_theme" property.
 const envTheme = String(process.env.NEWSLETTER_THEME || "").toLowerCase();
 const defaultTheme =
-  envTheme === "dark" || envTheme === "light" ? envTheme : config.theme === "dark" ? "dark" : "light";
+  envTheme === "dark" || envTheme === "light" ? envTheme : prebuilt?.theme ?? (config.theme === "dark" ? "dark" : "light");
 console.log(
   "Sponsy:",
   ["top", "primary", "footer"].map((k) => `${k}=${sponsors[k] ? `"${sponsors[k].title}"` : "—"}`).join(" ")
