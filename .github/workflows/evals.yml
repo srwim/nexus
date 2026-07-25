@@ -1,0 +1,24 @@
+name: Evals
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    # The prompt is the playbook — changing it changes the brief's judgment, so
+    # it gets graded even outside a PR. (Directory arrives with Phase 1.)
+    paths: ["prompts/**"]
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # No `npm ci` — ranking, scoring and the tests are dependency-free, so CI
+      # is a checkout and two node commands.
+      - run: node --test lib/*.test.js evals/*.test.js
+      # --no-rubric keeps this free and key-free: deterministic metrics only.
+      # Exits non-zero on any must-exclude violation.
+      - run: node evals/run.js --no-rubric
