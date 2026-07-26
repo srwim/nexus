@@ -2,10 +2,13 @@ name: Daily newsletter
 
 # build-brief → [eval gate] → send
 #
-# The gate is a GitHub Environment, not code: `send` targets `auto` (no
-# reviewers, runs straight through) or `digest-send` (required reviewer, job
-# blocks until approved). Autonomy is a function of measured confidence — see
-# evals/gate.js for the policy and docs/EVALS.md for the threshold changelog.
+# The verdict from evals/gate.js picks which GitHub Environment `send` targets:
+# `auto` when the suite is clean and scored above threshold, `digest-send`
+# otherwise. Whether `digest-send` actually blocks is a repo setting — add a
+# required reviewer under Settings → Environments and the same verdict becomes a
+# hard stop with an approval UI and audit trail. Neither environment has
+# protection rules today, so both currently proceed.
+# See evals/gate.js for the policy and docs/EVALS.md for the threshold changelog.
 
 on:
   schedule:

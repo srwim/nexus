@@ -101,7 +101,17 @@ and record the move here.
 
 | Date | Threshold | Rationale |
 | --- | --- | --- |
-| 2026-07-25 | 5 | Initial. Everything gates; no rubric wired, so `score` is `null` and every brief routes to review by design. |
+| 2026-07-25 | 5 | Initial. No rubric wired, so `score` is `null` and every brief routes to `digest-send` by design. |
+
+## Enforcement
+
+`decide()` picks the environment; GitHub decides whether that environment
+blocks. A required reviewer on `digest-send` (Settings → Environments) makes the
+verdict a hard stop with a notification and an audit trail. Without one — the
+current state — runs route to `digest-send` and proceed unattended.
+
+The routing, the artifact, and the verdict are live either way; enforcement is
+one setting, not a code change.
 
 ## Not wired yet
 
