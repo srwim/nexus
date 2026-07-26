@@ -1,0 +1,2291 @@
+{
+  "id": "2026-07-26T16-18-15Z",
+  "captured_at": "2026-07-26T16:18:15.944Z",
+  "source": "https://arok.ai/nexus/",
+  "config": {
+    "zip": "",
+    "ratings": {
+      "politics": 3,
+      "usnews": 3,
+      "world": 3,
+      "conflict": 3,
+      "business": 2,
+      "science": 2,
+      "health": 2,
+      "climate": 2,
+      "local": 3,
+      "weather": 3,
+      "sports": 3,
+      "tech": 3,
+      "cyber": 2,
+      "ai": 3,
+      "space": 3,
+      "gaming": 2,
+      "crypto": 2,
+      "culture": 3
+    },
+    "leagues": [
+      "nfl",
+      "nba"
+    ]
+  },
+  "data": {
+    "politics": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "items": [
+        {
+          "title": "Homan on status of ICE officers involved in fatal shootings: 'I don't know specifically'",
+          "link": "https://thehill.com/policy/national-security/5990935-homan-ice-shooting-investigations/",
+          "source": "TheHill.com Just In",
+          "date": "2026-07-26T15:03:50.000Z",
+          "summary": "White House border czar Tom Homan on Sunday said he did not \"know specifically\" the status of the Immigration and Customs Enforcement (ICE) officers involved in two recent fatal shootings in Texas and Maine. \"I don't know specifically,\" Homan said on \"State of the Union\" to CNN's Dana Bash. \"I haven"
+        },
+        {
+          "title": "How AI could automate the poor tax",
+          "link": "https://thehill.com/opinion/technology/5988614-ai-surveillance-pricing-laws/",
+          "source": "TheHill.com Just In",
+          "date": "2026-07-26T15:00:00.000Z",
+          "summary": "Instead of asking, “What is this product worth?” AI asks, “What is this consumer willing to pay?”"
+        },
+        {
+          "title": "Van Hollen: Trump hit Saudi Arabia with 'bait and switch' by tying Israel relations to nuclear deal",
+          "link": "https://thehill.com/homenews/senate/5990897-van-hollen-trump-saudi-deal/",
+          "source": "TheHill.com Just In",
+          "date": "2026-07-26T14:30:47.000Z",
+          "summary": "Sen. Chris Van Hollen (D-Md.) on Sunday said President Trump hit Saudi Arabia with a \"bait and switch\" by changing the terms of a nuclear deal to tie it to building Saudi relations with Israel. \"As you well know, the Saudis have been very clear that they will normalize relations with Israel when we'"
+        },
+        {
+          "title": "'Mini Dust Bowl' could be forming in the US, expert warns. Will El Niño make it worse?",
+          "link": "https://thehill.com/policy/energy-environment/5989271-mini-dust-bowl-could-be-forming-in-the-us-expert-warns-will-el-nino-make-it-worse/",
+          "source": "TheHill.com Just In",
+          "date": "2026-07-26T14:28:00.000Z",
+          "summary": "\"If the long-term drought is as bad as it could be, and you are starting off already with severe drought, this raises the real possibility of a 'mini-Dust Bowl.'\""
+        },
+        {
+          "title": "JD Vance has some valid questions about space colonies",
+          "link": "https://thehill.com/opinion/technology/5988866-vance-mars-colony-concerns/",
+          "source": "TheHill.com Just In",
+          "date": "2026-07-26T14:00:00.000Z",
+          "summary": "As to the effects on the human body of being “outside of Earth’s gravity,” Vance is onto something."
+        },
+        {
+          "title": "GLP-1 drugs could reduce long-term sick leave: Study",
+          "link": "https://thehill.com/policy/healthcare/5990886-glp-1-drugs-reduce-sick-time-study/",
+          "source": "TheHill.com Just In",
+          "date": "2026-07-26T13:32:11.000Z",
+          "summary": "Based on Danish data, the study found those on GLP-1s had 17% less long-term absences."
+        },
+        {
+          "title": "How the modern plea bargain undercuts the constitutional right to a jury trial ",
+          "link": "https://thehill.com/opinion/judiciary/5986854-jury-trials-plea-bargaining-crisis/",
+          "source": "TheHill.com Just In",
+          "date": "2026-07-26T13:00:00.000Z",
+          "summary": "If the 250th anniversary of American independence invites reflection on our foundational values, this issue deserves a place near the center."
+        },
+        {
+          "title": "Live updates: Maine's Jackson clinches matchup with Collins as midterms approach; Cyclospora tests Trump admin",
+          "link": "https://thehill.com/homenews/5990529-live-updates-midterms-jackson-collins-cyclospora-trump/",
+          "source": "TheHill.com Just In",
+          "date": "2026-07-26T12:48:44.000Z",
+          "summary": "The November midterm elections are shaping up to be a tense and tight battle for control of Congress after Maine Democrats chose their nominee to face off against vulnerable incumbent Sen. Susan Collins (R-Maine). Former state Senate President Troy Jackson on Saturday formally clinched the Democrati"
+        },
+        {
+          "title": "Maine Senate Dems Nominee",
+          "link": "https://www.npr.org/2026/07/26/nx-s1-5906372/maine-senate-dems-nominee",
+          "source": "NPR Topics: Politics",
+          "date": "2026-07-26T12:25:26.000Z",
+          "summary": "Maine Democrats have chosen their candidate to run against incumbent GOP Sen. Susan Collins. Troy Jackson, former state lawmaker, steps in where the scandal-plagued Graham Platner stepped out."
+        },
+        {
+          "title": "Trump intensifies push for GOP senators to end filibuster 'before it is too late'",
+          "link": "https://thehill.com/homenews/administration/5990856-trump-urges-gop-terminate-filibuster/",
+          "source": "TheHill.com Just In",
+          "date": "2026-07-26T12:02:06.000Z",
+          "summary": "President Trump late Saturday night once again urged Republican senators to \"terminate the filibuster\" in an effort to pass his oft-championed voting bill and other legislation \"before it's too late.\" \"The all Republican Senators! Terminate the Filibuster, which the Dumocrats will do as soon as they"
+        },
+        {
+          "title": "Trump's threats to bomb Iran 'back to the Stone Ages' will backfire",
+          "link": "https://thehill.com/opinion/white-house/5986958-trump-threats-civilian-attacks-iran/",
+          "source": "TheHill.com Just In",
+          "date": "2026-07-26T12:00:00.000Z",
+          "summary": "U.S. policymakers would do well to ask whether upping the ante with bombs is likely to end this conflict, or deepen it by dragging in other countries in the Middle East and dragging down the global economy."
+        },
+        {
+          "title": "Politics chat: How the war with Iran will shape midterms, Troy Jackson enters Maine Senate race",
+          "link": "https://www.npr.org/2026/07/26/nx-s1-5906388/politics-chat-how-the-war-with-iran-will-shape-midterms-troy-jackson-enters-maine-senate-race",
+          "source": "NPR Topics: Politics",
+          "date": "2026-07-26T11:58:32.000Z",
+          "summary": "We'll look at how the war with Iran might shape the outcome for the 2026 Midterm elections, as well as how the new Democratic senate candidate in Maine might fare against the Republican incumbent."
+        },
+        {
+          "title": "Texas politicians call for guardrails on AI, data centers",
+          "link": "https://thehill.com/homenews/state-watch/5990678-texas-politicians-call-for-guardrails-on-ai-data-centers/",
+          "source": "TheHill.com Just In",
+          "date": "2026-07-26T11:00:55.000Z",
+          "summary": "Also, PUC prepares for data centers and the Texas Medical Association calls for legislative action on prediction market apps."
+        },
+        {
+          "title": "Democrats favored to win House, underdogs in Senate 100 days out",
+          "link": "https://thehill.com/homenews/campaign/5987178-midterm-forecast-house-senate/",
+          "source": "TheHill.com Just In",
+          "date": "2026-07-26T10:00:00.000Z",
+          "summary": "Democrats are favored to win the House but are slight underdogs in the fight for the Senate with 100 days to go before the midterms, according to the latest forecast from Decision Desk HQ (DDHQ). Both parties are dealing with headwinds as they head into the home stretch of the high-stakes election. "
+        },
+        {
+          "title": "Jackson enters 100-day sprint with Collins as Maine Democrats hit reset  ",
+          "link": "https://thehill.com/homenews/campaign/5990757-maine-democrats-troy-jackson-susan-collins-senate-race/",
+          "source": "TheHill.com Just In",
+          "date": "2026-07-26T10:00:00.000Z",
+          "summary": "BANGOR – Democrats in Maine anointed progressive Troy Jackson as their pick to take on Sen. Susan Collins (R) with a tall order: Beat the five-term incumbent who has defied political gravity for three decades in 100 days. Democrat Graham Platner’s exit from the marquee race earlier this month left t"
+        },
+        {
+          "title": "Lettuce explain: Cyclospora outbreaks test Trump administration messaging",
+          "link": "https://thehill.com/policy/healthcare/5989534-trump-administration-cyclosporiasis-outbreak-messaging/",
+          "source": "TheHill.com Just In",
+          "date": "2026-07-26T10:00:00.000Z",
+          "summary": "The Trump administration is facing a key messaging test as it tries to stop potentially multiple outbreaks of cyclosporiasis, a parasitic illness. Two months in and thousands of cases later, the outbreak has become a communications nightmare. Experts say confusing messages and a lack of central lead"
+        },
+        {
+          "title": "Rage-giving, innovation and cuts: How public media has survived without federal funds",
+          "link": "https://www.npr.org/2026/07/26/nx-s1-5884022/pbs-npr-public-radio-tv-funding-trump",
+          "source": "NPR Topics: Politics",
+          "date": "2026-07-26T10:00:00.000Z",
+          "summary": "A year after President Trump signed a law ending six decades of federal funding of public media, it's a time of reinvention, innovation and clear anxiety at public tv and radio stations nationwide."
+        },
+        {
+          "title": "Israel detains more than 70 in West Bank after deadly clashes",
+          "link": "https://thehill.com/policy/international/5990740-israeli-forces-arrest-west-bank/",
+          "source": "TheHill.com Just In",
+          "date": "2026-07-26T02:45:23.000Z",
+          "summary": "Israeli forces detained more than 70 people across the occupied West Bank overnight Friday and into Saturday after violence in a northern Palestinian village killed two Israeli soldiers and four Palestinians. According to The Associated Press, the Israeli military said in a statement that troops sea"
+        },
+        {
+          "title": "Biden ghostwriter tapes to be released",
+          "link": "https://www.npr.org/2026/07/25/nx-s1-5906749/biden-ghostwriter-tapes-justice-department-trump-debate",
+          "source": "NPR Topics: Politics",
+          "date": "2026-07-25T19:36:18.000Z",
+          "summary": "Former President Joe Biden is declining to appeal a court ruling that allows the Justice Department to publicize recordings of conversations between him and a writer collaborating on his memoir."
+        },
+        {
+          "title": "In South Texas, Paxton tests the limits of Trump’s Hispanic coalition",
+          "link": "https://www.politico.com/news/2026/07/25/paxton-talarico-texas-senate-latino-voters-01005951",
+          "source": "Politics",
+          "date": "2026-07-25T18:00:00.000Z",
+          "summary": "A visit to the Rio Grande Valley reveals a border community buckling under the weight of Republicans’ immigration policies."
+        }
+      ]
+    },
+    "usnews": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "items": [
+        {
+          "title": "New Jersey governor signs law banning surveillance pricing to protect shoppers",
+          "link": "https://www.theguardian.com/us-news/2026/jul/26/new-jersey-surveillance-pricing-ban",
+          "source": "US news | The Guardian",
+          "date": "2026-07-26T15:08:40.000Z",
+          "summary": "New law prohibits retailers from using personal data to charge different prices for identical products New Jersey governor Mikie Sherrill recently signed a new law prohibiting businesses from using shoppers’ personal information to charge different prices for identical products, making her state the"
+        },
+        {
+          "title": "Oklahoma influencer killed in apparent murder-suicide by husband, police say",
+          "link": "https://www.theguardian.com/us-news/2026/jul/26/oklahoma-influencer-killed-apparent-murder-suicide",
+          "source": "US news | The Guardian",
+          "date": "2026-07-26T14:38:46.000Z",
+          "summary": "Sara Gilson was fatally shot less than two weeks after accusing her husband of pedophilia on social media An Oklahoma woman known for posting on social media about parenting her children was fatally shot in an apparent murder-suicide by her husband a short time after she published a clip alluding to"
+        },
+        {
+          "title": "Ryan Gosling to join Marvel Cinematic Universe as Ghost Rider",
+          "link": "https://www.bbc.co.uk/news/articles/cgq5v72jqglo?at_medium=RSS&at_campaign=rss",
+          "source": "BBC News",
+          "date": "2026-07-26T13:30:38.000Z",
+          "summary": "During a surprise announcement at San Diego Comic-Con, the actor says the character is one he has \"wanted to play for a very long time\"."
+        },
+        {
+          "title": "Why does everything feel so joyless? Welcome to the age of decadence without pleasure | Michèle Mendelssohn and Charlie Tyson",
+          "link": "https://www.theguardian.com/us-news/ng-interactive/2026/jul/26/age-of-decadence-pleasure-ai",
+          "source": "US news | The Guardian",
+          "date": "2026-07-26T13:00:14.000Z",
+          "summary": "Decadence in our era comes in technologically mediated forms, emptied of desire and obsessed with self-optimisation Do you want to have a good time? You know, really enjoy yourself? Click here, and tell us your desires. Maybe it’s a new outfit, or some exotic cuisine delivered anonymously and steami"
+        },
+        {
+          "title": "The Pitt is powerful – but it’s the rawness of The Bear that truly portrays hospital work",
+          "link": "https://www.theguardian.com/commentisfree/2026/jul/26/the-pitt-hospital-work-the-bear",
+          "source": "US news | The Guardian",
+          "date": "2026-07-26T13:00:14.000Z",
+          "summary": "Both restaurant work and medicine involve abusive training and relentless devotion to minutiae – and the joy of offering comfort I pass a mother heaving in grief while her son’s heart monitors flatline. It is the last time she will ever hold his hand. For me, this is another day on call in the inten"
+        },
+        {
+          "title": "Meet the South Carolina Democrat looking to flip Lindsey Graham’s Senate seat",
+          "link": "https://www.theguardian.com/us-news/2026/jul/26/south-carolina-democrat-lindsey-graham-senate-seat",
+          "source": "US news | The Guardian",
+          "date": "2026-07-26T13:00:13.000Z",
+          "summary": "Dr Annie Andrews says her ‘mission remains the same’ as she now aims to unseat Darline Graham, sister of the late Republican senator It was early Sunday morning and Dr Annie Andrews was far from the political fray, dropping her youngest daughter off at a summer camp, when she heard the news. “It was"
+        },
+        {
+          "title": "Trump administration to announce rules for how states will share the Colorado River",
+          "link": "https://www.npr.org/2026/07/26/nx-s1-5904997/trump-administration-to-announce-rules-for-how-states-will-share-the-colorado-river",
+          "source": "NPR Topics: National",
+          "date": "2026-07-26T12:25:23.000Z",
+          "summary": "This week the federal government is to release new rules for how much water each of the seven states that share the Colorado River will get. Effects on the ecosystem were largely left unconsidered."
+        },
+        {
+          "title": "Loyal to the look: why Zohran Mamdani wears a suit in all seasons",
+          "link": "https://www.theguardian.com/us-news/2026/jul/26/zohran-mamdani-suit-new-york-mayor",
+          "source": "US news | The Guardian",
+          "date": "2026-07-26T12:00:11.000Z",
+          "summary": "Around town, on the pitch and even in the pool, the New York mayor keeps his suit on – what do his sartorial choices tell us? Playing football. Playing in the sand. Dancing on a stage with Alicia Keys and the entire New York Knicks roster. Swimming in a swimming pool. Swimming in the ocean. Traditio"
+        },
+        {
+          "title": "Trump allies approve new rules that will weaken protections for historic sites",
+          "link": "https://www.npr.org/2026/07/26/nx-s1-5906719/trump-allies-approve-new-rules-that-will-weaken-protections-for-historic-sites",
+          "source": "NPR Topics: National",
+          "date": "2026-07-26T11:58:34.000Z",
+          "summary": "An advisory council stacked with President Trump's allies voted to relax a 60-year-old historic preservation law, paving the way for federal projects that could harm historic sites across the country."
+        },
+        {
+          "title": "From the strait of Hormuz to the North Sea, a global maritime war rages around us – and more than the price of oil is at stake | Simon Tisdall",
+          "link": "https://www.theguardian.com/commentisfree/2026/jul/26/strait-of-hormuz-north-sea-global-maritime-war-oil-price",
+          "source": "US news | The Guardian",
+          "date": "2026-07-26T11:09:27.000Z",
+          "summary": "The collapse of the rules-based order is not confined to the land: we’re imperilled as centuries of maritime cooperation sink beneath the waves The US military campaign to protect merchant shipping from Iranian attacks by asserting direct maritime control in the strait of Hormuz is not an idea uniqu"
+        },
+        {
+          "title": "How do we defeat authoritarianism? By building a sense of belonging | Julie Fernandes and Katrina Gamble",
+          "link": "https://www.theguardian.com/commentisfree/2026/jul/26/how-to-defeat-authoritarianism-building-community",
+          "source": "US news | The Guardian",
+          "date": "2026-07-26T11:00:12.000Z",
+          "summary": "Eighty-five million Americans are disaffected and less likely to vote, our survey found. Our democratic revival depends on a sense of community Our country is at a crossroads between democracy and authoritarianism. And the only antidote is an organized, engaged citizenry. But at this critical moment"
+        },
+        {
+          "title": "He’s a doctor and a progressive. Will he win a key US Senate race in Michigan?",
+          "link": "https://www.theguardian.com/us-news/ng-interactive/2026/jul/26/abdul-el-sayed-michigan-senate",
+          "source": "US news | The Guardian",
+          "date": "2026-07-26T11:00:11.000Z",
+          "summary": "Abdul El-Sayed may be buoyed by a younger, anti-establishment coalition as he runs against an establishment candidate Abdul El-Sayed spends a fair amount of his day not taking himself so seriously. He jokes about his haircut, films selfie videos with supporters and has taken – more than once – to cr"
+        },
+        {
+          "title": "RFK Jr urges Alzheimer’s screening but blunts key panel that could drive research",
+          "link": "https://www.theguardian.com/us-news/2026/jul/26/rfk-jr-alzheimers-us-preventive-services-task-force",
+          "source": "US news | The Guardian",
+          "date": "2026-07-26T11:00:10.000Z",
+          "summary": "Experts say evidence for cognitive screening desired by health secretary ‘not great’ as taskforce idle since last year The US health secretary, Robert F Kennedy Jr, has called for better Alzheimer’s screening – but a critical federal panel that might have helped researchers find practical ways to do"
+        },
+        {
+          "title": "Republicans head home for the summer after a string of losses in Congress",
+          "link": "https://www.theguardian.com/us-news/2026/jul/26/house-republicans-democrats-recess-midterms",
+          "source": "US news | The Guardian",
+          "date": "2026-07-26T10:00:09.000Z",
+          "summary": "GOP legislative priorities could be at odds with voters as midterms come into view and Democrats attempt a resurgence When the chief Republican budget writer took to the floor of the House of Representatives this week to tout a plan to spend tens of billions of dollars on the war with Iran, he avoid"
+        },
+        {
+          "title": "‘We’re human beings’: Haitians in the US fear family separation and deportation to violence",
+          "link": "https://www.theguardian.com/us-news/2026/jul/26/haitians-temporary-protected-status",
+          "source": "US news | The Guardian",
+          "date": "2026-07-26T10:00:08.000Z",
+          "summary": "More than 330,000 Haitian immigrants in limbo as Trump administration seeks to end temporary protected status More than 330,000 Haitian immigrants in the US are set to lose their ability to legally live and work in the country as the Trump administration seeks to terminate their temporary protected "
+        },
+        {
+          "title": "Andy Burnham says he will disagree with Trump in public if necessary",
+          "link": "https://www.theguardian.com/politics/2026/jul/26/andy-burnham-interview-bbc-donald-trump-wes-streeting",
+          "source": "US news | The Guardian",
+          "date": "2026-07-26T09:13:35.000Z",
+          "summary": "PM promises to ‘defend national interest before anything else’ in first big broadcast interview since entering No 10 Andy Burnham has promised to disagree with Donald Trump if necessary, including in public, in his first big broadcast interview since becoming prime minister. Burnham’s comments came "
+        },
+        {
+          "title": "Meet the robots programmed by kids to speak their Indigenous languages",
+          "link": "https://www.npr.org/2026/07/26/nx-s1-5825798/robot-speaks-endangered-native-american-languages",
+          "source": "NPR Topics: National",
+          "date": "2026-07-26T09:00:00.000Z",
+          "summary": "Many Native American languages are endangered. With the help of his mentor, a 12-year-old in Michigan hopes to help preserve his language through robotics."
+        },
+        {
+          "title": "Climate change is now threatening a pillar of childhood: summer break",
+          "link": "https://www.npr.org/2026/07/26/nx-s1-5900911/wildfire-smoke-fires-camp-minnesota",
+          "source": "NPR Topics: National",
+          "date": "2026-07-26T09:00:00.000Z",
+          "summary": "When summer rolls around, many parents scramble to sign up their young kids for outdoor activities. But what do you do when extreme heat and wildfire smoke increasingly make the outdoors dangerous?"
+        },
+        {
+          "title": "San Francisco 49ers coach Kyle Shanahan to be limited in camp after serious car crash",
+          "link": "https://www.theguardian.com/sport/2026/jul/25/49ers-kyle-shanahan-concussion-car-crash-training-camp",
+          "source": "US news | The Guardian",
+          "date": "2026-07-25T21:14:26.000Z",
+          "summary": "Shanahan suffered concussion in 14 July crash Assistant Chris Foerster to lead practices Team expects coach back before opener San Francisco 49ers coach Kyle Shanahan suffered a concussion and other injuries in a car crash earlier this month that will limit his participation at the start of training"
+        },
+        {
+          "title": "Wildfire alert in the Western U.S. reaches its highest level",
+          "link": "https://www.npr.org/2026/07/25/nx-s1-5905334/wildfire-alert-in-the-western-u-s-reaches-its-highest-level",
+          "source": "NPR Topics: National",
+          "date": "2026-07-25T21:04:07.000Z",
+          "summary": "Wildfires have now scorched four million acres of land in the U.S. Federal fire managers say all of the country's resources are currently deployed to major fires."
+        }
+      ]
+    },
+    "world": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "items": [
+        {
+          "title": "Lando Norris wins Hungarian Grand Prix for first F1 triumph in 2026",
+          "link": "https://www.aljazeera.com/sports/2026/7/26/lando-norris-wins-hungarian-grand-prix-for-first-f1-triumph-in-2026?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T15:04:12.000Z",
+          "summary": "Defending champion Norris wins his first race of the year as Verstappen finishes second, and leader Antonelli third."
+        },
+        {
+          "title": "More than 360,000 evacuated as wildfires rage in France and Spain",
+          "link": "https://www.aljazeera.com/news/2026/7/26/more-than-360000-evacuated-as-wildfires-rage-in-france-and-spain?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T14:49:41.000Z",
+          "summary": "French and Spanish authorities are struggling to contain the blazes, which are partly caused by successive heatwaves."
+        },
+        {
+          "title": "Israel carries out double tap strike in central Gaza",
+          "link": "https://www.aljazeera.com/video/newsfeed/2026/7/26/israel-carries-out-double-tap-strike-in-central-gaza?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T14:47:02.000Z",
+          "summary": "Israel carries out double tap strike in central Gaza"
+        },
+        {
+          "title": "Tunisia grapples with five years of crisis since Saied’s power grab",
+          "link": "https://www.aljazeera.com/economy/2026/7/26/tunisia-grapples-with-five-years-of-crisis-since-saieds-power-grab?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T14:39:30.000Z",
+          "summary": "Tunisians protest five years of President Kais Saied's rule amid economic crisis and political arrests."
+        },
+        {
+          "title": "Senegal’s Faye launches a new party, formalising his split with Sonko",
+          "link": "https://www.aljazeera.com/news/2026/7/26/senegals-faye-launches-a-new-party-formalising-his-split-with-sonko?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T14:22:03.000Z",
+          "summary": "Months of tensions between president and ex-ally culminate in split that will reshape Senegal's political landscape."
+        },
+        {
+          "title": "Controversial Argentina World Cup banner gets new life in print",
+          "link": "https://www.aljazeera.com/video/newsfeed/2026/7/26/controversial-argentina-world-cup-banner-gets-new-life-in-print?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T14:05:03.000Z",
+          "summary": "A workshop in Buenos Aires is offering fans free prints of ‘The Malvinas are Argentine’, recreating the divisive banner"
+        },
+        {
+          "title": "Israel and the cost paradox of the Iran war",
+          "link": "https://www.aljazeera.com/opinions/2026/7/26/israel-and-the-cost-paradox-of-the-iran-war?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T14:04:39.000Z",
+          "summary": "Israel instigated the war on Iran and yet it has borne few of its costs."
+        },
+        {
+          "title": "Israeli air strike on a vehicle in Gaza kills two Hamas security officials",
+          "link": "https://www.aljazeera.com/news/2026/7/26/israeli-air-strike-on-a-vehicle-in-gaza-kills-two-hamas-security-officials?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T13:51:53.000Z",
+          "summary": "The head of internal security for Hamas in central Gaza was among the dead."
+        },
+        {
+          "title": "What we know so far about the Berlin Pride ramming attack",
+          "link": "https://www.bbc.co.uk/news/articles/cevmdxz4872o?at_medium=RSS&at_campaign=rss",
+          "source": "BBC News",
+          "date": "2026-07-26T13:40:29.000Z",
+          "summary": "A police manhunt is under way after a suspect rammed a car into a crowd at a Pride event in the German capital on Saturday night."
+        },
+        {
+          "title": "Yemen’s health workers race to halt latest outbreak of deadly dengue fever",
+          "link": "https://www.aljazeera.com/news/2026/7/26/yemens-health-workers-race-to-halt-latest-outbreak-of-deadly-dengue-fever?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T13:39:17.000Z",
+          "summary": "Health workers are battling to contain the mosquito-borne disease amid growing concern over rising infections."
+        },
+        {
+          "title": "From paradise to ‘pilot zone’ disaster: Returning to destroyed Lebanon home",
+          "link": "https://www.aljazeera.com/video/newsfeed/2026/7/26/from-paradise-to-pilot-zone-disaster-returning-to-destroyed-lebanon-home?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T13:34:45.000Z",
+          "summary": "Sumaya Yaghi returns to what's left of her destroyed home in southern Lebanon."
+        },
+        {
+          "title": "Why are Israeli settlers on a rampage in the occupied West Bank?",
+          "link": "https://www.aljazeera.com/news/2026/7/26/why-are-israeli-settlers-on-a-rampage-in-the-occupied-west-bank?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T13:31:04.000Z",
+          "summary": "Settlers torch two mosques in the Palestinian territory as Israeli PM Benjamin Netanyahu threatens 'more broad action'."
+        },
+        {
+          "title": "Langton released from hospital after concussion at Commonwealth Games",
+          "link": "https://www.aljazeera.com/sports/2026/7/26/langton-released-from-hospital-after-concussion-at-commonwealth-games?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T13:30:32.000Z",
+          "summary": "British gymnast Gabriel Langton admitted after headfirst crash off horizontal bar."
+        },
+        {
+          "title": "‘New education minister can’t bring my dead daughter back’",
+          "link": "https://www.aljazeera.com/video/newsfeed/2026/7/26/new-education-minister-cant-bring-my-dead-daughter?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T13:26:17.000Z",
+          "summary": "Parents of students who died by suicide following a paper leak in India say nothing can bring their loved ones back."
+        },
+        {
+          "title": "What next for India’s ‘Cockroach’ movement after education minister sacked",
+          "link": "https://www.aljazeera.com/news/2026/7/26/what-next-for-indias-cockroach-movement-after-education-minister-sacked?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T13:15:01.000Z",
+          "summary": "The weeks-long Gen Z-led protests forced a key Modi minister to resign. Where does the movement go from here?"
+        },
+        {
+          "title": "Breakfasts around the world: Syrnyky, or curd-chees hotcakes in Ukraine",
+          "link": "https://www.npr.org/2026/07/26/nx-s1-5890876/breakfasts-around-the-world-syrnyky-or-curd-chees-hotcakes-in-ukraine",
+          "source": "NPR Topics: World",
+          "date": "2026-07-26T12:50:50.000Z",
+          "summary": "Everyone in Ukraine has a story about syrnyki, the tangy, curd-cheese pancakes that have been a breakfast staple for hundreds of years."
+        },
+        {
+          "title": "Eighteen people missing in South China Sea after Vietnamese ship sank",
+          "link": "https://www.aljazeera.com/news/2026/7/26/eighteen-people-missing-in-south-china-sea-after-vietnamese-ship-sank?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T12:50:26.000Z",
+          "summary": "There were 62 people aboard the vessel when it sank, all of them Vietnamese nationals."
+        },
+        {
+          "title": "President Ahmed al-Sharaa: Syria seeking security deal with Israel",
+          "link": "https://www.aljazeera.com/news/2026/7/26/president-ahmed-al-sharaa-syria-seeking-security-deal-with-israel?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T12:34:13.000Z",
+          "summary": "Syrian President al-Sharaa tells Al Jazeera Damascus seeks a security deal with Israel, and warns of chaos in Lebanon."
+        },
+        {
+          "title": "What is the AI Kill Switch Act proposed in the US and how will it work?",
+          "link": "https://www.aljazeera.com/news/2026/7/26/what-is-the-ai-kill-switch-act-proposed-in-the-us-and-how-will-it-work?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T12:30:28.000Z",
+          "summary": "US lawmakers introduce a bill aimed at giving the government power to order companies to shut down 'rogue' AI systems."
+        },
+        {
+          "title": "Casemiro makes Inter Miami debut despite MLS investigation into transfer",
+          "link": "https://www.aljazeera.com/sports/2026/7/26/casemiro-makes-inter-miami-debut-despite-mls-investigation-into-transfer?traffic_source=rss",
+          "source": "Al Jazeera – Breaking News, World News and Video from Al Jazeera",
+          "date": "2026-07-26T12:20:19.000Z",
+          "summary": "Casemiro plays, Messi sits out during his post-World Cup rest, and Suarez scores to give Miami a sixth straight MLS win."
+        }
+      ]
+    },
+    "conflict": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "items": [
+        {
+          "title": "‘Game of Thrones’ as Ukraine’s president, defense minister split",
+          "link": "https://www.defenseone.com/threats/2026/07/game-thrones-ukraines-president-defense-minister-split/415009/",
+          "source": "Defense One - All Content",
+          "date": "2026-07-25T22:34:44.000Z",
+          "summary": "The largest government crisis since 2022 shows Ukrainian reform and democracy efforts are as rough and uneven as democracy itself."
+        },
+        {
+          "title": "As drones take over, ejection-seat makers prepare for a pilotless battlefield",
+          "link": "https://www.defenseone.com/threats/2026/07/ejection-seat-unmanned-aircraft/415008/",
+          "source": "Defense One - All Content",
+          "date": "2026-07-24T23:07:46.000Z",
+          "summary": "Martin-Baker is reaching out to drone companies: \"How can we help?\""
+        },
+        {
+          "title": "Global Risks Heating Up",
+          "link": "https://warontherocks.com/global-risks-heating-up/",
+          "source": "War on the Rocks",
+          "date": "2026-07-24T17:45:02.000Z",
+          "summary": "Welcome to The Adversarial. Every other week, we’ll provide you with expert analysis on America’s greatest challengers: China, Russia, Iran, North Korea, and jihadists. Read more below.***IranThe U.S.-Iranian ceasefire agreed in April began deteriorating — and the Memorandum of Understanding signed "
+        },
+        {
+          "title": "Before a Cyber Force, Fix Cyber Governance",
+          "link": "https://warontherocks.com/before-a-cyber-force-fix-cyber-governance/",
+          "source": "War on the Rocks",
+          "date": "2026-07-24T07:30:15.000Z",
+          "summary": "Let’s not start picking out uniforms just yet. The chorus calling for a Cyber Force continues to grow by the day, but the debate has its priorities backward. In June, an amendment from Sen. Kirsten Gillibrand (D-NY) calling for the creation of a cyber service within the Department of the Army failed"
+        },
+        {
+          "title": "The German navy can’t get enough P-8 patrol aircraft",
+          "link": "https://www.defenseone.com/business/2026/07/german-navy-cant-get-enough-p-8-patrol-aircraft/414988/",
+          "source": "Defense One - All Content",
+          "date": "2026-07-24T07:19:34.000Z",
+          "summary": "The service is building out its ability to track Russian naval activity in the High North."
+        },
+        {
+          "title": "Chaotic Progress: European NATO’s Quest for Stronger Defense",
+          "link": "https://warontherocks.com/chaotic-progress-european-natos-quest-for-stronger-defense/",
+          "source": "War on the Rocks",
+          "date": "2026-07-23T20:00:19.000Z",
+          "summary": "In 2024, Max Bergmann wrote, “NATO Missed a Chance to Transform Itself,” where he argued NATO’s leadership needs to facilitate a strong European pillar of the alliance through structural reforms in European institutions. Two years later, we asked Max to revisit his arguments.Image: The White House v"
+        },
+        {
+          "title": "Selective Service System seeks software to aid the military draft",
+          "link": "https://www.defenseone.com/defense-systems/2026/07/selective-service-system-seeks-software-aid-draft/414974/",
+          "source": "Defense One - All Content",
+          "date": "2026-07-23T18:00:00.000Z",
+          "summary": "The independent agency wants better tools to evaluate staffing and resource requirements."
+        },
+        {
+          "title": "Unions ask for injunction restoring collective bargaining at Defense",
+          "link": "https://www.defenseone.com/policy/2026/07/unions-ask-injunction-restoring-collective-bargaining-defense/414965/",
+          "source": "Defense One - All Content",
+          "date": "2026-07-23T16:00:00.000Z",
+          "summary": "The latest filing says Pentagon strayed from the Trump administration’s own guidance for implementing an executive order banning collective bargaining at most agencies."
+        },
+        {
+          "title": "America Needs an Off-Ramp Between Doing Nothing and Shutting AI Down",
+          "link": "https://warontherocks.com/cogs-of-war/america-needs-an-off-ramp-between-doing-nothing-and-shutting-ai-down/",
+          "source": "War on the Rocks",
+          "date": "2026-07-23T08:00:26.000Z",
+          "summary": "For 18 days in June, two of America’s most capable AI models went dark worldwide, not for technical or business reasons, but because the U.S. government ordered it. On June 12, 2026, the Commerce Department informed Anthropic that its Fable 5 and Mythos 5 models could no longer be provided to any fo"
+        },
+        {
+          "title": "The King of Cool: Mobile Refrigeration and the Remaking of Global Logistics",
+          "link": "https://warontherocks.com/cogs-of-war/the-king-of-cool-mobile-refrigeration-and-the-remaking-of-global-logistics/",
+          "source": "War on the Rocks",
+          "date": "2026-07-23T07:45:53.000Z",
+          "summary": "Editor’s note: This is the fifth article in a limited series celebrating American defense technologies born from wartime and their effects on broader national security, politics, and society. This series will run for several weeks to commemorate America’s 250th anniversary, and winners will be selec"
+        },
+        {
+          "title": "The Importance of the Invasion of Sicily",
+          "link": "https://warontherocks.com/the-importance-of-the-invasion-of-sicily/",
+          "source": "War on the Rocks",
+          "date": "2026-07-23T07:30:48.000Z",
+          "summary": "On July 10, 1943, the Allied invasion of Sicily — codenamed Operation Husky — put more assault troops ashore on its first day than the Normandy landings would 11 months later. Despite the scale of these amphibious and vertical assaults on the Mediterranean’s largest island, the images most carry of "
+        },
+        {
+          "title": "Hegseth’s conflicting statements, evasions drain lawmakers’ patience, support",
+          "link": "https://www.defenseone.com/policy/2026/07/hegseths-conflicting-statements-evasions-drain-lawmakers-patience-support/414955/",
+          "source": "Defense One - All Content",
+          "date": "2026-07-23T00:50:25.000Z",
+          "summary": "As public opinion on Trump’s Iran war collapses, senators express growing frustration at shifting White House rationales, missing strategy."
+        },
+        {
+          "title": "Defense Business Brief: Dispatch from Farnborough ",
+          "link": "https://www.defenseone.com/business/2026/07/defense-business-brief-dispatch-farnborough/414954/",
+          "source": "Defense One - All Content",
+          "date": "2026-07-23T00:44:15.000Z",
+          "summary": ""
+        },
+        {
+          "title": "The antifa terrorism threat the Trump administration describes does not exist",
+          "link": "https://www.defenseone.com/ideas/2026/07/antifa-terrorism-threat-trump/414953/",
+          "source": "Defense One - All Content",
+          "date": "2026-07-23T00:35:29.000Z",
+          "summary": "Focusing on it will only make Americans more vulnerable to actual threats."
+        },
+        {
+          "title": "An Australian CCA flew in a Pacific exercise. Boeing exec says it’s an important ‘first step’",
+          "link": "https://www.defenseone.com/business/2026/07/australian-cca-flew-pacific-exercise-boeing-exec-says-its-important-first-step/414951/",
+          "source": "Defense One - All Content",
+          "date": "2026-07-22T21:27:55.000Z",
+          "summary": "One Boeing CCA didn’t win the first U.S. competition, but another just joined a major exercise."
+        },
+        {
+          "title": "Lawmakers get taste of AI-enabled cyberattacks in China-Taiwan war game",
+          "link": "https://www.defenseone.com/threats/2026/07/lawmakers-get-taste-ai-enabled-cyberattacks-china-taiwan-war-game/414952/",
+          "source": "Defense One - All Content",
+          "date": "2026-07-22T21:00:00.000Z",
+          "summary": "Representatives weighed responses to simulated Chinese cyberattacks on U.S. infrastructure during a tabletop exercise hosted by CSIS."
+        },
+        {
+          "title": "Total War on Taipei: China Explores Elevating Cognitive Effects into Its Vision of Warfare",
+          "link": "https://warontherocks.com/total-war-on-taipei-china-explores-elevating-cognitive-effects-into-its-vision-of-warfare/",
+          "source": "War on the Rocks",
+          "date": "2026-07-22T07:30:49.000Z",
+          "summary": "In March 2025, China’s military researchers published a concept describing how to rapidly capture and subdue the city of Taipei. Distributed in restricted military channels, this approach argues Beijing can achieve victory “by blocking the city’s ability to receive external assistance, restricting i"
+        },
+        {
+          "title": "Canada’s GCAP decision is about relationships, not the F-35",
+          "link": "https://www.defenseone.com/ideas/2026/07/canada-gcap-f-35-relationship/414928/",
+          "source": "Defense One - All Content",
+          "date": "2026-07-22T02:25:32.000Z",
+          "summary": "On Monday, the defense minister echoed a call for increased cooperation among middle powers."
+        },
+        {
+          "title": "Spies are targeting US AI labs, experts warn Congress",
+          "link": "https://www.defenseone.com/threats/2026/07/ai-labs-spies/414929/",
+          "source": "Defense One - All Content",
+          "date": "2026-07-22T00:00:00.000Z",
+          "summary": "Former officials told the House Intelligence Committee that U.S. agencies have not kept pace with China’s efforts to steal technology."
+        },
+        {
+          "title": "Boeing adjusts approach to court more European business",
+          "link": "https://www.defenseone.com/business/2026/07/boeing-adjusts-approach-court-more-european-business/414916/",
+          "source": "Defense One - All Content",
+          "date": "2026-07-21T20:53:25.000Z",
+          "summary": "Growing international workforce, manufacturing and assembly come into focus as the aerospace giant pitches platforms abroad."
+        }
+      ]
+    },
+    "business": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "items": [
+        {
+          "title": "We have $8 million in traditional IRAs. Should we tap them to buy a house — and take the tax hit?",
+          "link": "https://www.marketwatch.com/story/we-have-8-million-in-traditional-iras-should-we-tap-them-to-buy-a-house-and-take-the-tax-hit-c2478daa?mod=mw_rss_topstories",
+          "source": "MarketWatch.com - Top Stories",
+          "date": "2026-07-26T15:00:00.000Z",
+          "summary": "“We would rather pay taxes upfront than pay mortgage interest.”"
+        },
+        {
+          "title": "Ukraine strikes Iranian vessels in Caspian Sea, Tehran accuses Kyiv of 'hostile and criminal act'",
+          "link": "https://www.cnbc.com/2026/07/26/ukraine-strikes-iranian-vessels-tehran-accuses-kyiv-of-hostile-act.html",
+          "source": "US Top News and Analysis",
+          "date": "2026-07-26T14:50:20.000Z",
+          "summary": "The latest attacks by Ukraine, combined with Saudi military strikes on Iran-backed Houthi targets in Yemen, represent a widening of the Middle East conflict."
+        },
+        {
+          "title": "For Gen X investors, dotcom bubble haunts stock market portfolios closing in on retirement ",
+          "link": "https://www.cnbc.com/2026/07/26/gen-x-investors-dotcom-bubble-retirement-portfolio.html",
+          "source": "US Top News and Analysis",
+          "date": "2026-07-26T14:44:29.000Z",
+          "summary": "Many Americans in the 50-55 age range have 10 to 15 work years left, extending 401(k), IRA growth investing, but they can't afford an ill-timed market crash."
+        },
+        {
+          "title": "Inside the S&P 500 AI boom, industrials are getting as rich as tech stocks",
+          "link": "https://www.cnbc.com/2026/07/26/best-ai-stocks-market-sp500.html",
+          "source": "US Top News and Analysis",
+          "date": "2026-07-26T14:12:20.000Z",
+          "summary": "The industrials sector of the stock market is benefitting from the AI infrastructure boom with its P/E ratio up close to tech levels and investor flows strong."
+        },
+        {
+          "title": "How AI wealth could be distributed to all Americans",
+          "link": "https://www.cnbc.com/2026/07/26/how-can-ai-wealth-be-shared-with-all-americans.html",
+          "source": "US Top News and Analysis",
+          "date": "2026-07-26T14:06:53.000Z",
+          "summary": "AI riches are already concentrated among a handful of powerful companies, but there are plenty of new, some radical, ideas about how to spread the wealth."
+        },
+        {
+          "title": "The S&P 500’s earnings growth has gone bonkers thanks to one company",
+          "link": "https://www.marketwatch.com/story/the-s-p-500s-earnings-growth-has-gone-bonkers-thanks-to-one-company-1c45b2ba?mod=mw_rss_topstories",
+          "source": "MarketWatch.com - Top Stories",
+          "date": "2026-07-26T14:00:00.000Z",
+          "summary": "Markets are gearing up for the busiest week of second-quarter earnings season."
+        },
+        {
+          "title": "Some high-earning investors will soon owe taxes on years of deferred capital gains",
+          "link": "https://www.cnbc.com/2026/07/26/opportunity-zone-investors-face-deferred-capital-gains-tax-bill.html",
+          "source": "US Top News and Analysis",
+          "date": "2026-07-26T13:30:02.000Z",
+          "summary": "A key incentive in place for current Opportunity Zone investors — deferring taxation of reinvested capital gains — will end on Dec. 31."
+        },
+        {
+          "title": "4 generations, 6 different visions of the American Dream: 'I'm optimistic because of our resilience'",
+          "link": "https://www.cnbc.com/2026/07/26/how-different-generations-are-rewriting-the-american-dream-today.html",
+          "source": "US Top News and Analysis",
+          "date": "2026-07-26T13:30:02.000Z",
+          "summary": "CNBC Make It asked notable voices in politics, finance and relationships on what it takes to achieve happiness and success in America today."
+        },
+        {
+          "title": "‘We are not romantically involved’: I’m marrying my platonic best friend of 20 years. Should I leave him my home?",
+          "link": "https://www.marketwatch.com/story/we-are-not-romantically-involved-im-marrying-my-platonic-best-friend-of-20-years-should-i-leave-him-my-home-3faa0a77?mod=mw_rss_topstories",
+          "source": "MarketWatch.com - Top Stories",
+          "date": "2026-07-26T13:00:00.000Z",
+          "summary": "“I own my home outright, have no children or other dependents.”"
+        },
+        {
+          "title": "There’s a technical ‘triple threat’ for stocks, but also places investors can hide",
+          "link": "https://www.marketwatch.com/story/theres-a-technical-triple-threat-for-stocks-but-also-places-investors-can-hide-59108c6b?mod=mw_rss_topstories",
+          "source": "MarketWatch.com - Top Stories",
+          "date": "2026-07-26T13:00:00.000Z",
+          "summary": "Treasury yields and oil prices surged, and the dollar confirmed the breakout toward a longer-term uptrend, to push the S&P 500 below key chart support."
+        },
+        {
+          "title": "I will definitely claim Social Security early. Why do so few people talk about the elephant in the room?",
+          "link": "https://www.marketwatch.com/story/i-will-claim-social-security-early-why-do-so-few-people-talk-about-the-elephant-in-the-room-64820675?mod=mw_rss_topstories",
+          "source": "MarketWatch.com - Top Stories",
+          "date": "2026-07-26T12:30:00.000Z",
+          "summary": "“The strongest argument for claiming benefits earlier goes beyond the traditional break-even analyses.”"
+        },
+        {
+          "title": "The Treasury market is sending Fed Chair Kevin Warsh a clear warning about rates",
+          "link": "https://www.marketwatch.com/story/the-treasury-market-is-sending-fed-chair-kevin-warsh-a-clear-warning-about-rates-d0026da9?mod=mw_rss_topstories",
+          "source": "MarketWatch.com - Top Stories",
+          "date": "2026-07-26T12:30:00.000Z",
+          "summary": "Rising Treasury yields show how “enormously worried” the market is about inflation — and whether the Fed will back up its tough talk with action"
+        },
+        {
+          "title": "New UK Prime Minister Burnham says he would be prepared to call out Trump",
+          "link": "https://www.cnbc.com/2026/07/26/new-uk-prime-minister-burnham-says-he-would-be-prepared-to-call-out-trump.html",
+          "source": "US Top News and Analysis",
+          "date": "2026-07-26T12:17:14.000Z",
+          "summary": "Burnham said he had a phone conversation with Trump on Monday when he officially took on the role, describing it as \"a good exchange\"."
+        },
+        {
+          "title": "100 days until midterm election: DCCC Chair DelBene says Democrats have the momentum",
+          "link": "https://www.cnbc.com/2026/07/26/election-midterms-dccc-chair-delbene-democrats.html",
+          "source": "US Top News and Analysis",
+          "date": "2026-07-26T12:00:01.000Z",
+          "summary": "Democrats see a path back to the U.S. House majority this November as President Donald Trump's approval dips."
+        },
+        {
+          "title": "‘I’m still confused’: I sold $80,000 in shares on June 30, so why didn’t I receive my dividend?",
+          "link": "https://www.marketwatch.com/story/im-still-confused-i-sold-80-000-in-shares-on-june-30-so-why-didnt-i-receive-my-dividend-d066016c?mod=mw_rss_topstories",
+          "source": "MarketWatch.com - Top Stories",
+          "date": "2026-07-26T12:00:00.000Z",
+          "summary": "“To my surprise, the proceeds from the sale were credited to my money-market settlement fund.”"
+        },
+        {
+          "title": "Oil prices are climbing again. Here's why this time could be different",
+          "link": "https://www.npr.org/2026/07/26/nx-s1-5905738/oil-prices-are-climbing-again-heres-why-this-time-could-be-different",
+          "source": "NPR Topics: Business",
+          "date": "2026-07-26T11:58:31.000Z",
+          "summary": "Oil prices surpassed $100 a barrel last week. NPR's Ayesha Rascoe speaks to Bob McNally, founder of the research firm Rapidan Energy Group, about how the Iran war is disrupting oil supplies."
+        },
+        {
+          "title": "Top Wall Street analysts back these 3 stocks for their long-term growth potential",
+          "link": "https://www.cnbc.com/2026/07/26/top-analysts-back-these-3-stocks-for-their-long-term-growth-potential.html",
+          "source": "US Top News and Analysis",
+          "date": "2026-07-26T11:33:11.000Z",
+          "summary": "Investors with a long-term horizon should look beyond the ongoing noise and focus on stocks that are well-positioned to generate strong returns."
+        },
+        {
+          "title": "‘Time will tell whether that was a good bet’: My adviser got me a full SpaceX IPO allocation. Was I lucky?",
+          "link": "https://www.marketwatch.com/story/time-will-tell-whether-that-was-a-good-bet-my-adviser-got-me-a-full-spacex-ipo-allocation-was-i-lucky-7f319645?mod=mw_rss_topstories",
+          "source": "MarketWatch.com - Top Stories",
+          "date": "2026-07-26T11:00:00.000Z",
+          "summary": "“Investors frequently receive only a small fraction of the shares they request — if they receive any at all.”"
+        },
+        {
+          "title": "Rage-giving, innovation and cuts: How public media has survived without federal funds",
+          "link": "https://www.npr.org/2026/07/26/nx-s1-5884022/pbs-npr-public-radio-tv-funding-trump",
+          "source": "NPR Topics: Business",
+          "date": "2026-07-26T10:00:00.000Z",
+          "summary": "A year after President Trump signed a law ending six decades of federal funding of public media, it's a time of reinvention, innovation and clear anxiety at public tv and radio stations nationwide."
+        },
+        {
+          "title": "Cocoa prices are easing. So why is chocolate still so expensive?",
+          "link": "https://www.cnbc.com/2026/07/26/cocoa-prices-chocolate-lindt-barry-callebaut-nestle.html",
+          "source": "US Top News and Analysis",
+          "date": "2026-07-26T05:00:01.000Z",
+          "summary": "Chocolate firms look to win shoppers back with premium products and social media trends after poor weather conditions, tariffs, and the Iran war hit sales."
+        }
+      ]
+    },
+    "science": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "items": [
+        {
+          "title": "The best way to save giant sequoias may be more fire",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260726015243.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-26T13:18:59.000Z",
+          "summary": "Giant sequoias are built to withstand ordinary fires, but recent extreme wildfires killed thousands of trees that had survived for centuries or even millennia. A new analysis of about 26,400 sequoias found that trees in areas treated with prescribed burns were nearly four times more likely to surviv"
+        },
+        {
+          "title": "Your AI calorie-tracking app may be off by 345 calories",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260726015237.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-26T13:06:15.000Z",
+          "summary": "Popular AI-powered food apps may make calorie counting easier, but they may also leave out a surprisingly large part of the meal. Four apps underestimated calories and fat by about one-third when tested against carefully prepared meals. High-fat ketogenic dishes appeared to cause the most trouble, w"
+        },
+        {
+          "title": "CRISPR makes prostate cancer vulnerable to immunotherapy",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260726015250.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-26T12:36:23.000Z",
+          "summary": "Scientists used CRISPR to make prostate cancer cells easier for the immune system to detect and destroy. The experimental treatment dramatically improved the effects of immunotherapy in mice and may offer hope for other hard-to-treat tumors."
+        },
+        {
+          "title": "Why losing the wrong fat can trigger diabetes",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260726015259.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-26T11:43:14.000Z",
+          "summary": "Scientists discovered that damaged fat cells can become inflamed, lose their ability to store lipids, and eventually vanish, disrupting the body’s metabolism. The findings show that diabetes can result not only from excess fat, but also from losing the healthy fat tissue the body needs."
+        },
+        {
+          "title": "A hidden Alzheimer’s tipping point may decide who gets dementia",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260726015257.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-26T10:14:57.000Z",
+          "summary": "Scientists have identified a possible tipping point that helps determine whether Alzheimer’s-related brain changes lead to dementia. The key may lie in how the brain’s immune cells respond to plaques and tau, offering a promising new target for treatments designed to extend cognitive resilience."
+        },
+        {
+          "title": "Climate change is now threatening a pillar of childhood: summer break",
+          "link": "https://www.npr.org/2026/07/26/nx-s1-5900911/wildfire-smoke-fires-camp-minnesota",
+          "source": "NPR Topics: Science",
+          "date": "2026-07-26T09:00:00.000Z",
+          "summary": "When summer rolls around, many parents scramble to sign up their young kids for outdoor activities. But what do you do when extreme heat and wildfire smoke increasingly make the outdoors dangerous?"
+        },
+        {
+          "title": "Inside the Backrooms: The internet’s creepiest place is becoming a tourist attraction",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260726015254.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-26T08:16:35.000Z",
+          "summary": "The Backrooms began as a single eerie image of empty yellow rooms, but internet users transformed it into a vast fictional world that feels disturbingly real. Through videos, games, maps, survival guides and social media stories, audiences do more than watch the horror unfold. They help build and ex"
+        },
+        {
+          "title": "Hidden genetic diversity helped inbred brown tree snakes conquer guam",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260726015236.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-26T07:15:38.000Z",
+          "summary": "A notorious snake invasion that devastated Guam’s native birds may have succeeded because the reptiles carried hidden genetic advantages. Using advanced long-read DNA sequencing, researchers uncovered more than 19,000 large genetic differences in brown tree snakes, many concentrated in genes tied to"
+        },
+        {
+          "title": "Scientists trace the shocking origin of human eyes to an ancient “cyclops”",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260725105554.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-26T05:10:29.000Z",
+          "summary": "Researchers say a tiny one-eyed ancestor that lived nearly 600 million years ago may have shaped the evolution of every vertebrate eye, including our own. They also found that its ancient median eye lives on today as the pineal gland, which helps synchronize our sleep with daylight."
+        },
+        {
+          "title": "SpaceX eyes tower catch for next Starship after auspicious end to 13th flight",
+          "link": "https://arstechnica.com/space/2026/07/spacex-eyes-tower-catch-for-next-starship-after-auspicious-end-to-13th-flight/",
+          "source": "Science - Ars Technica",
+          "date": "2026-07-25T17:47:22.000Z",
+          "summary": "SpaceX will likely attempt to catch Starship back at the launch pad on its next flight."
+        },
+        {
+          "title": "A single dose reversed autism-like symptoms in adult mice within hours",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260724061436.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-25T15:09:37.000Z",
+          "summary": "Even mild inflammation during pregnancy led mouse offspring to develop persistent brain overactivity, sensory sensitivity, repetitive behaviors, and increased seizure risk. Remarkably, one dose of rapamycin improved nearly all of these problems within about two hours. The benefits were temporary, bu"
+        },
+        {
+          "title": "Superagers keep youthful memories but their DNA does not explain why",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260723084045.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-25T14:41:54.000Z",
+          "summary": "Scientists expected SuperAgers might simply inherit fewer Alzheimer’s-related risks, but their genes looked much like those of typical older adults. Their extraordinary memories may instead come from still-unknown protective forces involving the brain, body, lifestyle, and environment."
+        },
+        {
+          "title": "Scientists put the “recycling is a distraction” claim to the test",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260724061437.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-25T14:00:35.000Z",
+          "summary": "Recycling, greener diets, and other personal climate choices do not seem to distract people from supporting major environmental reforms. A four-year study of nearly 2,800 Australians found that these habits neither increased nor reduced later political engagement."
+        },
+        {
+          "title": "The Universe can outrun light without breaking Einstein’s rules",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260724061444.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-25T13:17:03.000Z",
+          "summary": "Cosmic expansion allows distant galaxies to move away faster than light, while still letting us see ancient light they emitted when they were much closer. Eventually, accelerating expansion will push nearly every galaxy beyond our Local Group out of sight, making the Universe appear almost empty."
+        },
+        {
+          "title": "Oral GLP-1 drugs may quiet the brain’s food craving circuit",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260724061439.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-25T11:34:04.000Z",
+          "summary": "Newer oral drugs related to semaglutide medications such as Ozempic reduced pleasure-driven eating in mice by quieting a deep brain reward circuit. The finding could open new avenues for understanding food cravings and potentially treating substance use disorder."
+        },
+        {
+          "title": "With help from data, art museums are reframing the visitor experience",
+          "link": "https://arstechnica.com/culture/2026/07/with-help-from-data-art-museums-are-reframing-the-visitor-experience/",
+          "source": "Science - Ars Technica",
+          "date": "2026-07-25T11:00:32.000Z",
+          "summary": "Museums are embracing data-driven curation and a shifting technology landscape."
+        },
+        {
+          "title": "A daily fiber supplement reduced knee arthritis pain and improved strength",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260724061448.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-25T10:01:05.000Z",
+          "summary": "A prebiotic fiber supplement reduced knee osteoarthritis pain while also improving grip strength and pain sensitivity in a six-week trial. The results hint at a fascinating gut-muscle-pain connection and suggest that a simple daily supplement may be easier to maintain than digital physiotherapy."
+        },
+        {
+          "title": "Venus may be tearing itself apart from within",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260724061434.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-25T03:19:19.000Z",
+          "summary": "Scientists have uncovered new evidence that Venus may still be tearing itself apart from within. Advanced 3D simulations indicate that some of the planet's giant rift valleys formed relatively recently and could still be expanding. The results suggest Venus has a far more active interior than resear"
+        },
+        {
+          "title": "Scientists discover the Sun contains 55% more silver than expected",
+          "link": "https://www.sciencedaily.com/releases/2026/07/260723084049.htm",
+          "source": "Latest Science News -- ScienceDaily",
+          "date": "2026-07-25T01:55:27.000Z",
+          "summary": "A new analysis suggests the Sun holds far more silver than earlier estimates indicated. More advanced models of the solar atmosphere raised the calculated amount by 55 percent, bringing it into much closer agreement with ancient meteorites. The technique may also help scientists track the cosmic ori"
+        },
+        {
+          "title": "Trump officials herald a 'golden age' of science. Critics say it's a distraction",
+          "link": "https://www.npr.org/2026/07/24/nx-s1-5904455/trump-officials-herald-a-golden-age-of-science-critics-say-its-a-distraction",
+          "source": "NPR Topics: Science",
+          "date": "2026-07-24T20:25:59.000Z",
+          "summary": "White House officials say they are ushering in a new \"golden age\" of science, with changes to grantmaking and priorities like AI and quantum computing. Democrats say it masks damage to U.S. science."
+        }
+      ]
+    },
+    "health": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "items": [
+        {
+          "title": "Restricted eating hours may reduce cognitive decline in older age, researchers find",
+          "link": "https://www.theguardian.com/science/2026/jul/26/restricted-eating-hours-may-reduce-cognitive-decline-in-older-age-researchers-find",
+          "source": "Health | The Guardian",
+          "date": "2026-07-26T13:30:12.000Z",
+          "summary": "Preliminary study shows older people who avoided food four hours before bed did better in problem solving tests Confining mealtimes and snacks to a nine-hour window and avoiding food for four hours before bed may help stave off cognitive decline in older age, researchers say. A pilot study of older "
+        },
+        {
+          "title": "‘It was like something was crawling over me’ – the worrying rise of shingles among millennial women",
+          "link": "https://www.theguardian.com/society/2026/jul/26/shingles-rise-millennial-women",
+          "source": "Health | The Guardian",
+          "date": "2026-07-26T13:00:14.000Z",
+          "summary": "Stress, the cost of living, long working hours and even excessive exercise have all been touted as reasons the illness is rising among women in their 30s and 40s. What can be done to help them? The “lightning strike” pain was like nothing Francine Jones had experienced before. “That is the only way "
+        },
+        {
+          "title": "How cuts to federal agencies led to the current cyclosporiasis outbreak",
+          "link": "https://www.npr.org/2026/07/26/nx-s1-5906408/how-cuts-to-federal-agencies-led-to-the-current-cyclosporiasis-outbreak",
+          "source": "NPR Topics: Health",
+          "date": "2026-07-26T12:25:29.000Z",
+          "summary": "NPR's Ayesha Rascoe speaks with NBC health and medical news reporter Erika Edwards about the Trump Administration's cuts to federal agencies affects food safety measures."
+        },
+        {
+          "title": "Electrolyte lemonade to probiotic pop: do the new generation of ‘functional drinks’ live up to the hype?",
+          "link": "https://www.theguardian.com/lifeandstyle/2026/jul/26/ffunctional-drinks-hype-taste-test-probiotics-electrolytes-caffeine",
+          "source": "Health | The Guardian",
+          "date": "2026-07-26T11:00:11.000Z",
+          "summary": "They make grand claims about beauty benefits or extra energy – and even actor Gillian Anderson has her own brand. We investigate what they’re really doing – and put them to a taste test Show yourself some love. Fuel your focus. Life’s too good for bad energy. Find your calm in the everyday chaos. Li"
+        },
+        {
+          "title": "ADHD looks different in women and poses unique health risks",
+          "link": "https://www.npr.org/2026/07/26/nx-s1-5821101/adhd-women-health-diagnosis-missed-treatment",
+          "source": "NPR Topics: Health",
+          "date": "2026-07-26T09:00:00.000Z",
+          "summary": "For decades, ADHD was viewed as a childhood condition that mostly affected boys. Researchers now know ADHD manifests differently in girls, but many still go undiagnosed until adulthood."
+        },
+        {
+          "title": "Family of former Vodafone manager found drowned call for ‘Adrian’s law’ to protect franchisees",
+          "link": "https://www.theguardian.com/business/2026/jul/26/vodafone-adrian-howe-adrians-law-protect-franchisees",
+          "source": "Health | The Guardian",
+          "date": "2026-07-26T06:00:03.000Z",
+          "summary": "Adrian Howe’s family believe that fears his deal would be financially ruinous led him to kill himself The family of a former mobile phone store manager who was found drowned days before his new Vodafone franchise was to open its doors is pressing the government to introduce a new franchising law in "
+        },
+        {
+          "title": "Millions of people are losing weight using GLP-1s. How do the drugs affect their love lives?",
+          "link": "https://www.theguardian.com/science/2026/jul/26/glp1-drugs-weight-loss-side-effects-relationship",
+          "source": "Health | The Guardian",
+          "date": "2026-07-25T20:00:52.000Z",
+          "summary": "Prescribing doctors often warn of the medications’ potential side-effects – but unexpected impacts on romantic relationships are less understood For Jennifer, obesity was the obvious culprit for most of her problems. The litigation attorney told herself it was the reason why she wasn’t being invited"
+        },
+        {
+          "title": "Former FDA official says US handling of cyclospora near ‘catastrophic level’",
+          "link": "https://www.theguardian.com/us-news/2026/jul/25/former-trump-administration-food-safety-official-federal-response-cyclospora",
+          "source": "Health | The Guardian",
+          "date": "2026-07-25T14:04:43.000Z",
+          "summary": "Frank Yiannas calls for an independent review of the federal response to the illness causing explosive diarrhea Donald Trump’s former top food safety official has accused the administration of a near “catastrophic” mismanagement of the cyclospora outbreak that has sickened thousands of people in the"
+        },
+        {
+          "title": "COMIC: Temps are predicted to hit 106 in Egypt this week. How do people stay cool?",
+          "link": "https://www.npr.org/2026/07/25/g-s1-135194/summer-heat-egypt-cairo-air-conditioning",
+          "source": "NPR Topics: Health",
+          "date": "2026-07-25T12:05:34.000Z",
+          "summary": "Back in the '90s, I learned the art of staying cool in Egypt. At that time, air conditioning was not common. In the extremely hot summer of 2026, how are people managing?"
+        },
+        {
+          "title": "Some women who can't afford water are often pressured to provide sex for it",
+          "link": "https://www.npr.org/2026/07/25/g-s1-133450/sexual-violence-women-clean-water-nairobi-kenya",
+          "source": "NPR Topics: Health",
+          "date": "2026-07-25T11:59:19.000Z",
+          "summary": "Water is often a scarce commodity in Nairobi's largest slum. The only source may be a local cartel — and with that comes the risk of sexual threats and attacks."
+        },
+        {
+          "title": "Cancer rates are rising faster here than anywhere else. Are healthcare systems ready?",
+          "link": "https://www.npr.org/2026/07/25/g-s1-135365/cancer-breast-chemotherapy-nigeria",
+          "source": "NPR Topics: Health",
+          "date": "2026-07-25T11:51:44.000Z",
+          "summary": "As Nigeria grapples with a rapid rise in cancer cases, patients say they often feel as if they are on their own."
+        },
+        {
+          "title": "I tried so hard to become a salad eater. Now cyclospora is sending me back to burgers | Dave Schilling",
+          "link": "https://www.theguardian.com/commentisfree/2026/jul/25/i-tried-so-hard-salad-eater-cyclospora",
+          "source": "Health | The Guardian",
+          "date": "2026-07-25T11:00:41.000Z",
+          "summary": "Between the companies pushing junk food and the bacteria threatening our produce, eating right feels basically impossible While war and conflict seem to be raging across the planet, the greatest weapon of mass destruction afflicting the United States today is, apparently, a salad – in the sense that"
+        },
+        {
+          "title": "‘Ozempic face’ and hair loss: what evidence is there for weight-loss drug side-effects?",
+          "link": "https://www.theguardian.com/science/2026/jul/25/weight-loss-drug-side-effects-evidence-nausea-ozempic-face",
+          "source": "Health | The Guardian",
+          "date": "2026-07-25T07:00:36.000Z",
+          "summary": "Research into GLP-1 medications is not always robust but complaints such as digestive problems are well known Weight loss jabs such as Wegovy and Mounjaro have boomed in popularity, and so have reports of myriad side-effects. This week researchers have suggested GLP-1 medications could be associated"
+        },
+        {
+          "title": "Four types of thinker have been identified. Which one are you?",
+          "link": "https://www.theguardian.com/science/2026/jul/25/four-types-of-thinker-which-one-are-you",
+          "source": "Health | The Guardian",
+          "date": "2026-07-25T06:00:35.000Z",
+          "summary": "Investigation finds evidence of distinct groups, from big-picture thinkers to those who sweat the small stuff. Illustrations by Michael Parkin An investigation into what people think about has put the spotlight on the modern mind, revealing thoughts dominated by work, the need for coffee and a stron"
+        },
+        {
+          "title": "Judge rules FDA restrictions on mifepristone are arbitrary and capricious",
+          "link": "https://www.theguardian.com/us-news/2026/jul/24/fda-mifepristone-restrictions",
+          "source": "Health | The Guardian",
+          "date": "2026-07-24T22:00:58.000Z",
+          "summary": "Abortion medication ruled to be safe as judge orders Trump administration to consider overturning restrictions A federal judge upheld the safety of the abortion medication mifepristone and ordered the Trump administration to examine and consider overturning restrictions on the drug as barriers to ab"
+        },
+        {
+          "title": "Is strength training secretly just diet culture? – Stateside with Kai and Carter",
+          "link": "https://www.theguardian.com/us-news/video/2026/jul/24/strength-training-bulking-weight-body-image",
+          "source": "Health | The Guardian",
+          "date": "2026-07-24T20:45:23.000Z",
+          "summary": "After years of trying to be skinny, Guardian reporter Madeleine Aggeler did a 180 and decided to 'bulk'. Bulking, or gaining weight on purpose to get stronger, challenged everything she had been taught about her body, and transformed her relationship to food. Madeleine speaks to Carter Sherman about"
+        },
+        {
+          "title": "U.S. reports highest number of measles cases in 35 years",
+          "link": "https://www.npr.org/2026/07/24/nx-s1-5905694/u-s-reports-highest-number-of-measles-cases-in-35-years",
+          "source": "NPR Topics: Health",
+          "date": "2026-07-24T20:32:18.000Z",
+          "summary": "For the second year in a row, the U.S. has reported a record-breaking number of measles cases. The Centers for Disease Control and Prevention on Friday said the country has now confirmed 2,318 measles cases -- the highest case count since 1991."
+        },
+        {
+          "title": "15 years later, is the FDA's produce safety overhaul working?",
+          "link": "https://www.npr.org/2026/07/24/nx-s1-5903267-e1/15-years-later-is-the-fdas-produce-safety-overhaul-working",
+          "source": "NPR Topics: Health",
+          "date": "2026-07-24T20:26:08.000Z",
+          "summary": "Fifteen years ago, the FDA overhauled its safety rules for fruits and vegetables, hoping to prevent outbreaks of foodborne illness. How's that system working today?"
+        }
+      ]
+    },
+    "climate": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "items": [
+        {
+          "title": "Here’s how offshore wind helped New England beat record heat",
+          "link": "https://grist.org/energy/heres-how-offshore-wind-helped-new-england-beat-record-heat/",
+          "source": "Grist",
+          "date": "2026-07-26T13:00:00.000Z",
+          "summary": "The region has added dozens of turbines off the East Coast since last summer. They and other clean energy sources cut the need for oil power amid recent hot weather."
+        },
+        {
+          "title": "Firefighters in France battle to prevent huge blaze from approaching Bordeaux",
+          "link": "https://www.theguardian.com/world/2026/jul/26/firefighters-in-france-battle-to-prevent-huge-blaze-from-approaching-bordeaux",
+          "source": "Environment | The Guardian",
+          "date": "2026-07-26T12:56:30.000Z",
+          "summary": "Efforts to contain wildfire that has consumed an area of four times the size of Paris impeded by windy conditions Europe wildfires live – latest updates Authorities are battling to contain a huge wildfire near Bordeaux in south-west France that has consumed an area of land four times the size of Par"
+        },
+        {
+          "title": "‘Scandalous, irrational and irresponsible’: French beekeepers’ fury at lifting of pesticides ban",
+          "link": "https://www.theguardian.com/world/2026/jul/26/french-beekeepers-fury-lifting-of-pesticides-ban",
+          "source": "Environment | The Guardian",
+          "date": "2026-07-26T05:00:03.000Z",
+          "summary": "Allowing use of two neonicotinoids to combat crop-ruining disease will kill bees and reduce harvests, union says Beekeepers and environmentalists in France have reacted furiously after parliament approved a bill reauthorising two banned pesticides scientists say can poison bees. “There are no words "
+        },
+        {
+          "title": "Scorching US heatwave to hit 70 million people with third ‘heat dome’ in month",
+          "link": "https://www.theguardian.com/us-news/2026/jul/25/scorching-us-heat-wave",
+          "source": "Environment | The Guardian",
+          "date": "2026-07-25T18:34:53.000Z",
+          "summary": "Temperatures of 95-105F (35-40C) are expected, spanning Gulf of Mexico coast to the Great Plains and the midwest About 70 million people in the US are set to face excessive heat advisories as dangerously hot temperatures scorch much of the country’s southern and central states. The third major “heat"
+        },
+        {
+          "title": "France and Spain race to control wildfires as more than 250,000 evacuated – as it happened",
+          "link": "https://www.theguardian.com/world/live/2026/jul/25/france-spain-wildfires-latest-news-updates-madrid-cap-ferret-bordeaux-gironde",
+          "source": "Environment | The Guardian",
+          "date": "2026-07-25T17:07:36.000Z",
+          "summary": "Meanwhile, in the UK, a blaze in the Cairngorms national park has been described as ‘very serious’ by Scotland’s first minister Tell us: have you been affected by wildfires in Europe? The French prime minister, Sébastien Lecornu, has requested the armed forces to deploy an Airbus A400M military tran"
+        },
+        {
+          "title": "New North Sea oil drilling faces delay after gear accidentally dropped in sea",
+          "link": "https://www.theguardian.com/business/2026/jul/25/new-north-sea-oil-drilling-rosebank-faces-delay-after-gear-dropped-into-sea",
+          "source": "Environment | The Guardian",
+          "date": "2026-07-25T16:00:46.000Z",
+          "summary": "Exclusive: Blunder at Rosebank, UK’s biggest undeveloped oilfield, comes as government considers granting licence Production at Britain’s biggest undeveloped oil and gasfield could be delayed for months after equipment from a rig was accidentally dropped in the North Sea, the Guardian can reveal. An"
+        },
+        {
+          "title": "In Michigan, the price of energy is on the ballot and both parties know it",
+          "link": "https://grist.org/energy/in-michigan-the-price-of-energy-is-on-the-ballot-and-both-parties-know-it/",
+          "source": "Grist",
+          "date": "2026-07-25T13:00:00.000Z",
+          "summary": "The GOP spent years circling the state as a key 2026 pickup opportunity. But after a lopsided election loss, doubts are creeping in."
+        },
+        {
+          "title": "This desert oasis is a biological wonderland. Trump’s border wall threatens to destroy it",
+          "link": "https://www.theguardian.com/us-news/2026/jul/24/arizona-border-wall-endangered-species",
+          "source": "Environment | The Guardian",
+          "date": "2026-07-24T20:36:43.000Z",
+          "summary": "Environmental groups are sounding the alarm over plans that threaten a desert spring that’s home to rare fish and turtles and sacred to the O’odham people Quitobaquito Springs in south-west Arizona has been called a biological wonderland with few equals. The springs are an oasis in the vast Sonoran "
+        },
+        {
+          "title": "Scientists decry Trump’s ‘blame game’ after he claims Canada ‘poisoning’ US air",
+          "link": "https://www.theguardian.com/us-news/2026/jul/24/trump-canada-wildfires-smoke-scientists",
+          "source": "Environment | The Guardian",
+          "date": "2026-07-24T10:00:10.000Z",
+          "summary": "Trump told Mark Carney ‘you got to stop these fires from coming in’ as experts say wildfires symptom of climate crisis Scientists have reacted with incredulity after Donald Trump accused Canada of “poisoning” the US’s air with smoke billowing from a slew of forest fires and threatened sanctions upon"
+        },
+        {
+          "title": "As climate lawsuits advance, the oil industry enters ‘panic mode’",
+          "link": "https://grist.org/accountability/lawsuits-heatwave-wrongful-death-supreme-court/",
+          "source": "Grist",
+          "date": "2026-07-24T08:45:00.000Z",
+          "summary": "Oil companies face new legal challenges, such as a recent suit for wrongful death, and older cases that are creeping toward trial."
+        },
+        {
+          "title": "Indigenous leaders give the UN a roadmap for protecting their peoples",
+          "link": "https://grist.org/global-indigenous-affairs-desk/indigenous-leaders-give-the-un-a-roadmap-for-protecting-their-peoples/",
+          "source": "Grist",
+          "date": "2026-07-24T08:30:00.000Z",
+          "summary": "A new 12-point plan calls for stronger protections for Indigenous rights, lands, and voices as climate change, conflict, and other threats intensify."
+        },
+        {
+          "title": "One year, 17 towns, dozens of voices: what we heard along the coast of England and Wales",
+          "link": "https://www.theguardian.com/environment/2026/jul/24/one-year-17-towns-dozens-of-voices-what-we-heard-along-the-coast-of-england-and-wales",
+          "source": "Environment | The Guardian",
+          "date": "2026-07-24T06:00:06.000Z",
+          "summary": "Reporting from some of the poorest seaside towns revealed how young people have been left isolated – but remain resilient and full of hope If you were asked to summon up images of the coastline of England and Wales, you might think of sunny days, buckets, spades and carefree holidays. But for many y"
+        },
+        {
+          "title": "Trump says nearly 200 firms have signed pledge to protect Americans from costs arising from datacenters",
+          "link": "https://www.theguardian.com/us-news/2026/jul/23/trump-datacenter-costs-big-tech",
+          "source": "Environment | The Guardian",
+          "date": "2026-07-23T19:56:50.000Z",
+          "summary": "‘Ratepayer Protection Pledge’ president has touted is non-binding as people continue to struggle with rising bills Donald Trump has announced that about 200 entities have signed on to his non-binding “Ratepayer Protection Pledge”, expanding a voluntary commitment which claims to ensure US consumers "
+        },
+        {
+          "title": "At least two people missing in West Virginia after torrential rain causes flash floods",
+          "link": "https://www.theguardian.com/us-news/2026/jul/23/national-guard-west-virginia-flash-floods",
+          "source": "Environment | The Guardian",
+          "date": "2026-07-23T16:06:19.000Z",
+          "summary": "State’s governor had declared a state of emergency for all 55 counties, and deployed 500 national guard members Patrick Morrisey, the West Virginia governor, said at least two people were unaccounted for in Upshur county, after torrential rain caused flash floods in parts of the state. Speaking at a"
+        },
+        {
+          "title": "The secret to a better grid? Electric vehicles.",
+          "link": "https://grist.org/transportation/the-secret-to-a-better-grid-electric-vehicles/",
+          "source": "Grist",
+          "date": "2026-07-23T13:00:00.000Z",
+          "summary": "Despite fearmongering that EVs will crash the grid, an emerging technology will help them support it by providing backup power."
+        },
+        {
+          "title": "Legal logging and soaring saplings: the ‘green islands’ bucking the deforestation trend in central America",
+          "link": "https://www.theguardian.com/environment/2026/jul/23/guatemala-small-communities-restorative-forestation-aoe",
+          "source": "Environment | The Guardian",
+          "date": "2026-07-23T10:00:41.000Z",
+          "summary": "In Guatemala’s Maya biosphere reserve local people are making a living from trees at the same time as increasing forest cover, showing nature is best protected by those who depend on it The low rumbling grows louder until a huge harvester crashes into the open, dragging a 15-metre trunk of mahogany "
+        },
+        {
+          "title": "How war in Myanmar is driving a deadly rare earth mining boom",
+          "link": "https://grist.org/international/myanmar-war-rare-earth-mining-landslide-labor/",
+          "source": "Grist",
+          "date": "2026-07-23T08:45:00.000Z",
+          "summary": "Decades of conflict have left Myanmar vulnerable to a secretive industry that is polluting communities and endangering workers."
+        },
+        {
+          "title": "The deadly experiment that could save the American elm",
+          "link": "https://grist.org/solutions/the-deadly-experiment-that-could-save-the-american-elm/",
+          "source": "Grist",
+          "date": "2026-07-23T08:30:00.000Z",
+          "summary": "Researchers in Vermont infected 5,300 American elms with a lethal dose of Dutch elm disease. Those that survive could help them build the most genetically diverse, disease-resistant population yet."
+        },
+        {
+          "title": "The year climate change came for the Tour de France",
+          "link": "https://grist.org/culture/the-year-climate-change-came-for-the-tour-de-france/",
+          "source": "Grist",
+          "date": "2026-07-23T08:15:00.000Z",
+          "summary": "Record heat, wildfire threats, and an unprecedented stage modification highlighted the growing challenge global warming poses to endurance sports."
+        },
+        {
+          "title": "Without stronger government action, Brazil’s low deforestation in the Amazon is unlikely to last",
+          "link": "https://grist.org/international/without-stronger-government-action-brazils-low-deforestation-in-the-amazon-is-unlikely-to-last/",
+          "source": "Grist",
+          "date": "2026-07-23T08:00:00.000Z",
+          "summary": "Researchers say that the rainforest is at risk of losing the equivalent of about 2 million soccer fields over the next 10 years."
+        }
+      ]
+    },
+    "local": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "place": null,
+      "items": []
+    },
+    "weather": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "local": null,
+      "alerts": [
+        {
+          "title": "Extreme Heat Warning issued July 26 at 10:37AM CDT until July 26 at 9:00PM CDT by NWS Aberdeen SD",
+          "area": "Corson; Campbell; McPherson; Walworth; Edmunds; Dewey; Potter; Faulk; Stanley; Sully; Hughes; Hyde; Hand; Jones; Lyman; Buffalo",
+          "severity": "Severe",
+          "link": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.19ed01b272dfe2e57ff0b739d082242bfc58bff8.002.1"
+        },
+        {
+          "title": "Extreme Heat Warning issued July 26 at 10:37AM CDT until July 26 at 9:00PM CDT by NWS Aberdeen SD",
+          "area": "Traverse; Big Stone; Brown; Marshall; Roberts; Day; Spink; Clark; Codington; Grant; Hamlin; Deuel",
+          "severity": "Severe",
+          "link": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.19ed01b272dfe2e57ff0b739d082242bfc58bff8.001.1"
+        },
+        {
+          "title": "Extreme Heat Warning issued July 26 at 10:17AM CDT until July 26 at 9:00PM CDT by NWS Duluth MN",
+          "area": "North Itasca; North Cass; South Itasca; South Cass; Crow Wing; Northern Aitkin; South Aitkin; Pine; Douglas; Bayfield; Ashland; Burnett; Washburn; Sawyer",
+          "severity": "Severe",
+          "link": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.2eeb1a920414f65fd4754251cf377dc03d884eac.003.1"
+        },
+        {
+          "title": "Extreme Heat Warning issued July 26 at 10:17AM CDT until July 26 at 9:00PM CDT by NWS Duluth MN",
+          "area": "Carlton/South St. Louis",
+          "severity": "Severe",
+          "link": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.2eeb1a920414f65fd4754251cf377dc03d884eac.001.2"
+        },
+        {
+          "title": "Extreme Heat Warning issued July 26 at 10:10AM CDT until July 26 at 9:00PM CDT by NWS Quad Cities IA IL",
+          "area": "Buchanan; Delaware; Dubuque; Benton; Linn; Jones; Jackson; Iowa; Johnson; Cedar; Clinton; Muscatine; Scott; Keokuk; Washington; Louisa; Jefferson; Henry; Des Moines; Van Buren; Lee; Whiteside; Rock Island; Henry; Bureau; Putnam; Mercer; Henderson; Warren; Hancock; McDonough; Scotland; Clark",
+          "severity": "Severe",
+          "link": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.accd0a5199381c3efe4b10886cf9001773c8de93.001.1"
+        },
+        {
+          "title": "Extreme Heat Warning issued July 26 at 10:10AM CDT until July 26 at 9:00PM CDT by NWS Twin Cities/Chanhassen MN",
+          "area": "Dunn; Pepin; Chippewa; Eau Claire",
+          "severity": "Severe",
+          "link": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.ffcba726c7796a39a7010f949ae2c586a01db4be.006.1"
+        },
+        {
+          "title": "Extreme Heat Watch issued July 26 at 10:10AM CDT until July 27 at 10:00PM CDT by NWS Quad Cities IA IL",
+          "area": "Jo Daviess; Stephenson; Carroll",
+          "severity": "Severe",
+          "link": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.accd0a5199381c3efe4b10886cf9001773c8de93.002.2"
+        },
+        {
+          "title": "Extreme Heat Warning issued July 26 at 10:10AM CDT until July 26 at 9:00PM CDT by NWS Twin Cities/Chanhassen MN",
+          "area": "Stearns; Benton; Sherburne; Isanti; Chisago; Goodhue; Polk; St. Croix; Pierce",
+          "severity": "Severe",
+          "link": "https://api.weather.gov/alerts/urn:oid:2.49.0.1.840.0.ffcba726c7796a39a7010f949ae2c586a01db4be.002.1"
+        }
+      ]
+    },
+    "tech": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "items": [
+        {
+          "title": "Carrie is just trying to make a friend in the new trailer",
+          "link": "https://www.theverge.com/entertainment/971069/carrie-amazon-mike-flanagan-trailer-comic-con",
+          "source": "The Verge",
+          "date": "2026-07-26T15:33:27.000Z",
+          "summary": "The latest adaptation debuts October 7th. | Image: Amazon Mike Flanagan's latest Stephen King adaptation, Carrie (this will be his fourth), is slated to make its debut on Amazon Prime on October 7th. The new trailer dropped at Comic-Con 2026 and doesn't contain many surprises. If you're familiar wit"
+        },
+        {
+          "title": "You can get three months of Xbox Game Pass Ultimate for almost half off",
+          "link": "https://www.theverge.com/gadgets/970775/xbox-game-pass-ultimate-deal-sale",
+          "source": "The Verge",
+          "date": "2026-07-26T15:00:00.000Z",
+          "summary": "Subscribing to Xbox Game Pass Ultimate on a recurring basis has been tough to justify recently, even after Microsoft reduced the monthly cost from $29.99 to $22.99. But you can get a better deal on a three-month subscription (valued at $69) by grabbing a digital code at Eneba that costs $39.01 at th"
+        },
+        {
+          "title": "Marvel announces Ryan Gosling as Ghost Rider, a new Black Panther, and more",
+          "link": "https://www.theverge.com/entertainment/971071/marvel-ryan-gosling-ghost-rider-black-panther-comic-con",
+          "source": "The Verge",
+          "date": "2026-07-26T14:51:33.000Z",
+          "summary": "Ryan Gosling on stage at Comic-Con | Image: Marvel Studios While perhaps less dramatic than in years past, Marvel nonetheless had some big reveals lined up for Comic-Con. The highest profile was certainly the announcement that Ryan Gosling would be joining the MCU as Ghost Rider, with the Shawn Levy"
+        },
+        {
+          "title": "The vertical video takeover is here",
+          "link": "https://www.theverge.com/column/970756/vertical-video-tiktok-youtube-instagram-streaming-facebook",
+          "source": "The Verge",
+          "date": "2026-07-26T12:00:00.000Z",
+          "summary": "This is The Stepback, a weekly newsletter breaking down one essential story from the tech world. For more on all things vertical video, follow David Pierce. The Stepback arrives in our subscribers' inboxes on Sunday at 8AM ET. Opt in for The Stepback here. How it started For a while, every social an"
+        },
+        {
+          "title": "Monday.com is the latest tech company to blame AI for layoffs — here are 20 others",
+          "link": "https://techcrunch.com/2026/07/25/the-running-list-major-tech-layoffs-in-2026-where-employers-cited-ai/",
+          "source": "TechCrunch",
+          "date": "2026-07-26T01:30:00.000Z",
+          "summary": "A running look — in reverse chronological order — at the bigger tech companies that have announced significant layoffs this year with AI as a stated factor."
+        },
+        {
+          "title": "Warner Bros. lawsuit accuses Amazon of illegally poaching executives",
+          "link": "https://techcrunch.com/2026/07/25/warner-bros-lawsuit-accuses-amazon-of-illegally-poaching-executives/",
+          "source": "TechCrunch",
+          "date": "2026-07-25T20:55:11.000Z",
+          "summary": "The lawsuit will likely renew debates about whether term employment agreements are enforceable under California. law"
+        },
+        {
+          "title": "SDCC teaser gives us our first good look at Blade Runner 2099",
+          "link": "https://arstechnica.com/culture/2026/07/sdcc-teaser-gives-us-our-first-good-look-at-blade-runner-2099/",
+          "source": "Ars Technica - All content",
+          "date": "2026-07-25T20:52:30.000Z",
+          "summary": "Also: Forging the One Ring in Rings of Power S3 teaser; new Lanterns trailer; Spaceballs: The New One panel."
+        },
+        {
+          "title": "The hacker who humiliated spyware makers and was never caught",
+          "link": "https://techcrunch.com/2026/07/25/the-hacker-who-humiliated-spyware-makers-and-was-never-caught/",
+          "source": "TechCrunch",
+          "date": "2026-07-25T20:24:14.000Z",
+          "summary": "An awe-inspiring hacktivist who hacked two controversial government spyware makers may be the most prolific hacker to have never gotten caught. What do we know about Phineas Fisher?"
+        },
+        {
+          "title": "Elon Musk’s Boring Company reportedly raising funding at a $20 billion valuation",
+          "link": "https://techcrunch.com/2026/07/25/elon-musks-boring-company-reportedly-raising-funding-at-a-20-billion-valuation/",
+          "source": "TechCrunch",
+          "date": "2026-07-25T19:23:32.000Z",
+          "summary": "Elon Musk's tunneling startup is reportedly in talks for a major new funding round."
+        },
+        {
+          "title": "Google basically confirms the Pixel 11 is getting a price hike",
+          "link": "https://www.theverge.com/tech/971041/google-confirms-pixel-11-price-hike",
+          "source": "The Verge",
+          "date": "2026-07-25T18:13:36.000Z",
+          "summary": "Google's Vice President of Devices and Services, Shakil Barkat, all but confirmed in an interview with 9to5 Google that its next Pixel phone would cost more than the Pixel 10. Considering the ongoing RAM supply issues due to the explosion of AI data centers, the rumored price hike is not a complete "
+        },
+        {
+          "title": "SpaceX eyes tower catch for next Starship after auspicious end to 13th flight",
+          "link": "https://arstechnica.com/space/2026/07/spacex-eyes-tower-catch-for-next-starship-after-auspicious-end-to-13th-flight/",
+          "source": "Ars Technica - All content",
+          "date": "2026-07-25T17:47:22.000Z",
+          "summary": "SpaceX will likely attempt to catch Starship back at the launch pad on its next flight."
+        },
+        {
+          "title": "Kalshi demands Netflix take down trailer for ‘Prediction Games’ documentary",
+          "link": "https://techcrunch.com/2026/07/25/kalshi-demands-netflix-take-down-trailer-for-prediction-games-documentary/",
+          "source": "TechCrunch",
+          "date": "2026-07-25T16:46:46.000Z",
+          "summary": "Kalshi claims the trailer is “defamatory” and contains “both fabricated documents and false and misleading statements.”"
+        },
+        {
+          "title": "Librarians are hosting viral ‘Avoiding AI’ workshops for people who are fed up with Big Tech",
+          "link": "https://techcrunch.com/2026/07/25/librarians-are-hosting-viral-avoiding-ai-workshops-for-people-who-are-fed-up-with-big-tech/",
+          "source": "TechCrunch",
+          "date": "2026-07-25T16:00:00.000Z",
+          "summary": "At libraries around the country, \"Avoiding AI\" workshops have elicited unprecedented demand."
+        },
+        {
+          "title": "Synth historian Oli Freke will spend big on a good bicycle",
+          "link": "https://www.theverge.com/entertainment/971013/oli-freke-bjooks-beat-gems-drum-machine-book-interview",
+          "source": "The Verge",
+          "date": "2026-07-25T15:15:00.000Z",
+          "summary": "Oli Freke is a musician and journalist whose works have appeared in Sound on Sound, The Quietus, and Mixmag. This has included using math to explore the melodic potential of the Western 12-tone scale and deep dives on effects plug-ins. He's even written a book tracing the evolution of the synthesize"
+        },
+        {
+          "title": "Teenage Engineering’s unique music machines are 30 percent off",
+          "link": "https://www.theverge.com/gadgets/970685/teenage-engineering-30-percent-deal-sale",
+          "source": "The Verge",
+          "date": "2026-07-25T15:00:00.000Z",
+          "summary": "Teenage Engineering’s OP-XY has a huge number of functions. | Photo by Terrence O’Brien / The Verge With elements from synthesizers, loopers, and effects pedals, Teenage Engineering’s devices lie somewhere between musical instrument and modern art. These grooveboxes, as they’re often called, are cap"
+        },
+        {
+          "title": "One fallen power line exposed a growing AI data center problem. Here’s how to fix it.",
+          "link": "https://techcrunch.com/2026/07/25/one-fallen-power-line-exposed-a-growing-ai-data-center-problem-heres-how-to-fix-it/",
+          "source": "TechCrunch",
+          "date": "2026-07-25T13:05:00.000Z",
+          "summary": "A close call in Northern Virginia revealed just how poorly data centers respond to grid disruptions. Here's how to fix the problem."
+        },
+        {
+          "title": "Is this e-reader case a gun?",
+          "link": "https://www.theverge.com/tech/970343/e-reader-case-3d-printed-gun",
+          "source": "The Verge",
+          "date": "2026-07-25T13:00:00.000Z",
+          "summary": "Is an e-reader case as dangerous as a Glock 19? Last month, Louisville, Kentucky-based creator Luke The Maker showed off a bizarre, 3D-printed, pistol-shaped case design for the popular minimalist Xteink X4 e-reader. The X4 lies vertically atop the plastic gun's slide, with a cutout on the side to a"
+        },
+        {
+          "title": "What Surrounds Us will make you think a lot about circles",
+          "link": "https://www.theverge.com/games/961183/what-surrounds-us-review-pc-steam",
+          "source": "The Verge",
+          "date": "2026-07-25T12:00:00.000Z",
+          "summary": "What Surrounds Us takes its title literally. You play as a circle surrounding a hole in its middle - it looks like a donut with frosting. You work together with other sentient moving circles, sometimes helping them joyfully meet with others. And you traverse a large map that's composed entirely of, "
+        },
+        {
+          "title": "With help from data, art museums are reframing the visitor experience",
+          "link": "https://arstechnica.com/culture/2026/07/with-help-from-data-art-museums-are-reframing-the-visitor-experience/",
+          "source": "Ars Technica - All content",
+          "date": "2026-07-25T11:00:32.000Z",
+          "summary": "Museums are embracing data-driven curation and a shifting technology landscape."
+        }
+      ]
+    },
+    "cyber": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "items": [
+        {
+          "title": "GitHub, PyPI add time-absed defenses against supply chain attacks",
+          "link": "https://www.bleepingcomputer.com/news/security/github-pypi-add-time-absed-defenses-against-supply-chain-attacks/",
+          "source": "BleepingComputer",
+          "date": "2026-07-26T14:13:39.000Z",
+          "summary": "GitHub and PyPI (Python Package Index) have introduced a time-based mechanism in the Dependabot dependency management tool to protect against supply-chain attacks and to limit their impact. [...]"
+        },
+        {
+          "title": "Steam forum ClickFix attacks infect gamers with XMRig cryptominers",
+          "link": "https://www.bleepingcomputer.com/news/security/steam-forum-clickfix-attacks-infect-gamers-with-xmrig-cryptominers/",
+          "source": "BleepingComputer",
+          "date": "2026-07-25T22:37:47.000Z",
+          "summary": "Steam discussion forums are being abused in ClickFix attacks that pretend to be fixes for game and computer problems but actually infect devices with cryptominers. [...]"
+        },
+        {
+          "title": "Malvertising Sends Malware in Pieces, Then Makes the Browser Build the Executable",
+          "link": "https://thehackernews.com/2026/07/malvertising-sends-malware-in-pieces.html",
+          "source": "The Hacker News",
+          "date": "2026-07-25T18:48:44.000Z",
+          "summary": "A malvertising operation dubbed SourTrade is making victims' browsers build the final Windows executable themselves, using a legitimate Bun runtime as its base instead of serving one complete malicious file from a fixed URL. Confiant, which detailed the campaign on July 23, 2026, said it has operate"
+        },
+        {
+          "title": "Malicious sites use JavaScript to build malware in browser memory",
+          "link": "https://www.bleepingcomputer.com/news/security/malicious-sites-use-javascript-to-build-malware-in-browser-memory/",
+          "source": "BleepingComputer",
+          "date": "2026-07-25T15:21:09.000Z",
+          "summary": "A massive malvertising campaign is using fake Solana, Luno, and TradingView webpages with malicious JavaScript that instructs browsers to assemble malware directly in memory. [...]"
+        },
+        {
+          "title": "ShinyHunters data leaks fuel $2,000 sextortion email scam",
+          "link": "https://www.bleepingcomputer.com/news/security/shinyhunters-data-leaks-fuel-2-000-sextortion-email-scam/",
+          "source": "BleepingComputer",
+          "date": "2026-07-25T14:16:26.000Z",
+          "summary": "Threat actors are using email addresses exposed in data breaches leaked by the ShinyHunters extortion group to send sextortion emails demanding $2,000 in Bitcoin. [...]"
+        },
+        {
+          "title": "Fastjson 1.x RCE Vulnerability Targeted in Attacks With No Patched Available",
+          "link": "https://thehackernews.com/2026/07/fastjson-1x-rce-vulnerability-targeted.html",
+          "source": "The Hacker News",
+          "date": "2026-07-25T12:52:43.000Z",
+          "summary": "Security firms ThreatBook and Imperva say attackers are targeting a critical flaw in Fastjson, Alibaba's JSON library for Java. In affected Spring Boot applications, a malicious JSON request can execute code without authentication, with the privileges of the Java process. Tracked as CVE-2026-16723, "
+        },
+        {
+          "title": "Researcher Publishes GitLab RCE PoC Letting Authenticated Users Run Commands as Git",
+          "link": "https://thehackernews.com/2026/07/researcher-publishes-gitlab-rce-poc.html",
+          "source": "The Hacker News",
+          "date": "2026-07-25T10:14:26.000Z",
+          "summary": "Security researchers at depthfirst published working exploit code on July 24 for a GitLab flaw that GitLab patched six weeks earlier, on June 10. It runs commands as git on any self-managed 18.11.3 server that has not taken the update. Any authenticated user who can push to a project can run it. The"
+        },
+        {
+          "title": "CTM360 Research Reveals How Insurance Phishing Has Evolved Into Real-Time Account Hijacking",
+          "link": "https://thehackernews.com/2026/07/ctm360-research-reveals-how-insurance.html",
+          "source": "The Hacker News",
+          "date": "2026-07-25T10:14:21.000Z",
+          "summary": "For years, phishing campaigns targeting financial institutions followed the same playbook. Victims were tricked into entering usernames and passwords, attackers collected the credentials, and accounts were compromised later when an opportunity arose. That model is changing. Recent investigations int"
+        },
+        {
+          "title": "Cl0p Affiliates Target Internet-Exposed PTC Windchill and FlexPLM with Unauthenticated RCE",
+          "link": "https://thehackernews.com/2026/07/cl0p-affiliates-target-internet-exposed.html",
+          "source": "The Hacker News",
+          "date": "2026-07-25T10:14:03.000Z",
+          "summary": "Threat actors linked to the Cl0p (aka Chubby Scorpius, FIN11, Graceful Spider, and Lace Tempest) ransomware campaign are exploiting flaws in internet-exposed PTC Windmill and FlexPLM deployments as part of a new data extortion campaign. \"Attackers chain a pre-authentication information disclosure in"
+        },
+        {
+          "title": "DevMan RaaS Portal Centralizes Payload Builds, Victim Management, and Affiliate Payouts",
+          "link": "https://thehackernews.com/2026/07/devman-raas-portal-centralizes-payload.html",
+          "source": "The Hacker News",
+          "date": "2026-07-25T09:53:41.000Z",
+          "summary": "The operators of the DevMan ransomware-as-a-service (RaaS) scheme are maintaining a dedicated web platform that offers affiliates the ability to build payloads, oversee earnings, and manage various aspects related to victims. Swiss cybersecurity company PRODAFT is tracking the centrally administered"
+        },
+        {
+          "title": "OpenAI confirms ChatGPT is down worldwide",
+          "link": "https://www.bleepingcomputer.com/news/artificial-intelligence/openai-confirms-chatgpt-is-down-worldwide/",
+          "source": "BleepingComputer",
+          "date": "2026-07-25T09:31:09.000Z",
+          "summary": "ChatGPT, the famous artificial intelligence chatbot that allows users to converse with various personalities and topics, has connectivity issues worldwide. [...]"
+        },
+        {
+          "title": "OnTrac notifies customers of data breach after network hack",
+          "link": "https://www.bleepingcomputer.com/news/security/ontrac-notifies-customers-of-data-breach-after-network-hack/",
+          "source": "BleepingComputer",
+          "date": "2026-07-24T19:55:01.000Z",
+          "summary": "OnTrac parcel delivery company is informing that hackers breached its corporate network and may have accessed personal details belonging to its customers. [...]"
+        },
+        {
+          "title": "Hermes AI agent used to automate attack on Thai Finance Ministry",
+          "link": "https://www.bleepingcomputer.com/news/security/hermes-ai-agent-used-to-automate-attack-on-thai-finance-ministry/",
+          "source": "BleepingComputer",
+          "date": "2026-07-24T19:09:09.000Z",
+          "summary": "A threat actor used the open-source Hermes AI agent in unattended \"YOLO\" mode to automate post-exploitation activity during an alleged breach of Thailand's Ministry of Finance. [...]"
+        },
+        {
+          "title": "Hackers hijack hotel Wi-Fi DNS to steal Microsoft 365 accounts",
+          "link": "https://www.bleepingcomputer.com/news/security/hackers-hijack-hotel-wi-fi-dns-to-steal-microsoft-365-accounts/",
+          "source": "BleepingComputer",
+          "date": "2026-07-24T17:50:37.000Z",
+          "summary": "Hackers are changing the DNS settings on Wi-Fi devices at hotels and conference centers to redirect users to fake Microsoft 365 login pages. [...]"
+        },
+        {
+          "title": "Microsoft blames massive Microsoft 365 outage on maintenance bug",
+          "link": "https://www.bleepingcomputer.com/news/microsoft/microsoft-blames-massive-microsoft-365-outage-on-maintenance-bug/",
+          "source": "BleepingComputer",
+          "date": "2026-07-24T15:41:44.000Z",
+          "summary": "Microsoft says a bug in its automated network maintenance request system caused Thursday's massive outage by mistakenly removing IP routes from more devices than intended, disrupting Azure and Microsoft 365 services. [...]"
+        },
+        {
+          "title": "BlueNoroff Zoom Phishing Kit Profiles Crypto Wallets Before Malware Delivery",
+          "link": "https://thehackernews.com/2026/07/bluenoroff-zoom-phishing-kit-profiles.html",
+          "source": "The Hacker News",
+          "date": "2026-07-24T15:12:35.000Z",
+          "summary": "The North Korean threat actors behind the ClickFix-style campaigns that employ typosquatted Zoom and Microsoft Teams domains have been found to operate an active phishing kit to impersonate the videoconferencing platforms in social engineering campaigns designed to deliver malware. \"BlueNoroff has o"
+        },
+        {
+          "title": "Certighost Exploit Lets Low-Privileged Active Directory Users Impersonate a Domain Controller",
+          "link": "https://thehackernews.com/2026/07/certighost-exploit-lets-low-privileged.html",
+          "source": "The Hacker News",
+          "date": "2026-07-24T14:15:21.000Z",
+          "summary": "Researchers H0j3n and Aniq Fakhrul published a working exploit on July 24 that lets a low-privileged Active Directory user obtain a certificate for a Domain Controller and authenticate as that machine. They codenamed the flaw Certighost. Because Domain Controller accounts carry directory replication"
+        },
+        {
+          "title": "Chick-fil-A data breach affects more than 13,000 customers",
+          "link": "https://www.bleepingcomputer.com/news/security/chick-fil-a-data-breach-affects-more-than-13-000-customers/",
+          "source": "BleepingComputer",
+          "date": "2026-07-24T14:04:29.000Z",
+          "summary": "Chick-fil-A has confirmed that over 13,000 customers had their accounts breached in a wave of credential stuffing attacks targeting its website and mobile app between June 17 and June 19. [...]"
+        },
+        {
+          "title": "Slopsquatting, Phantom Domains, and HalluSquatting Are the Same AI Attack",
+          "link": "https://www.bleepingcomputer.com/news/security/slopsquatting-phantom-domains-and-hallusquatting-are-the-same-ai-attack/",
+          "source": "BleepingComputer",
+          "date": "2026-07-24T14:01:11.000Z",
+          "summary": "Slopsquatting, phantom squatting, and HalluSquatting all exploit the same late-binding attack pattern, where AI coding agents trust hallucinated package, repo, or domain names. ActiveState explains how pre-fetch verification and governed dependency management can help stop these attacks before malic"
+        },
+        {
+          "title": "Europol flags 4,340 URLs for removal in 'The Com' crackdown",
+          "link": "https://www.bleepingcomputer.com/news/security/europol-flags-4-340-urls-for-removal-in-the-com-crackdown/",
+          "source": "BleepingComputer",
+          "date": "2026-07-24T12:56:53.000Z",
+          "summary": "Europol has flagged 4,340 URLs for removal during a multi-week operation targeting online content linked to \"The Com,\" a loosely organized network of nihilistic violent extremist groups. [...]"
+        }
+      ]
+    },
+    "ai": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "items": [
+        {
+          "title": "Monday.com is the latest tech company to blame AI for layoffs — here are 20 others",
+          "link": "https://techcrunch.com/2026/07/25/the-running-list-major-tech-layoffs-in-2026-where-employers-cited-ai/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-26T01:30:00.000Z",
+          "summary": "A running look — in reverse chronological order — at the bigger tech companies that have announced significant layoffs this year with AI as a stated factor."
+        },
+        {
+          "title": "Librarians are hosting viral ‘Avoiding AI’ workshops for people who are fed up with Big Tech",
+          "link": "https://techcrunch.com/2026/07/25/librarians-are-hosting-viral-avoiding-ai-workshops-for-people-who-are-fed-up-with-big-tech/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-25T16:00:00.000Z",
+          "summary": "At libraries around the country, \"Avoiding AI\" workshops have elicited unprecedented demand."
+        },
+        {
+          "title": "One fallen power line exposed a growing AI data center problem. Here’s how to fix it.",
+          "link": "https://techcrunch.com/2026/07/25/one-fallen-power-line-exposed-a-growing-ai-data-center-problem-heres-how-to-fix-it/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-25T13:05:00.000Z",
+          "summary": "A close call in Northern Virginia revealed just how poorly data centers respond to grid disruptions. Here's how to fix the problem."
+        },
+        {
+          "title": "I tried out OpenAI’s new AI keypad — which will be fun for some coders and slightly mystifying to everyone else",
+          "link": "https://techcrunch.com/2026/07/24/i-tried-out-openais-new-ai-keypad-which-will-be-fun-for-coders-and-slightly-mystifying-to-everyone-else/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-25T00:23:11.000Z",
+          "summary": "OpenAI's fancy new AI keypad will be a lot of fun for some, while many others are probably not going to touch it."
+        },
+        {
+          "title": "Prentis, new AI lab co-founded by Reid Hoffman, Mark Pincus in talks to raise $100M",
+          "link": "https://techcrunch.com/2026/07/24/prentis-new-ai-lab-co-founded-by-reid-hoffman-mark-pincus-in-talks-to-raise-100m/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-24T22:25:58.000Z",
+          "summary": "The neolab is betting that automating routine computer tasks will soon outpace coding as AI's biggest use case."
+        },
+        {
+          "title": "Why Cognition bought Poke: AI personality is becoming a competitive advantage",
+          "link": "https://techcrunch.com/2026/07/24/why-cognition-bought-poke-ai-personality-is-becoming-a-competitive-advantage/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-24T18:07:32.000Z",
+          "summary": "The acquisition brings Poke’s conversational style and interaction model to Cognition’s coding agent Devin, reflecting a growing belief that how AI assistants interact with users is as important as the models powering them."
+        },
+        {
+          "title": "The quest to keep organs alive outside the body",
+          "link": "https://www.technologyreview.com/2026/07/24/1140790/the-quest-to-keep-organs-alive-outside-the-body/",
+          "source": "MIT Technology Review",
+          "date": "2026-07-24T17:03:55.000Z",
+          "summary": "This week, I covered a fascinating effort to preserve organs outside the body. There’s a huge shortage of donor organs, and one of the main reasons is time—they survive only a matter of hours outside the body, even when they’re kept on ice. Doctors dream of organ banks—stores of human organs that ca"
+        },
+        {
+          "title": "Anthropic launches Opus 5",
+          "link": "https://techcrunch.com/2026/07/24/anthropic-launches-opus-5/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-24T17:00:00.000Z",
+          "summary": "Opus 5 will be both cheaper and less restrictive than Fable, likely making it preferable in most use cases."
+        },
+        {
+          "title": "As US weighs response to Chinese AI, industry urges against broad open-weight restrictions",
+          "link": "https://techcrunch.com/2026/07/24/as-us-weighs-response-to-chinese-ai-industry-urges-against-broad-open-weight-restrictions/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-24T15:51:49.000Z",
+          "summary": "AI companies, including Nvidia and Mistral, urge policymakers to avoid broad restrictions on open-weight AI models as Washington debates responses to Chinese AI and alleged model distillation."
+        },
+        {
+          "title": "Bluesky’s AI assistant Attie expands into an open social research tool",
+          "link": "https://techcrunch.com/2026/07/24/blueskys-ai-assistant-attie-expands-into-an-open-social-research-tool/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-24T15:13:57.000Z",
+          "summary": "Users can now ask Attie questions about news, trends, and conversations on Bluesky and other apps on the AT Protocol."
+        },
+        {
+          "title": "Midjourney acquired the astrology app Co-Star",
+          "link": "https://techcrunch.com/2026/07/24/midjourney-acquired-the-astrology-app-co-star/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-24T15:09:55.000Z",
+          "summary": "The AI lab Midjourney continues to expand its purview beyond image and video generation."
+        },
+        {
+          "title": "‘AI communism’, rogue models, and the why Kimi K3 spooked Wall Street",
+          "link": "https://techcrunch.com/podcast/ai-communism-rogue-models-and-the-why-kimi-k3-spooked-wall-street/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-24T14:00:00.000Z",
+          "summary": "Chinese AI lab Moonshot’s open model Kimi went viral this week for reasons that had less to do with the model itself and more to do with how the U.S. AI industry reacted to it. Meanwhile, an unreleased OpenAI model wandered outside its test environment and ended up connected to a real security breac"
+        },
+        {
+          "title": "OpenAI’s new voice mode makes it to the ChatGPT desktop app",
+          "link": "https://techcrunch.com/2026/07/24/openais-new-voice-mode-makes-it-to-the-chatgpt-desktop-app/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-24T13:36:42.000Z",
+          "summary": "ChatGPT Voice on desktop can work with both ChatGPT Work and Codex to complete tasks and control agents."
+        },
+        {
+          "title": "The Download: an organ transplant breakthrough, and homegrown Chinese chips",
+          "link": "https://www.technologyreview.com/2026/07/24/1140776/the-download-organ-transplant-breakthrough-chinese-chips/",
+          "source": "MIT Technology Review",
+          "date": "2026-07-24T12:10:00.000Z",
+          "summary": "This is today’s edition of The Download, our weekday newsletter that provides a daily dose of what’s going on in the world of technology. Supercooled kidneys have been transplanted into pigs in a “landmark achievement” When it comes to organ donation, time is everything. As soon as an organ has been"
+        },
+        {
+          "title": "How AI guardrails are impeding the work of offensive cybersecurity researchers",
+          "link": "https://techcrunch.com/2026/07/23/how-ai-guardrails-are-impeding-the-work-of-offensive-cybersecurity-researchers/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-24T01:00:00.000Z",
+          "summary": "We spoke with several cybersecurity researchers, who look for unknown vulnerabilities and develop tools to exploit them, about how OpenAI’s and Anthropic’s guardrails affect their work."
+        },
+        {
+          "title": "AMD takes on Nvidia with its Helios AI rack-scale system",
+          "link": "https://techcrunch.com/2026/07/23/amd-takes-on-nvidia-with-its-helios-ai-rack-scale-system/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-23T20:33:02.000Z",
+          "summary": "AMD is challenging its chipmaker rival with a new rack-scale system that will start shipping to customers later this year."
+        },
+        {
+          "title": "Anthropic updates Claude voice mode with more capable models",
+          "link": "https://techcrunch.com/2026/07/23/anthropic-updates-claude-voice-mode-with-more-capable-models/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-23T19:00:00.000Z",
+          "summary": "Claude's new voice model will let you reschedule your meeting or draft an email."
+        },
+        {
+          "title": "AegisAI, founded by former Google security execs, lands $36M to stop AI-driven spear phishing",
+          "link": "https://techcrunch.com/2026/07/23/aegisai-founded-by-former-google-security-execs-lands-36m-to-stop-ai-driven-spear-phishing/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-23T18:38:34.000Z",
+          "summary": "AegisAI co-founders developed AI agents that quickly analyze each message as a human would, paying attention to small anomalies that even the most elaborate checklist wouldn’t catch."
+        },
+        {
+          "title": "Runway launches AI model router as generative media gets crowded",
+          "link": "https://techcrunch.com/2026/07/23/runway-bets-on-ai-model-routing-as-generative-media-gets-crowded/",
+          "source": "AI News & Artificial Intelligence | TechCrunch",
+          "date": "2026-07-23T17:07:35.000Z",
+          "summary": "The Media Router is a tool that automatically selects the best image, video, or audio generation model for a request based on whether a developer prioritizes quality, speed or cost."
+        }
+      ]
+    },
+    "space": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "items": [
+        {
+          "title": " What happened to space horror movies? ",
+          "link": "https://www.space.com/entertainment/space-movies-shows/what-happened-to-space-horror-movies",
+          "source": " Latest from Space.com ",
+          "date": "2026-07-26T13:00:00.000Z",
+          "summary": "They mostly don't come out anymore... mostly."
+        },
+        {
+          "title": "NASA Astronaut Chris Williams, Crewmates Return from Space Station",
+          "link": "https://www.nasa.gov/news-release/nasa-astronaut-chris-williams-crewmates-return-from-space-station/",
+          "source": "NASA",
+          "date": "2026-07-26T10:59:44.000Z",
+          "summary": "Concluding an eight-month science mission aboard the International Space Station, NASA astronaut Chris Williams returned to Earth on Sunday alongside Roscosmos cosmonauts Sergey Kud-Sverchkov and Sergei Mikaev. The crew made its safe, parachute-assisted landing at 5:27 a.m. CDT (3:27 p.m., Kazakhsta"
+        },
+        {
+          "title": " I'm not an astronaut, but I went to the International Space Station (sort of) ",
+          "link": "https://www.space.com/space-exploration/international-space-station/im-not-an-astronaut-but-i-went-to-the-international-space-station-sort-of",
+          "source": " Latest from Space.com ",
+          "date": "2026-07-26T10:00:00.000Z",
+          "summary": "\"Just the fact that it exists, just the fact that it continues to exist. We should marvel at that.\""
+        },
+        {
+          "title": " We talk with astronaut Michael Foale about the 1997 Space Station Mir crisis: 'He took all the blame of the collision on his shoulders' ",
+          "link": "https://www.space.com/entertainment/space-movies-shows/we-talk-with-astronaut-michael-foale-about-the-1997-space-station-mir-crisis-he-took-all-the-blame-of-the-collision-on-his-shoulders",
+          "source": " Latest from Space.com ",
+          "date": "2026-07-25T16:00:00.000Z",
+          "summary": "'I believe that we, as a crew, saved space station Mir that day'"
+        },
+        {
+          "title": " This Week In Space podcast: Episode 220 — First on Mars ",
+          "link": "https://www.space.com/entertainment/space-movies-shows/this-week-in-space-podcast-episode-220-first-on-mars",
+          "source": " Latest from Space.com ",
+          "date": "2026-07-25T15:11:27.000Z",
+          "summary": "On Episode 220 of This Week In Space, Rod Pyle and Tariq Malik are joined by Dr. Pascal Lee and astrobiologist Dr. Penny Boston to mark the 50th anniversary of Viking 1's landing on Mars."
+        },
+        {
+          "title": " An off-the-shelf camera could help us find more black holes smashing together ",
+          "link": "https://www.space.com/astronomy/black-holes/an-off-the-shelf-camera-could-help-us-find-more-black-holes-smashing-together",
+          "source": " Latest from Space.com ",
+          "date": "2026-07-25T13:00:00.000Z",
+          "summary": "\"It doesn't require any new technology development, which is almost unheard of for solving a LIGO instrumentation problem.\""
+        },
+        {
+          "title": " NASA astronaut, 2 cosmonauts return to Earth after 241 days on space station ",
+          "link": "https://www.space.com/space-exploration/human-spaceflight/nasa-astronaut-two-cosmonauts-return-to-earth-soyuz-ms-28",
+          "source": " Latest from Space.com ",
+          "date": "2026-07-25T10:00:00.000Z",
+          "summary": "NASA astronaut Chris Williams and two Russian cosmonauts returned to Earth from the International Space Station early Sunday morning (July 26)."
+        },
+        {
+          "title": " SpaceX's Starship megarocket makes the 'softest splashdown' ever after launching next-gen Starlink satellites in Flight 13 test (video) ",
+          "link": "https://www.space.com/space-exploration/launches-spacecraft/spacexs-starship-megarocket-makes-the-softest-splashdown-ever-after-launching-next-gen-starlink-satellites-in-flight-13-test-video",
+          "source": " Latest from Space.com ",
+          "date": "2026-07-25T01:40:17.000Z",
+          "summary": "SpaceX launched Starship, the world's most powerful rocket, on a critical 13th test flight on July 24, a stunning test flight that notched big success and ended with a huge surprise."
+        },
+        {
+          "title": " ZWO Seestar S30 Pro smart telescope review ",
+          "link": "https://www.space.com/stargazing/skywatching-kit/zwo-seestar-s30-pro-smart-telescope-review",
+          "source": " Latest from Space.com ",
+          "date": "2026-07-24T20:00:00.000Z",
+          "summary": "A compact, automated smart telescope with a higher resolution upgrade"
+        },
+        {
+          "title": " We boldly chat with 'Star Trek: Strange New Worlds' showrunners about space dinosaurs and Lovecraftian horrors for season 4 (interview) ",
+          "link": "https://www.space.com/entertainment/space-movies-shows/we-boldly-chat-with-star-trek-strange-new-worlds-showrunners-about-space-dinosaurs-and-lovecraftian-horrors-for-season-4-interview",
+          "source": " Latest from Space.com ",
+          "date": "2026-07-24T18:00:00.000Z",
+          "summary": "'The minute we started talking about doing dinosaurs, we were like, 'Yeah, let’s figure out a way to do that.''"
+        },
+        {
+          "title": "NASA’s ESCAPADE Snaps Family Portrait of Earth, Moon",
+          "link": "https://science.nasa.gov/image-article/centers-and-facilities/goddard/nasas-escapade-snaps-family-portrait-of-earth-moon/",
+          "source": "NASA",
+          "date": "2026-07-24T17:47:06.000Z",
+          "summary": "On July 3, one of NASA’s two Mars-destined ESCAPADE (Escape and Plasma Acceleration and Dynamics Explorers) spacecraft captured photos of Earth and the Moon in visible and thermal infrared light. At the time, the spacecraft was 363,250 miles (584,600 kilometers) from Earth and 115,600 miles (186,100"
+        },
+        {
+          "title": "New Crew Members Welcomed to International Space Station",
+          "link": "https://www.nasa.gov/image-article/new-crew-members-welcomed-to-international-space-station/",
+          "source": "NASA",
+          "date": "2026-07-24T16:43:02.000Z",
+          "summary": "From left, Expedition 74 flight engineers Anna Kikina and Pyotr Dubrov of Roscosmos, and Anil Menon of NASA pose for a July 18, 2026, photo while holding a cake celebrating their recent arrival aboard the International Space Station. The trio arrived at the space station on July 14, 2026, after laun"
+        },
+        {
+          "title": "NASA Announces New Spacecraft Technology Demonstration Mission at Moon    ",
+          "link": "https://www.nasa.gov/directorates/armd/nasa-announces-new-spacecraft-technology-demonstration-mission-at-moon/",
+          "source": "NASA",
+          "date": "2026-07-24T16:35:46.000Z",
+          "summary": "NASA is working with industry to advance the next phase of cislunar infrastructure for the agency’s Artemis program and Moon Base, including orbital assets and demonstrations. Under a contract awarded to Advanced Space, the agency’s CAPSTONE 02 mission will demonstrate rendezvous and proximity opera"
+        },
+        {
+          "title": " What lurks beneath the volcanoes of Jupiter's moon Io? NASA's Juno probe just took a peek ",
+          "link": "https://www.space.com/astronomy/jupiter/juno-probe-reveals-whats-happening-beneath-the-surface-of-jupiters-most-volcanic-moon",
+          "source": " Latest from Space.com ",
+          "date": "2026-07-24T16:00:00.000Z",
+          "summary": "The subsurface findings could transform how scientists study volcanoes across the solar system — including those on Earth."
+        },
+        {
+          "title": "NASA to Support Blue Origin New Glenn Rocket Testing, Advance Artemis",
+          "link": "https://www.nasa.gov/news-release/nasa-to-support-blue-origin-new-glenn-rocket-testing-advance-artemis/",
+          "source": "NASA",
+          "date": "2026-07-24T15:30:21.000Z",
+          "summary": "NASA and Blue Origin announced Friday they recently agreed to conduct second stage hot fire testing for the company’s New Glenn rocket on the B-2 test stand at the agency’s Stennis Space Center near Bay St. Louis, Mississippi. The annex to a reimbursable Space Act Agreement signed earlier this month"
+        },
+        {
+          "title": " Planet hunter gets the silent treatment | Space photo of the day for July 24, 2026 ",
+          "link": "https://www.space.com/space-exploration/planet-hunter-gets-the-silent-treatment-space-photo-of-the-day-for-july-24-2026",
+          "source": " Latest from Space.com ",
+          "date": "2026-07-24T14:00:00.000Z",
+          "summary": "ESA's Plato spacecraft completes critical testing ahead of its spaceflight."
+        },
+        {
+          "title": " The easiest way to learn the summer night sky starts with these 3 stars ",
+          "link": "https://www.space.com/stargazing/the-easiest-way-to-learn-the-summer-night-sky-starts-with-these-3-stars",
+          "source": " Latest from Space.com ",
+          "date": "2026-07-24T13:00:00.000Z",
+          "summary": "How to use the Summer Triangle stars — Vega, Deneb and Altair — as a key to unlock your understanding of the night sky."
+        },
+        {
+          "title": " Lightning strike on Chinese rocket captured in epic launch photo ",
+          "link": "https://www.space.com/space-exploration/launches-spacecraft/epic-photo-captures-lightning-striking-a-chinese-rocket-during-liftoff",
+          "source": " Latest from Space.com ",
+          "date": "2026-07-24T12:57:03.000Z",
+          "summary": "Lightning struck a Chinese Long March-3B rocket shortly after liftoff this week, but the launch still successfully placed its satellite payload in orbit."
+        },
+        {
+          "title": " This Week In Space LIVE: The Viking Mars landings 50 years later ",
+          "link": "https://www.space.com/astronomy/mars/this-week-in-space-live-the-viking-mars-landings-50-years-later",
+          "source": " Latest from Space.com ",
+          "date": "2026-07-24T12:00:00.000Z",
+          "summary": "Tune in today, July 24, at 1:30 p.m. ET for a LIVE This Week In Space taping to mark the 50th anniversary of the Viking landings on Mars."
+        },
+        {
+          "title": "Hubble Spies One-Sided Spiral",
+          "link": "https://science.nasa.gov/missions/hubble/hubble-spies-one-sided-spiral/",
+          "source": "NASA",
+          "date": "2026-07-24T11:11:08.000Z",
+          "summary": "This Hubble image features spiral galaxy NGC 4654, located 72 million light-years away in the constellation Virgo (the Maiden)."
+        }
+      ]
+    },
+    "gaming": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "items": [
+        {
+          "title": "Avengers, Ghost Rider, And More: Everything Marvel Revealed At San Diego Comic Con 2026",
+          "link": "https://kotaku.com/avengers-ghost-rider-and-more-everything-marvel-revealed-at-san-diego-comic-con-2026-2000719376",
+          "source": "Kotaku",
+          "date": "2026-07-26T15:14:52.000Z",
+          "summary": "The Hall H panel even included a Deadpool cameo"
+        },
+        {
+          "title": "‘Unfilmable’ Cyberpunk Classic Neuromancer Receives First Trailer",
+          "link": "https://kotaku.com/unfilmable-cyberpunk-classic-neuromancer-receives-first-trailer-2000719381",
+          "source": "Kotaku",
+          "date": "2026-07-26T15:11:22.000Z",
+          "summary": "The criminal underbelly of William Gibson’s genre shaping Sprawl comes to you from Apple TV"
+        },
+        {
+          "title": "Wuchang: Fallen Feathers tops 5 million players despite dev team's collapse",
+          "link": "https://www.eurogamer.net/wuchang-fallen-feathers-5-million-players",
+          "source": "Eurogamer.net Latest Articles Feed",
+          "date": "2026-07-26T15:05:53.000Z",
+          "summary": "Wuchang: Fallen Feathers has surpassed five million players. Read more"
+        },
+        {
+          "title": "Star Trek: Strange New Worlds cast reveal why Kirk and Spock still aren't best friends in season 4",
+          "link": "https://www.polygon.com/star-trek-strange-new-worlds-season-4-cast-interview/",
+          "source": " Polygon.com ",
+          "date": "2026-07-26T15:00:12.000Z",
+          "summary": "As the series moves closer to The Original Series, the cast explains why every episode still feels unmistakably like Star Trek."
+        },
+        {
+          "title": "Dungeons & Dragons: Honor Among Thieves 2 might never get made",
+          "link": "https://www.polygon.com/dungeons-and-dragons-honor-among-thieves-2-script-update/",
+          "source": " Polygon.com ",
+          "date": "2026-07-26T14:10:37.000Z",
+          "summary": "We got a disappointing update about a potential sequel to an underrated Dungeons & Dragons: Honor Among Thieves at San Diego Comic-Con"
+        },
+        {
+          "title": "Splatoon Raiders endgame turns it into Nintendo’s Vampire Survivors",
+          "link": "https://www.polygon.com/splatoon-raiders-endgame-vampire-survivors/",
+          "source": " Polygon.com ",
+          "date": "2026-07-26T14:00:12.000Z",
+          "summary": "Splatoon Raiders is a lot of colorful fun, but the shooter really comes alive in its chaotic endgame."
+        },
+        {
+          "title": "Marvel Boss Responds To Avengers: Doomsday Trailer Backlash Over The Lack Of Build-Up",
+          "link": "https://kotaku.com/marvels-kevin-feige-defends-lack-of-avengers-doomsday-buildup-thanos-sat-on-a-chair-2000719364",
+          "source": "Kotaku",
+          "date": "2026-07-26T13:34:07.000Z",
+          "summary": "The MCU boss was asked about fan concerns following the first trailer"
+        },
+        {
+          "title": "Marvel confirmed a Nova movie after its San Diego Comic-Con panel ended",
+          "link": "https://www.polygon.com/marvel-nova-movie-announced-comic-con/",
+          "source": " Polygon.com ",
+          "date": "2026-07-26T13:27:00.000Z",
+          "summary": "While a Nova movie wasn't announced on stage at San Diego Comic-Con, Kevin Feige confirmed one is in the works in a post-panel interview"
+        },
+        {
+          "title": "The Odyssey wouldn't be possible without Christopher Nolan's most underrated movie",
+          "link": "https://www.polygon.com/christopher-nolans-training-ground-for-the-odyssey-was-batman-begins/",
+          "source": " Polygon.com ",
+          "date": "2026-07-26T13:00:12.000Z",
+          "summary": "Christopher Nolan's most similar movie to The Odyssey is not Oppenheimer, it's Batman Begins, which employs similar storytelling techniques"
+        },
+        {
+          "title": "False Memory is the perfect excuse to binge one of anime's greatest masterpieces",
+          "link": "https://www.polygon.com/flcl-best-anime-streaming/",
+          "source": " Polygon.com ",
+          "date": "2026-07-26T12:30:12.000Z",
+          "summary": "Before False Memory premieres the surreal six-episode sci-fi anime masterpiece that changed the medium forever."
+        },
+        {
+          "title": "Halo: Combat Evolved invented Xbox, and that was just for starters",
+          "link": "https://www.polygon.com/patch-notes-halo-campaign-evolved/",
+          "source": " Polygon.com ",
+          "date": "2026-07-26T12:00:12.000Z",
+          "summary": "Bungie's 2001 masterpiece has been remade as Halo: Campaign Evolved, but no game ever needed it less"
+        },
+        {
+          "title": "Peggy Hill’s voice actor had no idea people didn’t like her King of the Hill character",
+          "link": "https://www.polygon.com/peggy-voice-actor-king-of-the-hill/",
+          "source": " Polygon.com ",
+          "date": "2026-07-26T11:00:12.000Z",
+          "summary": "While Peggy Hill is the subject of much online hate from fans of King of the Hill, voice actor Kathy Najimy had no idea"
+        },
+        {
+          "title": "10 near-perfect horror movies that capture the monsters and mayhem of The Odyssey",
+          "link": "https://www.polygon.com/10-horror-movies-to-watch-if-you-loved-the-odyssey/",
+          "source": " Polygon.com ",
+          "date": "2026-07-26T10:00:12.000Z",
+          "summary": "From The Thing and Nope to The Witch, these 10 horror movies capture the terrifying monsters, practical effects, and epic scale of The Odyssey."
+        },
+        {
+          "title": "Marvel Studios Hall H panel: All the news, trailers, and reveals",
+          "link": "https://www.polygon.com/marvel-studios-hall-h-panel-news-everything-announced/",
+          "source": " Polygon.com ",
+          "date": "2026-07-26T02:00:56.000Z",
+          "summary": "What's next for the MCU, after Avengers: Doomsday? Marvel just confirmed a new Black Panther and Ghost Rider — here's everything announced."
+        },
+        {
+          "title": "Warren Spector’s Thick As Thieves Ends Support After Just Two Months: ‘Working In The Gaming Industry Is At Times Delightful And At Other Times Heartbreaking’",
+          "link": "https://kotaku.com/warren-spectors-thick-as-thieves-ends-support-after-two-months-2000719337",
+          "source": "Kotaku",
+          "date": "2026-07-25T21:02:55.000Z",
+          "summary": "After significant layoffs at the studio, the leaner Thief successor is hoping to continue with peer-to-peer servers"
+        },
+        {
+          "title": "Multiple Meccha Chameleon Steam Workshop Maps Got Infected With Malware And Its Discord Server Was Hacked",
+          "link": "https://kotaku.com/multiple-meccha-chameleon-steam-workshop-maps-got-infected-with-malware-and-its-discord-server-was-hacked-2000719315",
+          "source": "Kotaku",
+          "date": "2026-07-25T19:48:24.000Z",
+          "summary": "While Meccha Chameleon's developers have already rolled out a fix, but the game's official Discord server seems to be a lost cause"
+        },
+        {
+          "title": "Rare Nintendo Console Discovered Throughout Japanese Love Hotel",
+          "link": "https://kotaku.com/rare-nintendo-console-discovered-throughout-japanese-love-hotel-2000719317",
+          "source": "Kotaku",
+          "date": "2026-07-25T18:08:45.000Z",
+          "summary": "Each room in an unnamed hourly establishment was outfitted with a fully functioning 'Famicombox,' resurrecting rumors that a former Nintendo president dabbled in some after hours assignments"
+        },
+        {
+          "title": "Bethesda Addresses Concerns That The Elder Scrolls 6 Will Be Impacted By Xbox Layoffs And Claims ‘The Roadmap Is Unaffected’",
+          "link": "https://kotaku.com/bethesda-addresses-concerns-that-the-elder-scrolls-6-will-be-impacted-by-xbox-layoffs-the-roadmap-is-unaffected-2000719305",
+          "source": "Kotaku",
+          "date": "2026-07-25T17:33:19.000Z",
+          "summary": "Even after announcing four new Fallout games and firing hundreds of staff, Bethesda still seems confident that The Elder Scrolls 6's internal roadmap hasn't shifted"
+        },
+        {
+          "title": "Silent Hill f writers were challenged to read \"100-200 books a year\" during production",
+          "link": "https://www.eurogamer.net/silent-hill-f-writers-read-100-200-books-a-year-during-development",
+          "source": "Eurogamer.net Latest Articles Feed",
+          "date": "2026-07-25T17:25:17.000Z",
+          "summary": "Silent Hill producer Motoi Okamoto said the scriptwriters of Silent Hill f \"pressured each other\" to read \"100 to 200 books a year\", including those from f's writer Ryukishi07, to ensure they had a thorough understanding of the writer's \"style and quirks\". Read more"
+        },
+        {
+          "title": "Aliens: Fireteam Elite 2 confirms release date and it's closer than you think",
+          "link": "https://www.eurogamer.net/aliens-fireteam-elite-2-release-date-confirmed",
+          "source": "Eurogamer.net Latest Articles Feed",
+          "date": "2026-07-25T16:39:20.000Z",
+          "summary": "Aliens: Fireteam Elite 2 will release on 25th August 2026. Read more"
+        }
+      ]
+    },
+    "crypto": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "items": [
+        {
+          "title": "Mira Murati’s Inkling AI Model Review: Best Open-Source Model in the West",
+          "link": "https://decrypt.co/373884/review-inkling-mira-murati-first-open-source-ai",
+          "source": "Decrypt",
+          "date": "2026-07-26T14:01:03.000Z",
+          "summary": "After two years of silence from Thinking Machines Lab, Murati's debut model is out and on OpenRouter. The MCP score is genuinely impressive. The price-to-performance math is more complicated."
+        },
+        {
+          "title": "Bitcoin OG selling eases as dormant BTC movement hits 4-year low: Galaxy",
+          "link": "https://cointelegraph.com/markets/bitcoin-og-dormant-btc-movement-thorn?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+          "source": "Cointelegraph.com News",
+          "date": "2026-07-26T13:06:00.000Z",
+          "summary": "Dormant BTC activity fell to its lowest level since Q3 2022, suggesting long-term holders have slowed distribution after heavy profit-taking."
+        },
+        {
+          "title": "U.S. regulator warns prediction markets against cutting corners in event contracts",
+          "link": "https://www.coindesk.com/policy/2026/07/24/u-s-regulator-warns-prediction-markets-against-cutting-corners-in-event-contracts",
+          "source": "CoinDesk: Bitcoin, Ethereum, Crypto News and Price Data",
+          "date": "2026-07-26T13:00:00.000Z",
+          "summary": "The Commodity Futures Trading Commission again issued an advisory that signals firms have been straying into cookie-cutter self-certification."
+        },
+        {
+          "title": "Here’s what happened in crypto today",
+          "link": "https://cointelegraph.com/news/what-happened-in-crypto-today?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+          "source": "Cointelegraph.com News",
+          "date": "2026-07-26T12:04:52.000Z",
+          "summary": "Need to know what happened in crypto today? Here is the latest news on daily trends and events impacting Bitcoin price, blockchain, DeFi, Web3 and crypto regulation."
+        },
+        {
+          "title": "South Korea’s largest bank to launch payment service on JPMorgan’s Kinexys",
+          "link": "https://cointelegraph.com/news/south-korea-bank-payment-jpmorgans-kinexys?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+          "source": "Cointelegraph.com News",
+          "date": "2026-07-26T10:23:00.000Z",
+          "summary": "KB Kookmin Bank will use JPMorgan’s blockchain platform to support US dollar cross-border payments for import and export businesses across 10 countries."
+        },
+        {
+          "title": "Europe's high regulatory bar could spark new crypto industry M&A wave",
+          "link": "https://www.coindesk.com/policy/2026/07/26/europe-s-high-regulatory-bar-could-spark-new-crypto-industry-m-and-a-wave",
+          "source": "CoinDesk: Bitcoin, Ethereum, Crypto News and Price Data",
+          "date": "2026-07-26T10:00:00.000Z",
+          "summary": "As MiCA beds in and the U.K. finalizes its crypto framework, stringent regulation could spur mergers, acquisitions and closer ties with banks."
+        },
+        {
+          "title": "Shiba Inu surges 36% as South Korean traders fuel mystery rally",
+          "link": "https://www.coindesk.com/markets/2026/07/26/shiba-inu-surges-36-as-south-korean-traders-fuel-mystery-rally",
+          "source": "CoinDesk: Bitcoin, Ethereum, Crypto News and Price Data",
+          "date": "2026-07-26T07:29:45.000Z",
+          "summary": "The rally has no announcement behind it, other dog tokens haven't matched it, and Korean venues are carrying the volume."
+        },
+        {
+          "title": "BitMart to wind down exchange, end trading by Aug. 26",
+          "link": "https://cointelegraph.com/news/bitmart-wind-down-exchange-end-trading?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+          "source": "Cointelegraph.com News",
+          "date": "2026-07-26T07:13:00.000Z",
+          "summary": "Crypto exchange BitMart said it will wind down operations after its BMX token plunged and users reported withdrawal delays, with platform operations set to end in January."
+        },
+        {
+          "title": "Crypto exchange BitMart to shut down after nine years, BMX token crashes 58%",
+          "link": "https://www.coindesk.com/markets/2026/07/26/crypto-exchange-bitmart-to-shut-down-after-nine-years-bmx-token-crashes-58",
+          "source": "CoinDesk: Bitcoin, Ethereum, Crypto News and Price Data",
+          "date": "2026-07-26T06:59:51.000Z",
+          "summary": "Users have a month to close trades and six months to withdraw funds, and the exchange gave no specific reason for the closure."
+        },
+        {
+          "title": "Binance ‘red teams’ its own staff every month to keep hackers out",
+          "link": "https://cointelegraph.com/news/binance-red-teams-own-staff-every-month-to-keep-hackers-out?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+          "source": "Cointelegraph.com News",
+          "date": "2026-07-26T02:01:00.000Z",
+          "summary": "Binance regularly tests its employees for security hygiene, as social engineering is becoming a major source of industry breaches."
+        },
+        {
+          "title": "Robinhood in talks with Crypto.com over prediction markets: WSJ",
+          "link": "https://cointelegraph.com/news/robinhood-cryptocom-prediction-markets?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+          "source": "Cointelegraph.com News",
+          "date": "2026-07-25T21:05:00.000Z",
+          "summary": "While prediction market companies in the US continue to face legal battles between state and federal authorities, Robinhood is reportedly considering expanding its services."
+        },
+        {
+          "title": "Bitcoin advocacy group to join US State Department’s ‘digital freedom’ program",
+          "link": "https://cointelegraph.com/news/bitcoin-policy-institute-state-department-program?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+          "source": "Cointelegraph.com News",
+          "date": "2026-07-25T18:19:00.000Z",
+          "summary": "The Bitcoin Policy Institute and three partner organizations will be able to send employees to work alongside State Department officials to address issues including digital freedom."
+        },
+        {
+          "title": "Russia’s largest bank Sberbank plans crypto trading infrastructure by December",
+          "link": "https://www.coindesk.com/business/2026/07/25/russia-s-largest-bank-sberbank-plans-crypto-trading-infrastructure-by-december",
+          "source": "CoinDesk: Bitcoin, Ethereum, Crypto News and Price Data",
+          "date": "2026-07-25T16:59:36.000Z",
+          "summary": "New regulations for crypto trading, custody, and settlement in Russia take effect Sept. 1, with requirements for licensed intermediaries applying from July 2027."
+        },
+        {
+          "title": " Wise to resubmit US bank charter application under GENIUS Act",
+          "link": "https://cointelegraph.com/news/wise-resubmit-occ-charter-application-genius-stablecoins?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+          "source": "Cointelegraph.com News",
+          "date": "2026-07-25T16:10:00.000Z",
+          "summary": "The OCC denied the UK company’s application this week citing AML/CFT risks, despite approving similar charters for digital asset companies in the last year."
+        },
+        {
+          "title": "North Korea arrests hackers accused of laundering stolen funds from country's bank via crypto",
+          "link": "https://www.coindesk.com/business/2026/07/25/north-korea-arrests-hackers-accused-of-laundering-stolen-funds-from-country-s-bank-via-crypto",
+          "source": "CoinDesk: Bitcoin, Ethereum, Crypto News and Price Data",
+          "date": "2026-07-25T15:46:05.000Z",
+          "summary": "The group allegedly breached Central Bank systems, converted crypto to cash via Chinese brokers, and used small transfers to evade detection."
+        },
+        {
+          "title": "What Is an AI Kill Switch and Why Do US Lawmakers Want One?",
+          "link": "https://decrypt.co/374332/what-is-ai-kill-switch-openai-hack-hugging-face",
+          "source": "Decrypt",
+          "date": "2026-07-25T14:01:03.000Z",
+          "summary": "The AI Kill Switch Act would let Homeland Security order frontier AI throttled or shut down, with fines up to $20 million a day for defying it."
+        },
+        {
+          "title": "Democratizing weather derivatives through tokenization could be crypto's most important real-world use case",
+          "link": "https://www.coindesk.com/opinion/2026/07/25/democratizing-weather-derivatives-through-tokenization-could-be-crypto-s-most-important-real-world-use-case",
+          "source": "CoinDesk: Bitcoin, Ethereum, Crypto News and Price Data",
+          "date": "2026-07-25T13:00:00.000Z",
+          "summary": "Main Street, which faces the most significant climate-related financial risk, currently lacks an avenue to hedge weather-related risks, argues CoinDesk’s Omkar Godbole."
+        },
+        {
+          "title": "Fidelity joins push for Senate passage of CLARITY Act",
+          "link": "https://cointelegraph.com/news/fidelity-push-senate-passage-of-clarity-act?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+          "source": "Cointelegraph.com News",
+          "date": "2026-07-25T11:32:00.000Z",
+          "summary": "Fidelity called on the US Senate to pass the CLARITY Act, joining industry groups and crypto firms pushing for market structure legislation."
+        },
+        {
+          "title": "Dango’s perp DEX taps out nearly 4 months after launch",
+          "link": "https://cointelegraph.com/news/dangos-perp-dex-taps-nearly-months-launch?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+          "source": "Cointelegraph.com News",
+          "date": "2026-07-25T10:05:00.000Z",
+          "summary": "Dango will close its network on Aug. 13, joining BitMEX, Odos and Satori Finance in a wave of recent crypto shutdowns."
+        }
+      ]
+    },
+    "culture": {
+      "updatedAt": "2026-07-26T15:40:07.288Z",
+      "items": [
+        {
+          "title": "‘The Odyssey’ Holds Strong for Big Second Weekend of $87M, Passes $600M Globally",
+          "link": "https://www.hollywoodreporter.com/movies/movie-news/the-odyssey-big-second-weekend-box-office-1236656039/",
+          "source": "The Hollywood Reporter",
+          "date": "2026-07-26T15:12:42.000Z",
+          "summary": "The film boasts one of the best second weekend ever for an R-rated movie, behind only 'Deadpool & Wolverine.'"
+        },
+        {
+          "title": "‘Rick and Morty’ Spinoff ‘President Curtis’ Plays It Safe, but Keeps the Sci-Fi Franchise Cruising: TV Review",
+          "link": "https://variety.com/2026/tv/reviews/president-curtis-review-rick-and-morty-spinoff-1236817266/",
+          "source": "Variety",
+          "date": "2026-07-26T15:00:00.000Z",
+          "summary": "“They spin off so fast,” Morty (Harry Belden) sighs of the latest visitors to the garage he shares with his grandfather Rick (Ian Cardoni). “I give it 10 episodes,” Rick replies. The scene is an obligatory, efficient passing of the baton from the characters’ namesake show “Rick and Morty,” a juggern"
+        },
+        {
+          "title": "Inside ‘Colony’: ‘Train to Busan’ Director Yeon Sang-ho and Gianna Jun Discuss Their Thrilling New Take on the Zombie Movie",
+          "link": "https://variety.com/2026/film/news/colony-south-korea-yeon-sang-ho-gianna-jun-ji-hyun-zombie-movie-train-to-busan-1236821333/",
+          "source": "Variety",
+          "date": "2026-07-26T15:00:00.000Z",
+          "summary": "“Train to Busan” proved that humans can’t outrun the infected. “Colony” proves they can’t outsmart them. Director Yeon Sang-ho returns to the zombie genre with his third live-action thriller, “Colony,” expanding the “Yeoniverse,” the cinematic universe he’s built through his genre-defining horror fi"
+        },
+        {
+          "title": "Box Office: ‘Toy Story 5’ Crosses $1 Billion, Becomes Highest-Grossing Movie of the Year",
+          "link": "https://variety.com/2026/film/box-office/toy-story-5-billion-dollar-box-office-1236818437/",
+          "source": "Variety",
+          "date": "2026-07-26T14:50:59.000Z",
+          "summary": "Who says toys are outdated? Disney and Pixar’s “Toy Story 5,” which grapples with the reality that kids would rather play with tech than dolls, has surpassed $1 billion globally and now ranks as the highest-grossing release of the year. The film has earned $448 million domestically and $573 million "
+        },
+        {
+          "title": "‘Films Are Like Dreams and Magic Tricks’: A Conversation with Mike Mills",
+          "link": "https://www.rollingstone.com/tv-movies/tv-movie-features/mike-mills-interview-criterion-1235596482/",
+          "source": "Rolling Stone",
+          "date": "2026-07-26T14:15:00.000Z",
+          "summary": "The writer-director opens up about a Criterion Collection box set of his work, personal filmmaking, music, and more"
+        },
+        {
+          "title": "Darlene Love Is 85. She’s Not Even Thinking About Retirement",
+          "link": "https://www.rollingstone.com/music/music-features/darlene-love-christmas-concert-retirement-1235598104/",
+          "source": "Rolling Stone",
+          "date": "2026-07-26T14:00:00.000Z",
+          "summary": "The vocalist behind some of Phil Spector's greatest songs is plotting a residency, working on a documentary, and trying to put together an all-star holiday show"
+        },
+        {
+          "title": "Marvel Casts Ryan Gosling as Ghost Rider for 2028 Film: ‘A Character I’ve Wanted to Play for a Long Time’",
+          "link": "https://www.rollingstone.com/tv-movies/tv-movie-news/marvel-ryan-gosling-ghost-rider-david-jonsson-black-panther-1235598892/",
+          "source": "Rolling Stone",
+          "date": "2026-07-26T13:49:23.000Z",
+          "summary": "Comic-Con panel also reveals that actor David Jonsson will take over as Black Panther in the third installment of that series"
+        },
+        {
+          "title": "PBS SoCal, KMEX Lead L.A. Local Emmy Wins; KVEA, KABC Land Top Newscast Prizes",
+          "link": "https://variety.com/2026/tv/news/la-local-emmy-winners-pbs-socal-leads-kvea-kabc-1236821371/",
+          "source": "Variety",
+          "date": "2026-07-26T07:39:20.000Z",
+          "summary": "PBS SoCal (KOCE and KCET) was the big winner Saturday night at the L.A. Area Emmy Awards, landing eight — including for live events-programming, entertainment, crime/social issues and arts. Univision’s KMEX was next, with seven, followed by Telemundo’s KVEA with six. KVEA once again won the newscast"
+        },
+        {
+          "title": "The Doom Boom: Marvel Studios Brings ‘Doomsday’ and More to Its Most Crowded Comic-Con Panel Ever",
+          "link": "https://www.hollywoodreporter.com/movies/movie-news/marvel-studios-doomsday-comic-con-panel-recap-1236656358/",
+          "source": "The Hollywood Reporter",
+          "date": "2026-07-26T04:39:06.000Z",
+          "summary": "Big reveals, exclusive footage, and costumes for everyone!"
+        },
+        {
+          "title": "Winston Duke Trusts David Jonsson to Take On ‘Black Panther’: ‘I Think It’s Going to Be Great’",
+          "link": "https://variety.com/2026/film/news/winston-duke-david-jonsson-black-panther-3-1236821351/",
+          "source": "Variety",
+          "date": "2026-07-26T03:55:28.000Z",
+          "summary": "Winston Duke is officially returning to Wakanda for “Black Panther 3”, and David Jonsson is coming along with him. Marvel teased the third “Black Panther” at San Diego Comic-Con, which releases Dec. 15, 2028. Jonsson will play T’Challa’s son, Prince T’Challa II, continuing the late Chadwick Boseman’"
+        },
+        {
+          "title": "Ryan Reynolds’ Deadpool Crashes Comic-Con to Beg for ‘Avengers: Doomsday’ Role",
+          "link": "https://www.hollywoodreporter.com/movies/movie-news/ryan-reynolds-deadpool-avengers-doomsday-comic-con-1236656648/",
+          "source": "The Hollywood Reporter",
+          "date": "2026-07-26T03:10:11.000Z",
+          "summary": "\"When do you start filming?\" asked the star, who appeared in a new gray costume and endured a barb from Paul Rudd during Marvel's high-profile panel."
+        },
+        {
+          "title": "Warner Bros. Sues Amazon, Accusing Company of “Seeking to Pirate Away Employees”",
+          "link": "https://www.hollywoodreporter.com/tv/tv-news/warner-bros-amazon-lawsuit-pirate-away-employees-pia-barlow-1236656642/",
+          "source": "The Hollywood Reporter",
+          "date": "2026-07-26T03:02:11.000Z",
+          "summary": "Warner Bros. alleges intentional interference with contractual relations, breach of contract, intentional interference with prospective economic advance and unfair competition against Amazon in the suit that was filed on Tuesday"
+        },
+        {
+          "title": "‘Black Panther 3’: David Jonsson to Star as T’Challa’s Son, Sequel Set for 2028",
+          "link": "https://www.hollywoodreporter.com/movies/movie-news/black-panther-3-marvel-ryan-coogler-comic-con-1236656570/",
+          "source": "The Hollywood Reporter",
+          "date": "2026-07-26T01:45:55.000Z",
+          "summary": "The crown jewel of this year's Comic-Con was Saturday's Marvel Studios panel, where the actor was announced as a grown version of T'Challa's son."
+        },
+        {
+          "title": "‘Coyote vs. Acme’ Director and Star Lana Condor on Finally Showing Their Film to the Fans at Comic-Con: ‘The Fight Was For a Good Reason’",
+          "link": "https://variety.com/2026/film/news/coyote-vs-acme-director-lana-condor-public-screening-fans-comic-con-1236821209/",
+          "source": "Variety",
+          "date": "2026-07-26T01:34:19.000Z",
+          "summary": "If you went back to November 2023 and told “Coyote vs. Acme” director Dave Green that his Looney Toons legal comedy would make its debut at San Diego Comic-Con, he probably wouldn’t believe it. Of course, that’s largely because that’s when Green learned the film had been shelved by Warner Bros. Disc"
+        },
+        {
+          "title": "Prime Video Unveils Teaser, Release Date for Mike Flanagan’s ‘Carrie’ Series",
+          "link": "https://www.hollywoodreporter.com/tv/tv-news/prime-video-carrie-series-teaser-trailer-1236655407/",
+          "source": "The Hollywood Reporter",
+          "date": "2026-07-26T00:50:00.000Z",
+          "summary": "At the end of the ‘Carrie’ panel at San Diego Comic-Con, showrunner Mike Flanagan announced that all eight episodes of the series adaptation of Stephen King’s classic will premiere on Oct. 7."
+        },
+        {
+          "title": "John Cena Races to Find a Nuclear Warhead in ‘Matchbox the Movie’ Trailer",
+          "link": "https://www.hollywoodreporter.com/movies/movie-news/john-cena-matchbox-the-movie-trailer-watch-1236656615/",
+          "source": "The Hollywood Reporter",
+          "date": "2026-07-26T00:39:07.000Z",
+          "summary": "Jessica Biel also stars in Sam Hargrave's feature that debuted its first footage at Comic-Con ahead of its fall launch."
+        }
+      ]
+    },
+    "sports": {
+      "updatedAt": "2026-07-26T16:18:15.943Z",
+      "items": [
+        {
+          "title": "Ricky Proehl's 'I scored a touchdown' story: SB XXXVI",
+          "link": "https://www.espn.com/video/clip/_/id/49455521/sb-xxxvi",
+          "source": "ESPN NFL",
+          "date": "2026-07-26T15:43:42Z",
+          "summary": "Ricky Proehl's 'I scored a touchdown' story: SB XXXVI"
+        },
+        {
+          "title": "Fowler: Bucs 'optimistic' they can get deal done with Baker Mayfield",
+          "link": "https://www.espn.com/video/clip/_/id/49454449/bucs-optimistic-get-deal-done-baker-mayfield",
+          "source": "ESPN NFL",
+          "date": "2026-07-26T13:41:02Z",
+          "summary": "Fowler: Bucs 'optimistic' they can get deal done with Baker Mayfield"
+        },
+        {
+          "title": "Sources: Caldwell-Pope to join 76ers after Grizzlies buyout",
+          "link": "https://www.espn.com/nba/story/_/id/49449509/sources-caldwell-pope-join-76ers-grizzlies-buyout",
+          "source": "ESPN NBA",
+          "date": "2026-07-26T13:33:19Z",
+          "summary": "Kentavious Caldwell-Pope has agreed to a buyout with the Grizzlies and plans to sign a one-year deal with the 76ers after clearing waivers, sources told ESPN."
+        },
+        {
+          "title": "LeBron James rode 'emotional roller coaster' before decision",
+          "link": "https://www.espn.com/nba/story/_/id/49448932/lebron-james-rode-emotional-roller-coaster-decision",
+          "source": "ESPN NBA",
+          "date": "2026-07-26T13:25:14Z",
+          "summary": "Rich Paul called the lead-up to LeBron James' decision to join the Sixers an \"emotional roller coaster\" that didn't end until early Friday morning."
+        },
+        {
+          "title": "How will Patriots QB Drake Maye adjust to his new center?",
+          "link": "https://www.espn.com/nfl/story/_/id/49450705/new-england-patriots-qb-drake-maye-new-center-jared-wilson",
+          "source": "ESPN NFL",
+          "date": "2026-07-26T10:00:04Z",
+          "summary": "Jared Wilson is sliding from left guard to center, the position he played in college at Georgia."
+        },
+        {
+          "title": "Why Dolphins rookie class could be among NFL's most impactful",
+          "link": "https://www.espn.com/nfl/story/_/id/49440506/nfl-training-camp-2026-season-dolphins-rookies-impact",
+          "source": "ESPN NFL",
+          "date": "2026-07-26T10:00:03Z",
+          "summary": "The Dolphins drafted 13 players in the spring. They all will have a chance to make an impact this season."
+        },
+        {
+          "title": "2026 Seattle Seahawks training camp: Latest intel, updates",
+          "link": "https://www.espn.com/nfl/story/_/id/49427699/seattle-seahawks-training-camp-2026-intel-updates",
+          "source": "ESPN NFL",
+          "date": "2026-07-26T01:38:47Z",
+          "summary": "Follow our daily updates from Seahawks training camp, including intel on QBs, position battles and potential breakouts."
+        },
+        {
+          "title": "Spencer Jones agrees to Thunder offer; Nuggets get option to match",
+          "link": "https://www.espn.com/nba/story/_/id/49447641/spencer-jones-agrees-thunder-offer-nuggets-get-option-match",
+          "source": "ESPN NBA",
+          "date": "2026-07-25T17:04:01Z",
+          "summary": "Restricted free agent Spencer Jones has agreed to a two-year, $12 million offer sheet with the Thunder, his agent told ESPN, with the Nuggets having the option to match the deal until Sunday night."
+        },
+        {
+          "title": "What's next for teams that missed out on LeBron?",
+          "link": "https://www.espn.com/video/clip/_/id/49447053/next-teams-missed-lebron",
+          "source": "ESPN NBA",
+          "date": "2026-07-25T15:37:23Z",
+          "summary": "What's next for teams that missed out on LeBron?"
+        },
+        {
+          "title": "LeBron chooses 76ers: Why not Cavs or Heat? Here's what Windy knows",
+          "link": "https://www.espn.com/nba/story/_/id/49443519/lebron-76ers-cavaliers-heat-everything-windhorst-knows-stunning-decision",
+          "source": "ESPN NBA",
+          "date": "2026-07-25T13:16:58Z",
+          "summary": "This decision creates massive questions for Philly, Cleveland, Miami and the legend who once again just rocked the NBA."
+        },
+        {
+          "title": "Kevin Negandhi: Today is an incredible day to be a 76ers fan",
+          "link": "https://www.espn.com/video/clip/_/id/49442605/today-incredible-day-76ers-fan",
+          "source": "ESPN NBA",
+          "date": "2026-07-24T23:35:33Z",
+          "summary": "Kevin Negandhi: Today is an incredible day to be a 76ers fan"
+        }
+      ]
+    }
+  },
+  "labels": {
+    "must_include": [],
+    "must_exclude": []
+  }
+}
