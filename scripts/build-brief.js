@@ -49,5 +49,5 @@ const items = digest.sections.reduce((n, s) => n + (s.items?.length || 0), 0);
 console.log(`Brief: ${digest.sections.length} sections, ${items} items, theme ${theme}`);
 console.log(
   "Sponsy:",
-  ["top", "primary", "footer"].map((k) => `${k}=${sponsors[k] ? `"${sponsors[k].title}"` : "—"}`).join(" ")
+  ["top", "primary", "footer"].map((k) => `${k}=${sponsors[k] ? `"${sponsors[k].title}" -> ${sponsors[k].url || "NO LINK"}` : "—"}`).join(" ")
 );

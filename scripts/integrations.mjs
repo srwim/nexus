@@ -50,17 +50,31 @@ function slotToSponsor(slot) {
 
   const bodyHtml = (field("Ad Copy", "Text", "Body") || slot.copy?.html || "").trim();
   const bodyText = (slot.copy?.markdown || "").trim();
-  // Sponsy's link picker stores each custom link as { title, url } on the slot,
-  // where `title` is the anchor text the advertiser chose. Prefer that over the
-  // plain "Link" field so the plug reads as intended instead of a bare URL.
-  const firstLink = slot.links?.[0];
-  const linkObj = typeof firstLink === "string" ? { url: firstLink } : firstLink || {};
-  const url = linkObj.url || field("Link", "URL") || slot.parsedUrls?.[0] || slot.customer?.website || "";
+
+  // Sponsy exposes a sponsor's destination in several places depending on how
+  // the advertiser entered it — the link picker, a "Link" field, an anchor typed
+  // into the rich-text copy, or the customer record. Check every one: a sponsor
+  // link that silently doesn't render is revenue quietly not delivered.
+  // Sponsy's link picker stores { title, url }, where `title` is the anchor text
+  // the advertiser chose — preferred over a bare URL so the plug reads properly.
+  const links = (Array.isArray(slot.links) ? slot.links : []).map((l) =>
+    typeof l === "string" ? { url: l } : l || {}
+  );
+  const linkObj = links.find((l) => l.url) || {};
+  const hrefInCopy = (`${bodyHtml} ${bodyText}`.match(/href=["'](https?:\/\/[^"']+)/i) || [])[1] || "";
+  const url =
+    linkObj.url ||
+    field("Link", "URL") ||
+    slot.parsedUrls?.[0] ||
+    hrefInCopy ||
+    slot.customer?.website ||
+    "";
+
   return {
     title: strip(field("Title")) || slot.customer?.name || "Our sponsor",
     bodyHtml, // rendered as-is when present
     body: bodyHtml ? "" : bodyText, // otherwise plain text (escaped)
-    url: typeof url === "string" ? url : "",
+    url: typeof url === "string" ? url.trim() : "",
     cta: strip(field("CTA", "Call to Action")), // may be empty
     linkText: strip(String(linkObj.title || "")), // anchor text, may be empty
   };
