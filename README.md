@@ -36,24 +36,29 @@ The daily send is two jobs with a measurement between them:
 build-brief  ──►  [ eval gate ]  ──►  send
                                       Resend · Slack · Drive · HubSpot
    builds and freezes        clean suite + score ≥ threshold
-   today's brief,            └─► environment: auto        (sends unattended)
+   today's brief,            └─► environment: auto
    uploads it as an          otherwise
-   artifact to read          └─► environment: digest-send (blocks for review)
+   artifact to read          └─► environment: digest-send
 ```
 
 `build-brief` produces the brief, freezes it to `brief.json`, and uploads it as
 an artifact. `evals/run.js --gate` then scores it and emits a verdict, which the
 `send` job consumes as its GitHub Environment name. Sending the *frozen* brief
-rather than rebuilding is deliberate: what ships is what was approved.
+rather than rebuilding is deliberate: what ships is what was measured.
 
-Autonomy scales with measured confidence rather than being assumed. The gate
-starts fully closed — `THRESHOLD` is 5 and the rubric metric isn't wired, so
-`score` is `null` and every brief routes to a human. As eval history
-accumulates and the rubric earns trust, the threshold comes down and more sends
-go unattended; a must-exclude violation always pulls it back to review,
-regardless of score. The policy is one function in
-[`evals/gate.js`](evals/gate.js), and every threshold change is logged in
-[`docs/EVALS.md`](docs/EVALS.md).
+Autonomy scales with measured confidence rather than being assumed. `THRESHOLD`
+is 5 and the rubric metric isn't wired, so `score` is `null` and every brief is
+currently routed to `digest-send`. As eval history accumulates and the rubric
+earns trust, the threshold comes down and more sends route to `auto`; a
+must-exclude violation always pulls it back, regardless of score. The policy is
+one function in [`evals/gate.js`](evals/gate.js), and every threshold change is
+logged in [`docs/EVALS.md`](docs/EVALS.md).
+
+**Enforcement is a repo setting, not code.** Routing is live, but a GitHub
+Environment only blocks if it has protection rules. `digest-send` currently has
+none, so runs route there and proceed. Adding a required reviewer under
+Settings → Environments → `digest-send` turns the same verdict into a hard stop
+with a notification, an approval UI, and an audit trail — no diff required.
 
 ```bash
 npm test         # ranking + scorer + gate
