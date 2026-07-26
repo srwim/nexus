@@ -49,7 +49,7 @@ const defaultTheme =
   envTheme === "dark" || envTheme === "light" ? envTheme : prebuilt?.theme ?? (config.theme === "dark" ? "dark" : "light");
 console.log(
   "Sponsy:",
-  ["top", "primary", "footer"].map((k) => `${k}=${sponsors[k] ? `"${sponsors[k].title}"` : "—"}`).join(" ")
+  ["top", "primary", "footer"].map((k) => `${k}=${sponsors[k] ? `"${sponsors[k].title}" -> ${sponsors[k].url || "NO LINK"}` : "—"}`).join(" ")
 );
 
 // Per-recipient one-click unsubscribe link, signed so it can't be forged.
