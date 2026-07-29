@@ -63,9 +63,20 @@ export default {
       // Quoted city keeps results local; the full state name disambiguates
       // common city names without over-restricting.
       const q = `"${place.city}" ${stateFull}`;
+
+      // Without a date window, "give me 10 results" returns the 10 most recent
+      // EVER — so a town with little coverage backfills with two-week-old
+      // stories. Bounding it means quiet markets return fewer items instead of
+      // stale ones. Keep in step with MAX_AGE_DAYS in lib/clientLocal.js.
+      //
+      // The boundary is rounded to midnight so the URL stays identical all day
+      // and the edge cache still works; a live timestamp would make every
+      // request unique and burn the 100/day free quota.
+      const since = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
       const apiUrl =
         `https://gnews.io/api/v4/search?q=${encodeURIComponent(q)}` +
-        `&country=us&lang=en&max=10&apikey=${env.GNEWS_KEY}`;
+        `&country=us&lang=en&max=10&sortby=publishedAt&from=${since}T00:00:00Z` +
+        `&apikey=${env.GNEWS_KEY}`;
 
       const res = await fetch(apiUrl, { cf: { cacheTtl: 900, cacheEverything: true } });
       if (!res.ok) {
