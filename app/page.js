@@ -31,7 +31,7 @@ export default function Home() {
 
   return (
     <div>
-      <h1>Your Feed</h1>
+      <h1>Your <em>Feed</em></h1>
       <p className="subtitle">
         Ranked by your topic ratings · <Link href="/settings" style={{ color: "var(--accent)" }}>adjust them anytime</Link>
         {digest.updatedAt ? (

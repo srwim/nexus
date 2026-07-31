@@ -1,14 +1,30 @@
+/* Fonts must be imported before any other rule. Loaded over the network rather
+   than self-hosted via next/font: if Google Fonts is ever unreachable the page
+   still renders on the fallback stack, whereas a build-time fetch would fail
+   the deploy outright. */
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400&display=swap");
+
+/* ==========================================================================
+   NEXUS on the AROK design system.
+     · clay #c07a4b = interaction      · moss #a3b18a = affirmative / yours
+     · square corners, hairline rules  · mono is the label + metadata voice
+   ========================================================================== */
+
 :root {
-  --bg: #0b0b0f;
-  --panel: #14141b;
-  --panel-2: #1b1b25;
-  --border: #262633;
-  --text: #e7e7ee;
-  --muted: #9ca3af;
-  --accent: #6ee7b7;
-  --accent-dim: #059669;
-  --danger: #f87171;
-  --star: #fbbf24;
+  --bg: #0b0b0a;        /* warm ink, matches arok.ai */
+  --panel: #141412;
+  --panel-2: #1e1e1b;
+  --border: #2b2b26;
+  --text: #e9e5db;      /* paper */
+  --muted: #9c988d;
+  --accent: #c07a4b;    /* clay — interaction only */
+  --accent-dim: #5c3722; /* tinted panel; paper reads 8.3:1 on it */
+  --danger: #d4503a;
+  --star: #a3b18a;      /* moss — these are the reader's own weights */
+
+  --sans: "Archivo", -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+  --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -16,7 +32,8 @@
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -32,7 +49,7 @@ a { color: inherit; text-decoration: none; }
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
-  background: rgba(11, 11, 15, 0.9);
+  background: rgba(11, 11, 10, 0.9); /* must track --bg, or the blur reads cool */
   backdrop-filter: blur(10px);
   z-index: 10;
 }
@@ -41,84 +58,155 @@ a { color: inherit; text-decoration: none; }
 .topbar-logo img {
   width: 44px;
   height: 44px;
-  border-radius: 50%;
+  border-radius: 50%; /* the orb stays round — squaring it would break the mark */
   display: block;
   transition: transform .15s, box-shadow .15s;
 }
-.topbar-logo:hover img { transform: scale(1.06); box-shadow: 0 0 0 2px var(--accent-dim); }
+.topbar-logo:hover img { transform: scale(1.06); box-shadow: 0 0 0 2px var(--accent); }
 
 .brand { justify-self: center; font-size: 40px; font-weight: 800; letter-spacing: 3px; line-height: 1; }
-.brand span { color: var(--accent); }
+.brand span {
+  font-family: var(--sans);
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
 
 .topbar nav { justify-self: end; display: flex; gap: 22px; }
-.topbar nav a { color: var(--muted); font-size: 14px; font-weight: 600; transition: color .15s; }
+.topbar nav a {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  transition: color .15s;
+}
 .topbar nav a:hover { color: var(--accent); }
 
 main { flex: 1; width: 100%; max-width: 980px; margin: 0 auto; padding: 28px 20px 60px; }
 
-.footer { text-align: center; color: #565664; font-size: 12px; padding: 18px; border-top: 1px solid var(--border); }
-.footer-site { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-top: 8px; color: #6b7280; }
-.footer-site a { color: #9ca3af; transition: color .15s; }
+.footer { text-align: center; color: var(--muted); font-size: 12px; padding: 18px; border-top: 1px solid var(--border); }
+.footer-site { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-top: 8px; color: var(--muted); }
+.footer-site,
+.footer-site a { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; }
+.footer-site a { color: var(--muted); transition: color .15s; }
 .footer-site a:hover { color: var(--accent); }
 
-h1 { font-size: 26px; margin-bottom: 6px; }
-.subtitle { color: var(--muted); font-size: 14px; margin-bottom: 26px; }
+/* One word of the title carries the serif italic, as across the system. */
+h1 { font-family: var(--sans); font-size: 26px; font-weight: 500; letter-spacing: -.03em; line-height: 1.0; margin-bottom: 6px; }
+h1 em, h1 .accent {
+  font-family: var(--serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1.1em;
+  color: var(--accent);
+}
+.subtitle {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  margin-bottom: 26px;
+}
 
 .tldr {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--accent-dim);
-  border-radius: 10px;
   padding: 14px 16px;
   margin: -6px 0 28px;
   font-size: 14px;
   line-height: 1.6;
   color: var(--text);
 }
-.tldr-label { color: var(--accent); font-weight: 800; letter-spacing: 0.5px; margin-right: 8px; }
+.tldr-label {
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  margin-right: 8px;
+}
 .tldr-link { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--border); }
-.tldr-link:hover { color: var(--accent); border-bottom-color: var(--accent-dim); }
-.tldr-sep { color: var(--muted); }
+.tldr-link:hover { color: var(--accent); border-bottom-color: var(--accent); }
+.tldr-sep { color: var(--border); }
 
 .section { margin-bottom: 34px; }
 .section-head {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  border-bottom: 2px solid var(--accent-dim);
+  border-bottom: 1px solid var(--border);
   padding-bottom: 8px;
   margin-bottom: 4px;
 }
-.section-head h2 { font-size: 15px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); }
-.section-head .meta { color: var(--muted); font-size: 12px; }
+.section-head h2 {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+/* The star rating beside each topic head means the same thing as the Settings
+   stars, so it takes the same moss. It was inheriting --muted. */
+.section-head .meta {
+  color: var(--star);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
 
+/* Stories are hairline rows, not floating cards. */
 .article {
   display: block;
   padding: 14px 10px;
+  border: 0;
   border-bottom: 1px solid var(--border);
-  border-radius: 8px;
-  transition: background .15s;
+  transition: background .2s ease, padding-left .2s ease;
 }
-.article:hover { background: var(--panel); }
-.article .title { font-size: 15px; font-weight: 600; line-height: 1.4; }
-.article .snippet { color: var(--muted); font-size: 13px; margin-top: 5px; line-height: 1.5; }
-.article .src { color: #6b7280; font-size: 12px; margin-top: 6px; }
+.article:hover { background: var(--panel); padding-left: 12px; }
+.article .title { font-family: var(--sans); font-size: 15px; font-weight: 500; letter-spacing: -.01em; line-height: 1.4; }
+.article:hover .title { color: var(--accent); }
+.article .snippet { font-family: var(--sans); color: var(--muted); font-size: 13px; margin-top: 5px; line-height: 1.5; }
+.article .src {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  margin-top: 6px;
+}
 
 .card {
   background: var(--panel);
   border: 1px solid var(--border);
-  border-radius: 14px;
   padding: 20px;
   margin-bottom: 18px;
 }
 
 .weather-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 10px; }
-.weather-cell { background: var(--panel-2); border-radius: 10px; padding: 14px; }
-.weather-cell .period { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-.weather-cell .temp { font-size: 24px; font-weight: 800; margin: 4px 0; color: var(--accent); }
+.weather-cell { background: transparent; border: 1px solid var(--border); padding: 14px; }
+.weather-cell .period {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+}
+.weather-cell .temp { font-family: var(--serif); font-size: 24px; font-weight: 400; letter-spacing: -.02em; margin: 4px 0; color: var(--accent); }
 .weather-cell .desc { font-size: 13px; color: var(--text); }
 
-.alert { color: var(--danger); font-size: 13px; padding: 6px 0; }
+/* Alerts stay loud — the one place colour is allowed to shout. */
+.alert {
+  color: var(--danger);
+  font-family: var(--sans);
+  border-left: 2px solid var(--danger);
+  padding: 6px 0 6px 10px;
+  font-size: 13px;
+}
 
 /* Settings */
 .pref-row {
@@ -127,11 +215,19 @@ h1 { font-size: 26px; margin-bottom: 6px; }
   justify-content: space-between;
   gap: 14px;
   padding: 14px 4px;
+  border-top: 0;
   border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
 }
-.pref-label { font-size: 15px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-.pref-label small { color: var(--muted); font-weight: 400; }
+.pref-label { font-family: var(--sans); font-size: 15px; font-weight: 500; display: flex; align-items: center; gap: 10px; }
+.pref-label small {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-weight: 400;
+}
 
 .stars { display: flex; gap: 4px; }
 .stars button {
@@ -139,96 +235,113 @@ h1 { font-size: 26px; margin-bottom: 6px; }
   border: none;
   font-size: 22px;
   cursor: pointer;
-  color: #3f3f4d;
-  transition: transform .1s, color .1s;
+  color: var(--border);
+  transition: color .15s ease, transform .1s;
   line-height: 1;
 }
 .stars button.on { color: var(--star); }
-.stars button:hover { transform: scale(1.2); }
+.stars button:hover { color: var(--star); transform: scale(1.2); }
 
 .stars .off-btn {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.3px;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
   color: var(--muted);
   border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 2px 9px;
+  padding: 3px 9px;
   margin-right: 8px;
   align-self: center;
 }
 .stars .off-btn:hover { transform: none; color: var(--text); border-color: var(--muted); }
-.stars .off-btn.on { color: #fff; background: var(--danger); border-color: var(--danger); }
+.stars .off-btn.on { color: var(--bg); background: var(--danger); border-color: var(--danger); }
 
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .chip {
   border: 1px solid var(--border);
-  background: var(--panel-2);
+  background: transparent;
   color: var(--muted);
-  border-radius: 999px;
   padding: 7px 14px;
-  font-size: 13px;
-  font-weight: 600;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
   cursor: pointer;
   transition: all .15s;
 }
-.chip.on { background: var(--accent-dim); border-color: var(--accent-dim); color: #fff; }
+.chip.on { background: var(--accent-dim); border-color: var(--accent); color: var(--text); }
 
 input[type="text"], input[type="email"] {
   background: var(--panel-2);
   border: 1px solid var(--border);
   color: var(--text);
-  border-radius: 10px;
   padding: 11px 14px;
-  font-size: 14px;
+  font-family: var(--mono);
+  font-size: 12px;
   width: 220px;
   outline: none;
 }
-input:focus { border-color: var(--accent-dim); }
+/* accent-dim is a panel tint, too quiet to signal focus — focus gets full clay. */
+input:focus { border-color: var(--accent); outline: none; }
 
-.btn {
-  background: var(--accent-dim);
-  color: #fff;
-  border: none;
-  border-radius: 10px;
+.btn, .btn.ghost {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
   padding: 12px 22px;
-  font-size: 14px;
-  font-weight: 700;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: filter .15s;
+  transition: background .2s ease, color .2s ease, border-color .2s ease;
 }
-.btn:hover { filter: brightness(1.15); }
-.btn.ghost { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); }
+.btn:hover, .btn.ghost:hover { background: var(--accent); color: var(--bg); border-color: var(--accent); }
 
-.saved-note { color: var(--accent); font-size: 13px; margin-left: 12px; }
+.saved-note { color: var(--star); font-family: var(--mono); font-size: 11px; letter-spacing: .1em; margin-left: 12px; }
 
-.loading { color: var(--muted); text-align: center; padding: 60px 0; font-size: 14px; }
+.loading { color: var(--muted); text-align: center; padding: 60px 0; font-family: var(--mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
 .spinner {
   width: 26px; height: 26px; margin: 0 auto 14px;
-  border: 3px solid var(--border); border-top-color: var(--accent);
-  border-radius: 50%; animation: spin .8s linear infinite;
+  border: 2px solid var(--border); border-top-color: var(--accent);
+  border-radius: 50%; /* a spinner has to be round */
+  animation: spin .8s linear infinite;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 .hint {
   background: var(--panel-2);
   border: 1px solid var(--border);
-  border-left: 3px solid var(--accent-dim);
-  border-radius: 8px;
+  border-left: 2px solid var(--accent);
   padding: 12px 16px;
-  font-size: 13px;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .1em;
   color: var(--muted);
   line-height: 1.6;
   margin: 14px 0;
   word-break: break-all;
 }
-.hint code { color: var(--accent); font-size: 12px; }
+.hint code { color: var(--accent); font-size: 10.5px; }
+
+/* Square corners everywhere the system touches. The orb and the spinner are
+   deliberately exempt above. */
+.topbar, .footer, .tldr, .tldr-link, .article, .card, .weather-cell, .alert,
+.pref-row, .chip, .stars button, .btn, .btn.ghost, .hint,
+input[type="text"], input[type="email"] {
+  border-radius: 0;
+}
 
 @media (max-width: 640px) {
   .topbar { padding: 10px 14px; }
   .topbar nav { gap: 12px; }
-  .topbar nav a { font-size: 13px; }
+  .topbar nav a { font-size: 10px; letter-spacing: .12em; }
   .brand { font-size: 26px; letter-spacing: 2px; }
   .topbar-logo img { width: 34px; height: 34px; }
   input[type="text"], input[type="email"] { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .article, .btn, .chip, .stars button, .topbar-logo img { transition: none !important; }
+  .spinner { animation-duration: 2s; }
 }

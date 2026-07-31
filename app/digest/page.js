@@ -26,7 +26,7 @@ export default function DigestPage() {
 
   return (
     <div>
-      <h1>Today&apos;s Brief</h1>
+      <h1>Today&apos;s <em>Brief</em></h1>
       <p className="subtitle">
         {digest.dateLabel} · the top stories for your highest-rated topics{" "}
         <button
