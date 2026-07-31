@@ -86,7 +86,7 @@ export default function SettingsPage() {
 
   return (
     <div>
-      <h1>Settings</h1>
+      <h1><em>Settings</em></h1>
       <p className="subtitle">
         Rate each topic 1–5 stars — higher means more stories, shown first. Hit <b>Off</b> (or tap the active star) to hide a topic entirely.
         <span className="saved-note">{savedNote}</span>
