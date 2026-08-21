@@ -243,16 +243,11 @@ export default function SettingsPage() {
           >
             {shared ? "Link Copied ✓" : "Copy Share Link"}
           </button>
-          <button
-            className="btn ghost"
-            onClick={() =>
-              window.open(
-                `${BASE}/newsletter${(prefs.theme || "light") === "dark" ? "-dark" : ""}.html?t=${Date.now()}`,
-                "_blank"
-              )
-            }
-          >
-            Preview Newsletter
+          {/* /preview, not the published newsletter.html — that file is built
+              from nexus.config.json and shows the house edition, so it could
+              never reflect anything changed on this page. */}
+          <button className="btn ghost" onClick={() => window.open(`${BASE}/preview/`, "_blank")}>
+            Preview My Email
           </button>
         </div>
       </div>
