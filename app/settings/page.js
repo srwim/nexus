@@ -278,6 +278,14 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* Consent notice, placed above both email-capturing cards so it is read
+          before either is used. Deliberately does not name the buttons: a
+          notice that cites a label goes stale the moment the label changes. */}
+      <p className="consent">
+        By submitting an email address on this page, you agree to receive communications from AROK AI.
+        You can unsubscribe anytime via the link at the bottom of each newsletter.
+      </p>
+
       {/* Everything above this point lives in this browser only. This card is
           what carries it to the email — without it, the daily brief is built
           from the publication default and a reader's choices look ignored. */}
