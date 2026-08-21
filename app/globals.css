@@ -87,6 +87,13 @@ a { color: inherit; text-decoration: none; }
 main { flex: 1; width: 100%; max-width: 980px; margin: 0 auto; padding: 28px 20px 60px; }
 
 .footer { text-align: center; color: var(--muted); font-size: 12px; padding: 18px; border-top: 1px solid var(--border); }
+.footer-note {
+  max-width: 62ch;
+  margin: 10px auto 0;
+  font-size: 11.5px;
+  line-height: 1.6;
+  opacity: .78;
+}
 .footer-site { display: flex; justify-content: center; gap: 18px; flex-wrap: wrap; margin-top: 8px; color: var(--muted); }
 .footer-site,
 .footer-site a { font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; }
@@ -178,7 +185,37 @@ h1 em, h1 .accent {
   letter-spacing: .12em;
   text-transform: uppercase;
   margin-top: 6px;
+  /* Origin left, provenance right. Wraps to two lines on narrow screens rather
+     than crushing either half. */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px 14px;
 }
+.article .src-origin { min-width: 0; }
+.article .src-meta {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  /* One step quieter than the origin: it's provenance, not the byline. */
+  opacity: .82;
+}
+.article .src-meta .sep { opacity: .5; }
+
+/* Five steps, one filled: left to right is the published bias scale. Ink only,
+   never party colour. */
+.lean-scale { display: inline-flex; gap: 2px; }
+.lean-scale i {
+  width: 5px;
+  height: 5px;
+  background: var(--border);
+  transition: background .2s ease;
+}
+.lean-scale i.on { background: var(--muted); }
+.article:hover .lean-scale i.on { background: var(--text); }
 
 .card {
   background: var(--panel);
