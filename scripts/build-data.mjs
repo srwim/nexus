@@ -2,8 +2,9 @@
 // rendered newsletter preview at public/newsletter.html.
 // Run by GitHub Actions on a schedule; run locally with `npm run data`.
 import { mkdir, writeFile, readFile } from "node:fs/promises";
-import { TOPICS } from "../lib/topics.js";
+import { TOPICS, SPORTS_LEAGUES } from "../lib/topics.js";
 import { fetchFeeds } from "../lib/rss.js";
+import { fetchLeagueLive } from "../lib/sportsLive.js";
 import { publisherOf } from "../lib/rank.js";
 import { getWeather, getLocalNews, buildDigest } from "../lib/digest.js";
 import { semanticDedupe, report as dedupReport } from "../lib/semantic.js";
@@ -40,9 +41,41 @@ const config = await readConfig();
 await mkdir(OUT, { recursive: true });
 
 const jobs = [];
+const secs = (t) => `${((Date.now() - t) / 1000).toFixed(1)}s`;
 
-// Sports is fetched live in the browser from the ESPN JSON API (lib/espn.js),
-// so nothing to prebuild here.
+// One line of the publisher-mix report. A section drawing on one or two outlets
+// is the failure this exists to catch — Gaming was 8-for-8 Polygon before anyone
+// noticed, because a feed that returns nothing looks identical to a feed that
+// simply had no news.
+function logMix(name, items, feedCount) {
+  const by = new Map();
+  for (const it of items) {
+    const p = publisherOf(it);
+    by.set(p, (by.get(p) || 0) + 1);
+  }
+  const ranked = [...by.entries()].sort((a, b) => b[1] - a[1]);
+  const silent = feedCount - ranked.length;
+  const top = ranked[0]?.[1] || 0;
+  const warn = ranked.length <= 2 ? "  ⚠ THIN" : top / (items.length || 1) > 0.6 ? "  ⚠ DOMINATED" : "";
+  console.log(
+    `  ${name.padEnd(10)} ${String(ranked.length).padStart(2)} publishers${silent > 0 ? `, ${silent} feed(s) silent` : ""}${warn}`
+  );
+  console.log(`             ${ranked.map(([p, n]) => `${p}(${n})`).join(" ")}`);
+}
+
+// Sports is prebuilt per league into a single sports.json. It used to be fetched
+// live in the browser, which limited it to ESPN — publisher RSS is not
+// CORS-enabled, so Autosport and the rest can only be reached from the build.
+const tSports = Date.now();
+const leagueKeys = Object.keys(SPORTS_LEAGUES);
+const leagueItems = await Promise.all(leagueKeys.map((k) => fetchLeagueLive(k, 12)));
+console.log(`⏱ fetched ${leagueKeys.length} sports leagues in ${secs(tSports)}`);
+console.log("\nLeague mix:");
+leagueKeys.forEach((k, i) => {
+  // +1 for ESPN, which is a source like any other from the reader's side.
+  logMix(k, leagueItems[i], (SPORTS_LEAGUES[k].feeds?.length || 0) + (SPORTS_LEAGUES[k].espn ? 1 : 0));
+});
+jobs.push(writeJson("sports", { leagues: Object.fromEntries(leagueKeys.map((k, i) => [k, leagueItems[i]])) }));
 
 // Zipcode-driven data (no model needed) runs in parallel with topic fetching.
 jobs.push(getLocalNews(config.zip, 20).then((d) => writeJson("local", d)));
@@ -51,7 +84,6 @@ jobs.push(getWeather(config.zip).then((w) => writeJson("weather", w)));
 // Static topics: fetch all feeds in parallel, then run semantic de-dup
 // SEQUENTIALLY so the single embedding model is reused (and never overlapped).
 const topicEntries = Object.entries(TOPICS).filter(([, t]) => t.feeds.length);
-const secs = (t) => `${((Date.now() - t) / 1000).toFixed(1)}s`;
 
 const tFetch = Date.now();
 const fetched = await Promise.all(
@@ -59,25 +91,8 @@ const fetched = await Promise.all(
 );
 console.log(`⏱ fetched ${topicEntries.length} topics in ${secs(tFetch)}`);
 
-// Publisher mix per topic. A section drawing on one or two outlets is the
-// failure this exists to catch — Gaming was 8-for-8 Polygon before anyone
-// noticed, because a feed that returns nothing looks identical to a feed that
-// simply had no news.
 console.log("\nPublisher mix:");
-for (const [key, items] of fetched) {
-  const by = new Map();
-  for (const it of items) {
-    const p = publisherOf(it);
-    by.set(p, (by.get(p) || 0) + 1);
-  }
-  const ranked = [...by.entries()].sort((a, b) => b[1] - a[1]);
-  const mix = ranked.map(([p, n]) => `${p}(${n})`).join(" ");
-  const silent = TOPICS[key].feeds.length - ranked.length;
-  const top = ranked[0]?.[1] || 0;
-  const warn = ranked.length <= 2 ? "  ⚠ THIN" : top / (items.length || 1) > 0.6 ? "  ⚠ DOMINATED" : "";
-  console.log(`  ${key.padEnd(10)} ${String(ranked.length).padStart(2)} publishers${silent > 0 ? `, ${silent} feed(s) silent` : ""}${warn}`);
-  console.log(`             ${mix}`);
-}
+for (const [key, items] of fetched) logMix(key, items, TOPICS[key].feeds.length);
 console.log("");
 
 const tDedup = Date.now();

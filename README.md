@@ -26,7 +26,7 @@ send email (Resend) · post to Slack · pull sponsor (Sponsy)
 archive to Google Drive · recipients from HubSpot list
 ```
 
-Star ratings and league picks live in your browser and apply instantly. The **zipcode and newsletter email** live in `nexus.config.json` in the repo (Settings has a "Copy my nexus.config.json" button — paste it into the file on GitHub whenever you change things).
+Star ratings and league picks live in your browser and apply instantly. Sports is per league — Motor Racing expands to Formula 1, NASCAR, MotoGP and IndyCar, and each league draws on its own beat outlets (Autosport, Motorsport.com, PlanetF1, RaceFans, Crash.net, Frontstretch…) alongside ESPN. The **zipcode and newsletter email** live in `nexus.config.json` in the repo (Settings has a "Copy my nexus.config.json" button — paste it into the file on GitHub whenever you change things).
 
 ## Evals and the autonomy gate
 
