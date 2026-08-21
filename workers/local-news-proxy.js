@@ -15,6 +15,15 @@
 //   4. The worker URL is already wired into the site via the LOCAL_NEWS_PROXY
 //      repo variable; nothing else to change.
 //
+// FOREIGN REPORTING (/translate route):
+//   Translates foreign headlines using Workers AI. To enable:
+//     a. Worker → Settings → Bindings → add a Workers AI binding named  AI .
+//     b. Add a secret  TRANSLATE_KEY  (any long random string) and set the same
+//        value as a GitHub Actions secret of the same name.
+//   The key is not optional. Workers AI gives 10,000 free neurons a day and
+//   bills past that, so an unauthenticated translate endpoint is someone else's
+//   free GPU and your invoice.
+//
 // NEWSLETTER UNSUBSCRIBE (/unsubscribe route):
 //   The newsletter footer links here to unsubscribe people in one click. For it
 //   to work, also add a  HUBSPOT_TOKEN  variable (same HubSpot service key used
@@ -27,6 +36,9 @@ export default {
     const url = new URL(request.url);
     if (url.pathname.replace(/\/+$/, "").endsWith("/unsubscribe")) {
       return handleUnsubscribe(url, env);
+    }
+    if (url.pathname.replace(/\/+$/, "").endsWith("/translate")) {
+      return handleTranslate(request, env);
     }
 
     const cors = {
@@ -100,6 +112,66 @@ export default {
     }
   },
 };
+
+// ── Translation for Foreign Reporting ────────────────────────────────────────
+// POST /translate  { "source": "ja", "texts": ["…", "…"] }
+//   -> { "translations": ["…", "…"] }   (null in a slot that failed)
+//
+// M2M100 is a dedicated translation model, not an instruction-following one.
+// That is deliberate: the input here is headline text from foreign news feeds,
+// which is untrusted. An instruct LLM would happily obey a headline that reads
+// "ignore previous instructions"; a translation model has no instruction channel
+// to hijack. It also costs far fewer neurons.
+const TRANSLATE_MODEL = "@cf/meta/m2m100-1.2b";
+const MAX_TEXTS = 60; // one batch per country per build, comfortably
+const MAX_CHARS = 600; // headlines and snippets; anything longer is not a headline
+
+async function handleTranslate(request, env) {
+  const json = (body, status = 200) =>
+    new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
+
+  if (request.method !== "POST") return json({ error: "POST only" }, 405);
+  if (!env.TRANSLATE_KEY) return json({ error: "TRANSLATE_KEY not set on the worker" }, 500);
+
+  // Constant-time-ish compare is overkill for a build-time key, but rejecting
+  // before touching the AI binding is what keeps the quota ours.
+  const given = request.headers.get("x-translate-key") || "";
+  if (given !== env.TRANSLATE_KEY) return json({ error: "unauthorized" }, 401);
+  if (!env.AI) return json({ error: "no AI binding — add one named AI in the worker settings" }, 500);
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return json({ error: "bad json" }, 400);
+  }
+
+  const source = String(body?.source || "").slice(0, 8);
+  const texts = Array.isArray(body?.texts) ? body.texts.slice(0, MAX_TEXTS) : [];
+  if (!source || !texts.length) return json({ error: "source and texts required" }, 400);
+
+  const translations = [];
+  for (const raw of texts) {
+    const text = String(raw ?? "").slice(0, MAX_CHARS).trim();
+    if (!text) {
+      translations.push(null);
+      continue;
+    }
+    try {
+      const out = await env.AI.run(TRANSLATE_MODEL, {
+        text,
+        source_lang: source,
+        target_lang: "en",
+      });
+      const t = (out?.translated_text || "").trim();
+      // An empty or echoed result is a failed translation, not a translation.
+      translations.push(t && t !== text ? t : null);
+    } catch {
+      translations.push(null);
+    }
+  }
+  return json({ translations });
+}
 
 // ── One-click unsubscribe ────────────────────────────────────────────────────
 // GET or POST /unsubscribe?e=<email>&t=<hmac>. Verifies the signed token, then
