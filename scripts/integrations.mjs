@@ -1,6 +1,7 @@
 // Optional integrations for the daily newsletter run. Every one is gated on
 // its secret being present — nothing here can break the send if unconfigured.
 import { createSign } from "node:crypto";
+import { decodePrefs } from "../lib/prefsPayload.js";
 
 // ---------- Slack: post the brief to a channel via incoming webhook ----------
 export async function postSlack(digest, config) {
@@ -137,9 +138,10 @@ export async function fetchSponsors({ debug = false } = {}) {
 // Reads emails from list HUBSPOT_LIST_ID using a private-app token
 // (HUBSPOT_TOKEN). Delivery still goes through Resend, so no paid
 // Marketing Hub tier is needed.
-// Returns [{ email, theme }] — theme comes from the optional "nexus_theme"
-// contact property ("light"/"dark") and is null when unset, in which case the
-// caller falls back to the publication default.
+// Returns [{ email, theme, prefs }] — theme comes from the optional
+// "nexus_theme" contact property ("light"/"dark"), prefs from "nexus_prefs"
+// (see lib/prefsPayload.js). Both are null when unset or unparseable, in which
+// case the caller falls back to the publication default.
 export async function hubspotRecipients() {
   const token = process.env.HUBSPOT_TOKEN;
   const listId = process.env.HUBSPOT_LIST_ID;
@@ -163,9 +165,10 @@ export async function hubspotRecipients() {
       console.log("HubSpot list: 0 members on the list yet");
       return [];
     }
-    // Ask for the optional per-subscriber theme. HubSpot 400s on unknown
-    // properties, so if "nexus_theme" hasn't been created yet we quietly retry
-    // with just the email and everyone gets the publication default.
+    // Ask for the optional per-subscriber properties. HubSpot 400s on the whole
+    // request if any property is unknown, so fall back a rung at a time: full
+    // settings, then theme only, then email only. A portal that hasn't had the
+    // properties created yet still gets its newsletter.
     const readContacts = (properties) =>
       fetch("https://api.hubapi.com/crm/v3/objects/contacts/batch/read", {
         method: "POST",
@@ -173,26 +176,40 @@ export async function hubspotRecipients() {
         body: JSON.stringify({ inputs: ids, properties }),
       });
 
-    let batchRes = await readContacts(["email", "nexus_theme"]);
-    let themed = true;
-    if (!batchRes.ok) {
-      themed = false;
-      batchRes = await readContacts(["email"]);
+    const attempts = [
+      ["email", "nexus_theme", "nexus_prefs"],
+      ["email", "nexus_theme"],
+      ["email"],
+    ];
+    let batchRes = null;
+    let level = 0;
+    for (; level < attempts.length; level++) {
+      batchRes = await readContacts(attempts[level]);
+      if (batchRes.ok) break;
     }
-    if (!batchRes.ok) {
-      console.warn(`HubSpot list: contact read failed (${batchRes.status}: ${(await batchRes.text()).slice(0, 160)})`);
+    if (!batchRes?.ok) {
+      console.warn(`HubSpot list: contact read failed (${batchRes?.status}: ${(await batchRes?.text())?.slice(0, 160)})`);
       return [];
     }
+    const missing = ["", ' (no "nexus_prefs" property — settings not personalized)', ' (no "nexus_theme"/"nexus_prefs" properties — using publication defaults)'][level];
+
     const contacts = await batchRes.json();
     const people = (contacts.results || [])
       .map((c) => {
         const t = String(c.properties?.nexus_theme || "").toLowerCase();
-        return { email: c.properties?.email, theme: t === "dark" || t === "light" ? t : null };
+        const prefs = decodePrefs(c.properties?.nexus_prefs);
+        return {
+          email: c.properties?.email,
+          // An explicit nexus_theme still wins; otherwise the theme inside the
+          // settings blob applies, so a reader only has to sync once.
+          theme: t === "dark" || t === "light" ? t : prefs?.theme || null,
+          prefs,
+        };
       })
       .filter((p) => p.email);
+    const personalized = people.filter((p) => p.prefs).length;
     console.log(
-      `HubSpot list: ${people.length} subscriber(s) pulled` +
-        (themed ? "" : ' (no "nexus_theme" property — using default theme)')
+      `HubSpot list: ${people.length} subscriber(s) pulled, ${personalized} with their own settings${missing}`
     );
     return people;
   } catch (e) {

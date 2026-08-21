@@ -4,6 +4,7 @@ import { usePrefs, shareLink } from "@/lib/usePrefs";
 import { BASE } from "@/lib/data";
 import { isWpAdmin } from "@/lib/wpAdmin";
 import { TOPICS, leaguesBySport } from "@/lib/topics";
+import { submitSubscription } from "@/lib/hubspotForm";
 import { SignupForm } from "@/components/SignupForm";
 
 function Stars({ value, onChange }) {
@@ -82,6 +83,8 @@ export default function SettingsPage() {
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
   const [admin, setAdmin] = useState(false);
+  const [syncEmail, setSyncEmail] = useState(null); // null = fall back to the saved address
+  const [syncStatus, setSyncStatus] = useState("idle"); // idle | sending | done | partial | error
 
   // Reveal admin-only tools when signed into the arok.ai WordPress admin.
   useEffect(() => {
@@ -231,6 +234,55 @@ export default function SettingsPage() {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Everything above this point lives in this browser only. This card is
+          what carries it to the email — without it, the daily brief is built
+          from the publication default and a reader's choices look ignored. */}
+      <div className="card">
+        <div className="section-head"><h2>Apply these settings to your email</h2></div>
+        <div className="hint" style={{ marginTop: 0 }}>
+          Your ratings, leagues, zipcode and theme are saved in this browser. Send them to your
+          subscription and tomorrow&apos;s Daily Brief is built from them instead of the house defaults.
+        </div>
+        <form
+          style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 12 }}
+          onSubmit={async (e) => {
+            e.preventDefault();
+            const address = (syncEmail ?? prefs.email ?? "").trim();
+            if (!/.+@.+\..+/.test(address)) return;
+            setSyncStatus("sending");
+            const { ok, prefsSaved } = await submitSubscription({ email: address, prefs });
+            if (ok) update({ ...prefs, email: address });
+            setSyncStatus(ok ? (prefsSaved ? "done" : "partial") : "error");
+          }}
+        >
+          <input
+            type="email"
+            required
+            placeholder="you@example.com"
+            aria-label="the email address your brief goes to"
+            value={syncEmail ?? prefs.email ?? ""}
+            onChange={(e) => {
+              setSyncEmail(e.target.value);
+              setSyncStatus("idle");
+            }}
+            style={{ flex: "1 1 220px" }}
+          />
+          <button className="btn" disabled={syncStatus === "sending"}>
+            {syncStatus === "sending" ? "Sending…" : syncStatus === "done" ? "Settings applied ✓" : "Apply to my email"}
+          </button>
+        </form>
+        {syncStatus === "partial" ? (
+          <div style={{ color: "var(--danger)", fontSize: 13, marginTop: 8 }}>
+            You&apos;re subscribed, but your settings couldn&apos;t be saved — the newsletter form is
+            missing its <code>nexus_prefs</code> field. Until it&apos;s added you&apos;ll get the default brief.
+          </div>
+        ) : syncStatus === "error" ? (
+          <div style={{ color: "var(--danger)", fontSize: 13, marginTop: 8 }}>
+            That didn&apos;t go through — try again in a moment.
+          </div>
+        ) : null}
       </div>
 
       {/* Public subscribe box — same HubSpot form as the Feed/Brief pages. */}

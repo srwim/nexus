@@ -4,6 +4,8 @@
 // portalId/formId are set in nexus.config.json.
 import { useState } from "react";
 import config from "../nexus.config.json";
+import { loadPrefs, savePrefs } from "../lib/usePrefs";
+import { submitSubscription } from "../lib/hubspotForm";
 
 export function SignupForm() {
   const hs = config.hubspot || {};
@@ -13,28 +15,21 @@ export function SignupForm() {
 
   if (!hs.portalId || !hs.formId) return null;
 
+  // Signing up carries the reader's current settings with it, so their first
+  // brief already matches the site they were just reading — rather than the
+  // publication default until they remember to sync.
+  //
+  // Read at submit time, not through usePrefs: this form also renders on the
+  // Settings page, where a hook copy taken at mount would send whatever the
+  // ratings were before the reader started changing them.
   const submit = async (e) => {
     e.preventDefault();
     if (!/.+@.+\..+/.test(email)) return;
     setStatus("sending");
-    try {
-      const fields = [{ objectTypeId: "0-1", name: "email", value: email }];
-      if (name.trim()) fields.push({ objectTypeId: "0-1", name: "firstname", value: name.trim() });
-      const res = await fetch(
-        `https://api.hsforms.com/submissions/v3/integration/submit/${hs.portalId}/${hs.formId}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            fields,
-            context: { pageUri: window.location.href, pageName: "NEXUS" },
-          }),
-        }
-      );
-      setStatus(res.ok ? "done" : "error");
-    } catch {
-      setStatus("error");
-    }
+    const prefs = loadPrefs();
+    const { ok } = await submitSubscription({ email, name, prefs });
+    if (ok) savePrefs({ ...prefs, email });
+    setStatus(ok ? "done" : "error");
   };
 
   if (status === "done") {
