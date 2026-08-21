@@ -6,6 +6,7 @@ import { useState } from "react";
 import config from "../nexus.config.json";
 import { loadPrefs, savePrefs } from "../lib/usePrefs";
 import { submitSubscription } from "../lib/hubspotForm";
+import { ConsentCheckbox } from "./ConsentCheckbox";
 
 export function SignupForm() {
   const hs = config.hubspot || {};
@@ -13,6 +14,8 @@ export function SignupForm() {
   const [name, setName] = useState("");
   const [status, setStatus] = useState("idle"); // idle | sending | done | error
   const [error, setError] = useState("");
+  const [consent, setConsent] = useState(false); // never pre-ticked
+  const [consentError, setConsentError] = useState(false);
 
   if (!hs.portalId || !hs.formId) return null;
 
@@ -26,9 +29,13 @@ export function SignupForm() {
   const submit = async (e) => {
     e.preventDefault();
     if (!/.+@.+\..+/.test(email)) return;
+    if (!consent) {
+      setConsentError(true);
+      return;
+    }
     setStatus("sending");
     const prefs = loadPrefs();
-    const { ok, error } = await submitSubscription({ email, name, prefs });
+    const { ok, error } = await submitSubscription({ email, name, prefs, consented: consent });
     if (ok) savePrefs({ ...prefs, email });
     setError(error || "");
     setStatus(ok ? "done" : "error");
@@ -68,6 +75,15 @@ export function SignupForm() {
           {status === "sending" ? "Signing you up…" : "Subscribe free"}
         </button>
       </form>
+      <ConsentCheckbox
+        id="consent-signup"
+        checked={consent}
+        onChange={(v) => {
+          setConsent(v);
+          if (v) setConsentError(false);
+        }}
+        error={consentError}
+      />
       {status === "error" ? (
         <div style={{ marginTop: 8 }}>
           <div style={{ color: "var(--danger)", fontSize: 13 }}>That didn&apos;t go through.</div>
@@ -77,11 +93,10 @@ export function SignupForm() {
             </div>
           ) : null}
         </div>
-      ) : (
-        <div style={{ color: "var(--muted)", fontSize: 12, marginTop: 8 }}>
-          One email a day. Unsubscribe anytime.
-        </div>
-      )}
+      ) : null}
+      {/* The old "One email a day. Unsubscribe anytime." line lived here. It is
+          now part of CONSENT_NOTICE above, and saying it twice on one card read
+          as reassurance-by-repetition. */}
     </div>
   );
 }
