@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { usePrefs, shareLink } from "@/lib/usePrefs";
 import { BASE } from "@/lib/data";
 import { isWpAdmin } from "@/lib/wpAdmin";
-import { TOPICS, SPORTS_LEAGUES } from "@/lib/topics";
+import { TOPICS, leaguesBySport } from "@/lib/topics";
 import { SignupForm } from "@/components/SignupForm";
 
 function Stars({ value, onChange }) {
@@ -28,6 +28,50 @@ function Stars({ value, onChange }) {
         </button>
       ))}
     </div>
+  );
+}
+
+// A sport with one league is just a chip — wrapping "Golf" in a disclosure the
+// reader must open to find "Golf" would be ceremony. Sports with several series
+// (Motor Racing) expand, using native <details> so keyboard and screen-reader
+// behaviour comes for free.
+function LeagueGroup({ sport, leagues, selected, onToggle }) {
+  const chips = (
+    <div className="chips" style={{ marginTop: 0 }}>
+      {leagues.map(([key, league]) => (
+        <button
+          key={key}
+          className={`chip ${selected.includes(key) ? "on" : ""}`}
+          aria-pressed={selected.includes(key)}
+          onClick={() => onToggle(key)}
+        >
+          {league.label}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (leagues.length === 1) return <div style={{ marginBottom: 8 }}>{chips}</div>;
+
+  const on = leagues.filter(([key]) => selected.includes(key)).length;
+  return (
+    <details open={on > 0} style={{ marginBottom: 8 }}>
+      <summary
+        style={{
+          cursor: "pointer",
+          fontFamily: "var(--mono)",
+          fontSize: 12,
+          letterSpacing: ".06em",
+          textTransform: "uppercase",
+          color: on > 0 ? "var(--accent)" : "var(--muted)",
+          padding: "6px 0",
+        }}
+      >
+        {sport}
+        {on > 0 ? ` · ${on} of ${leagues.length}` : ` · ${leagues.length} series`}
+      </summary>
+      <div style={{ padding: "4px 0 2px 12px", borderLeft: "1px solid var(--border)" }}>{chips}</div>
+    </details>
   );
 }
 
@@ -104,11 +148,15 @@ export default function SettingsPage() {
               <Stars value={prefs.ratings[key] || 0} onChange={(v) => setRating(key, v)} />
             </div>
             {key === "sports" && (prefs.ratings.sports || 0) > 0 ? (
-              <div className="chips" style={{ padding: "0 4px 14px" }}>
-                {Object.entries(SPORTS_LEAGUES).map(([lk, l]) => (
-                  <button key={lk} className={`chip ${prefs.leagues.includes(lk) ? "on" : ""}`} onClick={() => toggleLeague(lk)}>
-                    {l.label}
-                  </button>
+              <div style={{ padding: "0 4px 14px" }}>
+                {leaguesBySport().map(([sport, leagues]) => (
+                  <LeagueGroup
+                    key={sport}
+                    sport={sport}
+                    leagues={leagues}
+                    selected={prefs.leagues}
+                    onToggle={toggleLeague}
+                  />
                 ))}
               </div>
             ) : null}

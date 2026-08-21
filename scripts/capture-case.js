@@ -12,7 +12,7 @@
 // different star configs later.
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { TOPICS } from "../lib/topics.js";
-import { fetchSports } from "../lib/espn.js";
+import { fetchSportsLive } from "../lib/sportsLive.js";
 
 const CASES = new URL("../evals/cases/", import.meta.url);
 const local = process.argv.includes("--local");
@@ -35,7 +35,7 @@ async function readTopic(key) {
 const keys = Object.keys(TOPICS).filter((k) => k !== "sports");
 const entries = await Promise.all(keys.map(async (k) => [k, await readTopic(k)]));
 const data = Object.fromEntries(entries.filter(([, v]) => v));
-const sports = await fetchSports(config.leagues, 20);
+const sports = await fetchSportsLive(config.leagues, 20);
 if (sports.length) data.sports = { updatedAt: new Date().toISOString(), items: sports };
 
 const id = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19) + "Z";
