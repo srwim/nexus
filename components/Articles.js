@@ -1,5 +1,6 @@
 "use client";
 import { sourceLabel, LEAN_ORDER } from "@/lib/sources";
+import { COUNTRIES } from "@/lib/foreign";
 
 // Where the outlet sits on the published left/right scale, as a position on a
 // five-step ruler rather than a party colour. Red/blue would be the reflex, and
@@ -18,6 +19,27 @@ function LeanScale({ index }) {
 }
 
 function SourceMeta({ item }) {
+  // Foreign stories say where they came from and whether a machine touched
+  // them. Claiming a translation we didn't manage to make would be worse than
+  // showing the original, so an untranslated item says so plainly.
+  const country = item.country ? COUNTRIES[item.country] : null;
+  if (country) {
+    return (
+      <span
+        className="src-meta"
+        title={
+          item.translated
+            ? `Machine-translated from ${country.language}. Original: ${item.titleOriginal}`
+            : `${country.language}, not translated`
+        }
+      >
+        {country.label}
+        <span className="sep"> · </span>
+        {item.translated ? "Translated" : country.language}
+      </span>
+    );
+  }
+
   const label = sourceLabel(item);
   if (!label) return null;
   return (
@@ -40,7 +62,9 @@ export function ArticleList({ items, showSnippets = true }) {
     <div>
       {items.map((it, i) => (
         <a key={i} className="article" href={it.link} target="_blank" rel="noopener noreferrer">
-          <div className="title">{it.title}</div>
+          <div className="title" title={it.titleOriginal && it.translated ? it.titleOriginal : undefined}>
+            {it.title}
+          </div>
           {showSnippets && it.summary ? <div className="snippet">{it.summary}</div> : null}
           <div className="src">
             <span className="src-origin">

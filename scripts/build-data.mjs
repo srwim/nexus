@@ -5,8 +5,12 @@ import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { TOPICS, SPORTS_LEAGUES } from "../lib/topics.js";
 import { fetchFeeds } from "../lib/rss.js";
 import { fetchLeagueLive } from "../lib/sportsLive.js";
+import { COUNTRIES } from "../lib/foreign.js";
+import { cacheFromPublished, pendingStrings, applyTranslations, translatePending } from "./translate.mjs";
 import { publisherOf } from "../lib/rank.js";
-import { getWeather, getLocalNews, buildDigest } from "../lib/digest.js";
+import { filterStale } from "../lib/text.js";
+import { getWeather, getLocalNews } from "../lib/digest.js";
+import { digestFromData } from "../lib/publishedDigest.js";
 import { semanticDedupe, report as dedupReport } from "../lib/semantic.js";
 import { renderEmailHtml } from "../lib/email.js";
 
@@ -29,6 +33,21 @@ async function readConfig() {
     return JSON.parse(await readFile(new URL("../nexus.config.json", import.meta.url), "utf8"));
   } catch {
     return {};
+  }
+}
+
+// The previous build's output, read back from the live site. CI starts from a
+// clean checkout every run, so the published file is the only thing that
+// survives between builds — which makes it the natural translation cache.
+async function readPublished(name) {
+  const base = String(config.siteUrl || "").replace(/\/?$/, "/");
+  if (base === "/") return null;
+  try {
+    const res = await fetch(`${base}data/${name}.json?t=${Date.now()}`, { cache: "no-store" });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
   }
 }
 
@@ -77,9 +96,43 @@ leagueKeys.forEach((k, i) => {
 });
 jobs.push(writeJson("sports", { leagues: Object.fromEntries(leagueKeys.map((k, i) => [k, leagueItems[i]])) }));
 
+// Foreign Reporting: native-language feeds, translated at build time. The last
+// published foreign.json doubles as the translation cache, so a warm build only
+// pays for headlines it has never seen.
+const tForeign = Date.now();
+const countryKeys = Object.keys(COUNTRIES);
+const foreignLists = await Promise.all(
+  countryKeys.map((c) => fetchFeeds(COUNTRIES[c].feeds, 14).then((items) => filterStale(items, 4)))
+);
+const byCountry = Object.fromEntries(
+  countryKeys.map((c, i) => [c, { lang: COUNTRIES[c].lang, items: foreignLists[i] }])
+);
+console.log(`⏱ fetched ${countryKeys.length} countries in ${secs(tForeign)}`);
+console.log("\nForeign mix:");
+countryKeys.forEach((c, i) => logMix(c, foreignLists[i], COUNTRIES[c].feeds.length));
+
+const priorForeign = await readPublished("foreign");
+const translationCache = cacheFromPublished(priorForeign);
+const pending = pendingStrings(byCountry, translationCache);
+const translatedNow = await translatePending(pending, translationCache, {
+  endpoint: config.localNewsProxy,
+  apiKey: process.env.TRANSLATE_KEY,
+});
+const foreignItems = applyTranslations(byCountry, translationCache);
+const totalForeign = Object.values(foreignItems).reduce((n, l) => n + l.length, 0);
+const stillOriginal = Object.values(foreignItems)
+  .flat()
+  .filter((it) => !it.translated).length;
+console.log(
+  `  translate: cache ${translationCache.size}, new this run ${translatedNow}, ` +
+    `${totalForeign - stillOriginal}/${totalForeign} items in English\n`
+);
+jobs.push(writeJson("foreign", { countries: foreignItems }));
+
 // Zipcode-driven data (no model needed) runs in parallel with topic fetching.
-jobs.push(getLocalNews(config.zip, 20).then((d) => writeJson("local", d)));
-jobs.push(getWeather(config.zip).then((w) => writeJson("weather", w)));
+const [localData, weatherData] = await Promise.all([getLocalNews(config.zip, 20), getWeather(config.zip)]);
+jobs.push(writeJson("local", localData));
+jobs.push(writeJson("weather", weatherData));
 
 // Static topics: fetch all feeds in parallel, then run semantic de-dup
 // SEQUENTIALLY so the single embedding model is reused (and never overlapped).
@@ -96,11 +149,18 @@ for (const [key, items] of fetched) logMix(key, items, TOPICS[key].feeds.length)
 console.log("");
 
 const tDedup = Date.now();
+const pool = {
+  local: localData,
+  weather: weatherData,
+  sports: { leagues: Object.fromEntries(leagueKeys.map((k, i) => [k, leagueItems[i]])) },
+  foreign: { countries: foreignItems },
+};
 for (const [key, items] of fetched) {
   const deduped = await semanticDedupe(items, key);
   if (deduped.length < items.length) {
     console.log(`  semantic dedup: ${key} ${items.length} → ${deduped.length}`);
   }
+  pool[key] = { items: deduped };
   jobs.push(writeJson(key, { items: deduped }));
 }
 console.log(`⏱ semantic dedup in ${secs(tDedup)}`);
@@ -110,13 +170,17 @@ jobs.push(writeJson("_dedup-report", { pairs: dedupReport }));
 
 await Promise.all(jobs);
 
-// Newsletter preview (same renderer the daily email uses). Topic feeds are
-// served from the in-process cache populated above, so this is nearly free.
+// Newsletter preview, ranked from the data this run just built rather than
+// re-fetched. Same ranking function the real send uses, so the preview is the
+// email — and it costs nothing, where the old path re-fetched every feed and
+// would have shown an empty Foreign Reporting section (translations only exist
+// in the prebuilt file).
 const tPreview = Date.now();
-const digest = await buildDigest({
+const digest = digestFromData(pool, {
   zip: config.zip,
   ratings: config.ratings,
   leagues: config.leagues,
+  countries: config.countries,
 });
 // Both themes are published so Settings → Preview Newsletter can open the one
 // matching the reader's own choice (the static site can't render per-visitor).

@@ -102,6 +102,14 @@ The site is built to be shared. Every visitor gets their own experience with no 
 - **Share links** — Settings → "Copy share link" produces a URL that carries your exact ratings/leagues/zip to whoever opens it (email is never included).
 - **Newsletter signups** — create a plain email form in HubSpot (Marketing → Forms), put its `portalId` and `formId` in `nexus.config.json` under `hubspot`, and a "Get the Daily Brief" signup box appears on the site. Submissions land in HubSpot; add them to the contact list your `HUBSPOT_LIST_ID` secret points at and they'll receive the daily email automatically.
 
+- **Foreign Reporting** — domestic press from Japan, Germany, South Korea, China, France, Morocco, Egypt, Mexico, Argentina and Brazil, in each country's own language, machine-translated to English at build time. The original headline is kept on every story, and anything that couldn't be translated is shown in its original language rather than dropped. To switch translation on:
+
+  1. Cloudflare → your worker → Settings → Bindings → add a **Workers AI** binding named `AI`.
+  2. Add a worker secret `TRANSLATE_KEY` (any long random string), and add a GitHub Actions secret of the same name and value.
+  3. Redeploy the worker with the current `workers/local-news-proxy.js`.
+
+  Without those, the section still works — headlines just stay in their original language. Translation runs on Workers AI's free allowance (10,000 neurons/day); the build caches every translation in the published `foreign.json` and re-reads it next run, so a warm build translates only genuinely new headlines and the $0 profile holds.
+
 - **Per-subscriber editions** — each subscriber can receive a brief built from their own ratings, leagues, zipcode and theme instead of the house defaults. Two one-time steps in HubSpot switch it on:
 
   1. **Settings → Properties → Create property** on the Contact object: `nexus_prefs` (single-line text). Optionally `nexus_theme` (single-line text) too, if you haven't already.

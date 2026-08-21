@@ -4,6 +4,7 @@ import { usePrefs, shareLink } from "@/lib/usePrefs";
 import { BASE } from "@/lib/data";
 import { isWpAdmin } from "@/lib/wpAdmin";
 import { TOPICS, leaguesBySport } from "@/lib/topics";
+import { COUNTRIES } from "@/lib/foreign";
 import { submitSubscription } from "@/lib/hubspotForm";
 import { SignupForm } from "@/components/SignupForm";
 
@@ -109,6 +110,13 @@ export default function SettingsPage() {
     flash();
   };
 
+  const toggleCountry = (key) => {
+    const on = prefs.countries || [];
+    const has = on.includes(key);
+    update({ ...prefs, countries: has ? on.filter((c) => c !== key) : [...on, key] });
+    flash();
+  };
+
   const configJson = JSON.stringify(
     {
       zip: prefs.zip || "",
@@ -150,6 +158,44 @@ export default function SettingsPage() {
               </div>
               <Stars value={prefs.ratings[key] || 0} onChange={(v) => setRating(key, v)} />
             </div>
+            {key === "foreign" && (prefs.ratings.foreign || 0) > 0 ? (
+              <div style={{ padding: "0 4px 14px" }}>
+                <details open={(prefs.countries || []).length > 0} style={{ marginBottom: 8 }}>
+                  <summary
+                    style={{
+                      cursor: "pointer",
+                      fontFamily: "var(--mono)",
+                      fontSize: 12,
+                      letterSpacing: ".06em",
+                      textTransform: "uppercase",
+                      color: (prefs.countries || []).length ? "var(--accent)" : "var(--muted)",
+                      padding: "6px 0",
+                    }}
+                  >
+                    Countries · {(prefs.countries || []).length} of {Object.keys(COUNTRIES).length}
+                  </summary>
+                  <div style={{ padding: "4px 0 2px 12px", borderLeft: "1px solid var(--border)" }}>
+                    <div className="chips" style={{ marginTop: 0 }}>
+                      {Object.entries(COUNTRIES).map(([ck, c]) => (
+                        <button
+                          key={ck}
+                          className={`chip ${(prefs.countries || []).includes(ck) ? "on" : ""}`}
+                          aria-pressed={(prefs.countries || []).includes(ck)}
+                          onClick={() => toggleCountry(ck)}
+                          title={`${c.label} — ${c.language}, translated to English`}
+                        >
+                          {c.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="hint" style={{ marginTop: 10, marginBottom: 0 }}>
+                      Domestic press in each country&apos;s own language, machine-translated. The original
+                      headline is kept on every story.
+                    </div>
+                  </div>
+                </details>
+              </div>
+            ) : null}
             {key === "sports" && (prefs.ratings.sports || 0) > 0 ? (
               <div style={{ padding: "0 4px 14px" }}>
                 {leaguesBySport().map(([sport, leagues]) => (
