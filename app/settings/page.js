@@ -7,6 +7,7 @@ import { TOPICS, leaguesBySport } from "@/lib/topics";
 import { COUNTRIES } from "@/lib/foreign";
 import { submitSubscription } from "@/lib/hubspotForm";
 import { SignupForm } from "@/components/SignupForm";
+import { ConsentCheckbox } from "@/components/ConsentCheckbox";
 
 function Stars({ value, onChange }) {
   return (
@@ -87,6 +88,8 @@ export default function SettingsPage() {
   const [syncEmail, setSyncEmail] = useState(null); // null = fall back to the saved address
   const [syncStatus, setSyncStatus] = useState("idle"); // idle | sending | done | partial | error
   const [syncError, setSyncError] = useState("");
+  const [syncConsent, setSyncConsent] = useState(false); // never pre-ticked
+  const [syncConsentError, setSyncConsentError] = useState(false);
 
   // Reveal admin-only tools when signed into the arok.ai WordPress admin.
   useEffect(() => {
@@ -278,14 +281,6 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Consent notice, placed above both email-capturing cards so it is read
-          before either is used. Deliberately does not name the buttons: a
-          notice that cites a label goes stale the moment the label changes. */}
-      <p className="consent">
-        By submitting an email address on this page, you agree to receive communications from AROK AI.
-        You can unsubscribe anytime via the link at the bottom of each newsletter.
-      </p>
-
       {/* Everything above this point lives in this browser only. This card is
           what carries it to the email — without it, the daily brief is built
           from the publication default and a reader's choices look ignored. */}
@@ -301,8 +296,16 @@ export default function SettingsPage() {
             e.preventDefault();
             const address = (syncEmail ?? prefs.email ?? "").trim();
             if (!/.+@.+\..+/.test(address)) return;
+            if (!syncConsent) {
+              setSyncConsentError(true);
+              return;
+            }
             setSyncStatus("sending");
-            const { ok, prefsSaved, error } = await submitSubscription({ email: address, prefs });
+            const { ok, prefsSaved, error } = await submitSubscription({
+              email: address,
+              prefs,
+              consented: syncConsent,
+            });
             if (ok) update({ ...prefs, email: address });
             setSyncError(error || "");
             setSyncStatus(ok ? (prefsSaved ? "done" : "partial") : "error");
@@ -324,6 +327,15 @@ export default function SettingsPage() {
             {syncStatus === "sending" ? "Sending…" : syncStatus === "done" ? "Settings applied ✓" : "Apply to my email"}
           </button>
         </form>
+        <ConsentCheckbox
+          id="consent-settings"
+          checked={syncConsent}
+          onChange={(v) => {
+            setSyncConsent(v);
+            if (v) setSyncConsentError(false);
+          }}
+          error={syncConsentError}
+        />
         {syncStatus === "partial" || syncStatus === "error" ? (
           <div style={{ marginTop: 8 }}>
             <div style={{ color: "var(--danger)", fontSize: 13 }}>
