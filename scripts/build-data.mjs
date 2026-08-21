@@ -4,6 +4,7 @@
 import { mkdir, writeFile, readFile } from "node:fs/promises";
 import { TOPICS } from "../lib/topics.js";
 import { fetchFeeds } from "../lib/rss.js";
+import { publisherOf } from "../lib/rank.js";
 import { getWeather, getLocalNews, buildDigest } from "../lib/digest.js";
 import { semanticDedupe, report as dedupReport } from "../lib/semantic.js";
 import { renderEmailHtml } from "../lib/email.js";
@@ -57,6 +58,27 @@ const fetched = await Promise.all(
   topicEntries.map(([key, topic]) => fetchFeeds(topic.feeds, 20).then((items) => [key, items]))
 );
 console.log(`⏱ fetched ${topicEntries.length} topics in ${secs(tFetch)}`);
+
+// Publisher mix per topic. A section drawing on one or two outlets is the
+// failure this exists to catch — Gaming was 8-for-8 Polygon before anyone
+// noticed, because a feed that returns nothing looks identical to a feed that
+// simply had no news.
+console.log("\nPublisher mix:");
+for (const [key, items] of fetched) {
+  const by = new Map();
+  for (const it of items) {
+    const p = publisherOf(it);
+    by.set(p, (by.get(p) || 0) + 1);
+  }
+  const ranked = [...by.entries()].sort((a, b) => b[1] - a[1]);
+  const mix = ranked.map(([p, n]) => `${p}(${n})`).join(" ");
+  const silent = TOPICS[key].feeds.length - ranked.length;
+  const top = ranked[0]?.[1] || 0;
+  const warn = ranked.length <= 2 ? "  ⚠ THIN" : top / (items.length || 1) > 0.6 ? "  ⚠ DOMINATED" : "";
+  console.log(`  ${key.padEnd(10)} ${String(ranked.length).padStart(2)} publishers${silent > 0 ? `, ${silent} feed(s) silent` : ""}${warn}`);
+  console.log(`             ${mix}`);
+}
+console.log("");
 
 const tDedup = Date.now();
 for (const [key, items] of fetched) {
