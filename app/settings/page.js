@@ -86,6 +86,7 @@ export default function SettingsPage() {
   const [admin, setAdmin] = useState(false);
   const [syncEmail, setSyncEmail] = useState(null); // null = fall back to the saved address
   const [syncStatus, setSyncStatus] = useState("idle"); // idle | sending | done | partial | error
+  const [syncError, setSyncError] = useState("");
 
   // Reveal admin-only tools when signed into the arok.ai WordPress admin.
   useEffect(() => {
@@ -298,8 +299,9 @@ export default function SettingsPage() {
             const address = (syncEmail ?? prefs.email ?? "").trim();
             if (!/.+@.+\..+/.test(address)) return;
             setSyncStatus("sending");
-            const { ok, prefsSaved } = await submitSubscription({ email: address, prefs });
+            const { ok, prefsSaved, error } = await submitSubscription({ email: address, prefs });
             if (ok) update({ ...prefs, email: address });
+            setSyncError(error || "");
             setSyncStatus(ok ? (prefsSaved ? "done" : "partial") : "error");
           }}
         >
@@ -319,14 +321,20 @@ export default function SettingsPage() {
             {syncStatus === "sending" ? "Sending…" : syncStatus === "done" ? "Settings applied ✓" : "Apply to my email"}
           </button>
         </form>
-        {syncStatus === "partial" ? (
-          <div style={{ color: "var(--danger)", fontSize: 13, marginTop: 8 }}>
-            You&apos;re subscribed, but your settings couldn&apos;t be saved — the newsletter form is
-            missing its <code>nexus_prefs</code> field. Until it&apos;s added you&apos;ll get the default brief.
-          </div>
-        ) : syncStatus === "error" ? (
-          <div style={{ color: "var(--danger)", fontSize: 13, marginTop: 8 }}>
-            That didn&apos;t go through — try again in a moment.
+        {syncStatus === "partial" || syncStatus === "error" ? (
+          <div style={{ marginTop: 8 }}>
+            <div style={{ color: "var(--danger)", fontSize: 13 }}>
+              {syncStatus === "partial"
+                ? "You're subscribed, but your settings couldn't be saved. Until that's fixed you'll get the default brief."
+                : "That didn't go through."}
+            </div>
+            {/* HubSpot's own words. A friendly message alone leaves nothing to
+                act on, and these errors name the offending field outright. */}
+            {syncError ? (
+              <div style={{ color: "var(--muted)", fontSize: 12, marginTop: 4, fontFamily: "var(--mono)" }}>
+                HubSpot said: {syncError}
+              </div>
+            ) : null}
           </div>
         ) : null}
       </div>

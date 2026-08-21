@@ -2,8 +2,10 @@
   "zip": "",
   "siteUrl": "https://arok.ai/nexus/",
   "leagues": ["nfl", "nba"],
+  "countries": ["jp", "de", "fr", "br", "eg"],
   "ratings": {
     "politics": 3,
+    "foreign": 3,
     "usnews": 3,
     "world": 3,
     "conflict": 3,
