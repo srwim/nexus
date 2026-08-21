@@ -102,7 +102,11 @@ jobs.push(writeJson("sports", { leagues: Object.fromEntries(leagueKeys.map((k, i
 const tForeign = Date.now();
 const countryKeys = Object.keys(COUNTRIES);
 const foreignLists = await Promise.all(
-  countryKeys.map((c) => fetchFeeds(COUNTRIES[c].feeds, 14).then((items) => filterStale(items, 4)))
+  // keepUndated: foreign publishers localise their date strings, and dropping
+  // what Date.parse can't read would remove whole countries from the section.
+  countryKeys.map((c) =>
+    fetchFeeds(COUNTRIES[c].feeds, 14).then((items) => filterStale(items, 4, Date.now(), { keepUndated: true }))
+  )
 );
 const byCountry = Object.fromEntries(
   countryKeys.map((c, i) => [c, { lang: COUNTRIES[c].lang, items: foreignLists[i] }])

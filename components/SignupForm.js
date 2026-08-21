@@ -12,6 +12,7 @@ export function SignupForm() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [status, setStatus] = useState("idle"); // idle | sending | done | error
+  const [error, setError] = useState("");
 
   if (!hs.portalId || !hs.formId) return null;
 
@@ -27,8 +28,9 @@ export function SignupForm() {
     if (!/.+@.+\..+/.test(email)) return;
     setStatus("sending");
     const prefs = loadPrefs();
-    const { ok } = await submitSubscription({ email, name, prefs });
+    const { ok, error } = await submitSubscription({ email, name, prefs });
     if (ok) savePrefs({ ...prefs, email });
+    setError(error || "");
     setStatus(ok ? "done" : "error");
   };
 
@@ -67,8 +69,13 @@ export function SignupForm() {
         </button>
       </form>
       {status === "error" ? (
-        <div style={{ color: "var(--danger)", fontSize: 13, marginTop: 8 }}>
-          That didn&apos;t go through — try again in a moment.
+        <div style={{ marginTop: 8 }}>
+          <div style={{ color: "var(--danger)", fontSize: 13 }}>That didn&apos;t go through.</div>
+          {error ? (
+            <div style={{ color: "var(--muted)", fontSize: 12, marginTop: 4, fontFamily: "var(--mono)" }}>
+              HubSpot said: {error}
+            </div>
+          ) : null}
         </div>
       ) : (
         <div style={{ color: "var(--muted)", fontSize: 12, marginTop: 8 }}>
