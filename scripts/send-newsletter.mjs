@@ -2,7 +2,9 @@
 // fan out to the optional integrations. Run by .github/workflows/newsletter.yml.
 import { readFile } from "node:fs/promises";
 import { createHmac } from "node:crypto";
-import { buildPublishedDigest } from "../lib/publishedDigest.js";
+import { fetchPublishedData, digestFromData } from "../lib/publishedDigest.js";
+import { getLocalNews, getWeather } from "../lib/digest.js";
+import { prefsSignature } from "../lib/prefsPayload.js";
 import { renderEmailHtml } from "../lib/email.js";
 import { postSlack, fetchSponsors, hubspotRecipients, uploadToDrive } from "./integrations.mjs";
 
@@ -37,7 +39,13 @@ try {
   /* no gated brief (manual/local run) — build it fresh below */
 }
 
-const digest = prebuilt?.digest ?? (console.log("Building digest from published site data…"), await buildPublishedDigest(prefs, config.siteUrl));
+// The published pool, fetched at most once per run and shared by every
+// subscriber's digest. Lazy: a run where nobody has personalized settings and a
+// gated brief already exists never touches the network for it.
+let poolPromise = null;
+const pool = () => (poolPromise ??= (console.log("Reading published site data…"), fetchPublishedData(config.siteUrl)));
+
+const digest = prebuilt?.digest ?? (await digestFromData(await pool(), prefs));
 const sponsors = prebuilt?.sponsors ?? (await fetchSponsors({ debug: !!config.dryRun }));
 if (prebuilt) console.log(`Using approved brief built at ${prebuilt.generated_at}`);
 
@@ -76,18 +84,75 @@ for (const person of await hubspotRecipients()) {
 const recipients = [...byEmail.values()];
 console.log(
   `Recipients: ${recipients
-    .map((r) => `${r.email}=${r.theme ? `${r.theme} (own)` : `${defaultTheme} (default)`}`)
+    .map(
+      (r) =>
+        `${r.email}=${r.theme ? `${r.theme} (own)` : `${defaultTheme} (default)`}${r.prefs ? " +settings" : ""}`
+    )
     .join(", ")}`
 );
+
+// ---- Per-subscriber briefs ----
+// A reader who synced their settings gets a brief ranked from THEIR ratings,
+// leagues and zipcode. This is the fix for briefs that ignored what the reader
+// had chosen on the site: there used to be one digest built from
+// nexus.config.json and everybody got it.
+//
+// One digest per distinct settings signature rather than per person, and the
+// published pool is fetched once for all of them.
+//
+// ponytail: the autonomy gate reviews the default brief only. A personalized
+// brief re-ranks that same reviewed pool, so it cannot surface a story the gate
+// never saw — per-recipient gating was explicitly out of scope.
+const digestCache = new Map();
+const zipCache = new Map();
+
+// Local news and weather in the published pool are built for the publication's
+// own zipcode. A subscriber with a different one needs those two fetched for
+// them — cached by zipcode, so a hundred readers in the same town cost one call.
+async function dataForZip(zip) {
+  const base = await pool();
+  if (!zip || zip === (config.zip || "")) return base;
+  if (!zipCache.has(zip)) {
+    zipCache.set(
+      zip,
+      (async () => {
+        const [local, weather] = await Promise.all([getLocalNews(zip, 20), getWeather(zip)]);
+        return { ...base, local, weather };
+      })()
+    );
+  }
+  return zipCache.get(zip);
+}
+
+async function digestFor(person) {
+  if (!person.prefs) return digest; // publication default (gated, if a brief exists)
+  const sig = prefsSignature(person.prefs);
+  if (!digestCache.has(sig)) {
+    digestCache.set(
+      sig,
+      (async () => digestFromData(await dataForZip(person.prefs.zip), person.prefs))()
+    );
+  }
+  return digestCache.get(sig);
+}
 
 // Safety valve: set "dryRun": true in nexus.config.json to build and log the
 // whole run without mailing anyone — useful for checking sponsor copy before
 // spending a day's idempotency key on a real send.
 if (config.dryRun) {
-  console.log(
-    `DRY RUN — no email sent. Would send to ${recipients.length} recipient(s): ` +
-      JSON.stringify(recipients.map((r) => `${r.email}:${r.theme || defaultTheme}`))
-  );
+  // Build each brief anyway and print its shape — a dry run that skipped the
+  // personalization couldn't tell you whether the personalization works.
+  console.log(`DRY RUN — no email sent. ${recipients.length} recipient(s):`);
+  for (const person of recipients) {
+    const brief = await digestFor(person);
+    const shape = brief.sections
+      .map((s) => `${s.label}(${s.type === "news" ? s.items?.length ?? 0 : s.type})`)
+      .join(" ");
+    console.log(
+      `  ${person.email}  theme=${person.theme || defaultTheme}  settings=${person.prefs ? "own" : "default"}`
+    );
+    console.log(`    ${shape}`);
+  }
 } else if (!apiKey) {
   console.log("Email: skipped (no RESEND_API_KEY secret)");
 } else if (!recipients.length) {
@@ -102,8 +167,9 @@ if (config.dryRun) {
   for (const person of recipients.slice(0, 200)) {
     const to = person.email;
     const theme = person.theme || defaultTheme; // subscriber preference wins
+    const brief = await digestFor(person);
     const unsubscribeUrl = unsubscribeFor(to);
-    const html = renderEmailHtml(digest, { sponsors, theme, siteUrl: config.siteUrl, unsubscribeUrl });
+    const html = renderEmailHtml(brief, { sponsors, theme, siteUrl: config.siteUrl, unsubscribeUrl });
     const headers = unsubscribeUrl.startsWith("http")
       ? { "List-Unsubscribe": `<${unsubscribeUrl}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" }
       : { "List-Unsubscribe": `<${unsubscribeUrl}>` };
@@ -126,7 +192,10 @@ if (config.dryRun) {
       if (fail <= 2) console.warn(`  email to ${to} failed (${res.status}: ${(await res.text()).slice(0, 120)})`);
     }
   }
-  console.log(`Email: sent ${ok}, already sent today ${already}, failed ${fail} (default theme: ${defaultTheme})`);
+  console.log(
+    `Email: sent ${ok}, already sent today ${already}, failed ${fail} ` +
+      `(default theme: ${defaultTheme}; ${digestCache.size} personalized brief(s) built)`
+  );
 }
 
 console.log("Slack:", await postSlack(digest, config));

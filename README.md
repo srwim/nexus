@@ -100,7 +100,14 @@ The site is built to be shared. Every visitor gets their own experience with no 
 - **Live per-visitor weather** — when a visitor sets their zip, their forecast comes straight from the National Weather Service in their browser.
 - **Live per-visitor local news** — a small Cloudflare Worker (`workers/local-news-proxy.js`) calls the free [GNews](https://gnews.io) API server-side (100 requests/day free; key stays hidden in the worker) and returns local stories for any visitor's zipcode. Setup steps are at the top of that file: get a free key, add it as the worker variable `GNEWS_KEY`, deploy, and store the worker URL in the `LOCAL_NEWS_PROXY` repo variable. Google News RSS was the original plan but blocks Cloudflare IPs, hence the API.
 - **Share links** — Settings → "Copy share link" produces a URL that carries your exact ratings/leagues/zip to whoever opens it (email is never included).
-- **Newsletter signups** — create a plain email form in HubSpot (Marketing → Forms), put its `portalId` and `formId` in `nexus.config.json` under `hubspot`, and a "Get the Daily Brief" signup box appears on the site. Submissions land in HubSpot; add them to the contact list your `HUBSPOT_LIST_ID` secret points at and they'll receive the daily email automatically. Note: subscribers all receive the same edition, built from the ratings in `nexus.config.json`.
+- **Newsletter signups** — create a plain email form in HubSpot (Marketing → Forms), put its `portalId` and `formId` in `nexus.config.json` under `hubspot`, and a "Get the Daily Brief" signup box appears on the site. Submissions land in HubSpot; add them to the contact list your `HUBSPOT_LIST_ID` secret points at and they'll receive the daily email automatically.
+
+- **Per-subscriber editions** — each subscriber can receive a brief built from their own ratings, leagues, zipcode and theme instead of the house defaults. Two one-time steps in HubSpot switch it on:
+
+  1. **Settings → Properties → Create property** on the Contact object: `nexus_prefs` (single-line text). Optionally `nexus_theme` (single-line text) too, if you haven't already.
+  2. **Marketing → Forms → your signup form**: add `nexus_prefs` and `nexus_theme` as fields (hidden is fine).
+
+  Readers then hit **Apply to my email** in Settings and their next brief is built from what they chose. Until those steps are done nothing breaks — signup still works, settings simply don't stick, and everyone gets the publication default.
 
 If the newsletter grows beyond ~50 recipients, mind Resend's free-tier limits and add a verified sending domain (`NEWSLETTER_FROM`) — deliverability is much better than the shared onboarding address.
 
