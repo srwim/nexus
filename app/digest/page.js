@@ -32,7 +32,7 @@ export default function DigestPage() {
         <button
           className="btn ghost"
           style={{ marginLeft: 10, padding: "6px 14px", fontSize: 12 }}
-          onClick={() => window.open(`${BASE}/newsletter.html`, "_blank")}
+          onClick={() => window.open(`${BASE}/preview/`, "_blank")}
         >
           View as Email
         </button>
