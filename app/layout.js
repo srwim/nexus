@@ -1,5 +1,6 @@
 import "./globals.css";
 import Link from "next/link";
+import { RATING_BASIS, CHECKED } from "@/lib/sources";
 
 // The site is published to two hosts (arok.ai/nexus and srwim.github.io/nexus)
 // with identical content. Without a canonical, search engines treat that as
@@ -57,6 +58,13 @@ export default function RootLayout({ children }) {
         <main>{children}</main>
         <footer className="footer">
           <div>Syndicated from trusted public feeds · Ranked by your ratings</div>
+          {/* Attribution belongs next to the claim, not buried in an About page:
+              the labels assert something contestable about real organisations. */}
+          <div className="footer-note">
+            Ownership and political-lean labels summarise published ratings from {RATING_BASIS}, last
+            reviewed {CHECKED}. They are not NEXUS&apos;s own assessment, and outlets are left unlabelled
+            where those raters disagree.
+          </div>
           <div className="footer-site">
             <span>
               Designed by{" "}

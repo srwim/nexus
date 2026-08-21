@@ -1,4 +1,38 @@
 "use client";
+import { sourceLabel, LEAN_ORDER } from "@/lib/sources";
+
+// Where the outlet sits on the published left/right scale, as a position on a
+// five-step ruler rather than a party colour. Red/blue would be the reflex, and
+// it would editorialise through hue in a palette that has no business doing so;
+// a filled tick reads as a measurement, which is what it is.
+//
+// aria-hidden because the written label beside it already says the same thing.
+function LeanScale({ index }) {
+  return (
+    <span className="lean-scale" aria-hidden="true">
+      {LEAN_ORDER.map((_, i) => (
+        <i key={i} className={i === index ? "on" : ""} />
+      ))}
+    </span>
+  );
+}
+
+function SourceMeta({ item }) {
+  const label = sourceLabel(item);
+  if (!label) return null;
+  return (
+    <span className="src-meta" title={label.title}>
+      {label.owner}
+      {label.owner && label.leanLabel ? <span className="sep"> · </span> : null}
+      {label.leanLabel ? (
+        <>
+          <LeanScale index={label.leanIndex} />
+          {label.leanLabel}
+        </>
+      ) : null}
+    </span>
+  );
+}
 
 export function ArticleList({ items, showSnippets = true }) {
   if (!items?.length) return <div className="loading">No stories right now.</div>;
@@ -9,8 +43,13 @@ export function ArticleList({ items, showSnippets = true }) {
           <div className="title">{it.title}</div>
           {showSnippets && it.summary ? <div className="snippet">{it.summary}</div> : null}
           <div className="src">
-            {it.source}
-            {it.date ? ` · ${new Date(it.date).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}` : ""}
+            <span className="src-origin">
+              {it.source}
+              {it.date
+                ? ` · ${new Date(it.date).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}`
+                : ""}
+            </span>
+            <SourceMeta item={it} />
           </div>
         </a>
       ))}
