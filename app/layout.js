@@ -54,6 +54,7 @@ export default function RootLayout({ children }) {
             <Link href="/digest">Daily Brief</Link>
             <Link href="/settings">Settings</Link>
           </nav>
+
         </header>
         <main>{children}</main>
         <footer className="footer">
@@ -66,6 +67,9 @@ export default function RootLayout({ children }) {
             where those raters disagree.
           </div>
           <div className="footer-site">
+            <span>
+              <Link href="/privacy">Privacy Policy</Link>
+            </span>
             <span>
               Designed by{" "}
               <a href="http://sol-tek.us/" target="_blank" rel="noopener noreferrer">Sol-Tek</a>

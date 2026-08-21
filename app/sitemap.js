@@ -14,5 +14,9 @@ export default function sitemap() {
   return [
     { url: `${SITE}/`, lastModified, changeFrequency: "hourly", priority: 1 },
     { url: `${SITE}/digest/`, lastModified, changeFrequency: "daily", priority: 0.8 },
+    // Indexable on purpose: people look for a publisher's privacy policy
+    // directly, and a findable one is part of being credible about the claims
+    // in it. /preview is not listed — it's a per-visitor render and noindex.
+    { url: `${SITE}/privacy/`, lastModified, changeFrequency: "yearly", priority: 0.3 },
   ];
 }

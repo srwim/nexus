@@ -72,6 +72,16 @@ function unsubscribeFor(email) {
 }
 
 // ---- Email via Resend ----
+// CAN-SPAM assesses penalties per email sent, not per campaign, so a missing
+// postal address is a compounding exposure rather than a cosmetic gap. Loud on
+// purpose: this is easy to forget and expensive to forget.
+if (!config.newsletter?.postalAddress) {
+  console.warn(
+    "\n⚠ newsletter.postalAddress is empty in nexus.config.json.\n" +
+      "  Every commercial email must carry the sender's own valid postal address\n" +
+      "  (street, USPS-registered PO box, or CMRA mailbox). Set it before sending.\n"
+  );
+}
 const apiKey = process.env.RESEND_API_KEY;
 // Merge the configured address with the HubSpot list, de-duped by email. List
 // entries win because they carry the subscriber's theme preference.
@@ -169,7 +179,13 @@ if (config.dryRun) {
     const theme = person.theme || defaultTheme; // subscriber preference wins
     const brief = await digestFor(person);
     const unsubscribeUrl = unsubscribeFor(to);
-    const html = renderEmailHtml(brief, { sponsors, theme, siteUrl: config.siteUrl, unsubscribeUrl });
+    const html = renderEmailHtml(brief, {
+      sponsors,
+      theme,
+      siteUrl: config.siteUrl,
+      unsubscribeUrl,
+      postalAddress: config.newsletter?.postalAddress,
+    });
     const headers = unsubscribeUrl.startsWith("http")
       ? { "List-Unsubscribe": `<${unsubscribeUrl}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" }
       : { "List-Unsubscribe": `<${unsubscribeUrl}>` };
