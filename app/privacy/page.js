@@ -21,10 +21,13 @@ export default function PrivacyPage() {
 
       <h2>Who we are</h2>
       <p>
-        NEXUS is a personalized news brief published by AROK AI. If you have any question about your
-        data, or want it deleted, email <a href={`mailto:${CONTACT}`}>{CONTACT}</a>.
+        NEXUS is a personalized news brief published under the AROK AI brand by{" "}
+        <b>Consolidated Technologies LLC</b>, a Utah limited liability company. Consolidated
+        Technologies LLC is the data controller for the information described below. If you have any
+        question about your data, or want it deleted, email{" "}
+        <a href={`mailto:${CONTACT}`}>{CONTACT}</a>.
       </p>
-      {postal ? <p>Our postal address is {postal}.</p> : null}
+      {postal ? <p>Our postal address is {postal.replace(/ · /g, ", ")}.</p> : null}
 
       <h2>What we collect, and why</h2>
       <ul>
