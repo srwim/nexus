@@ -75,8 +75,8 @@ export default function PrivacyPage() {
       <h2>How long we keep it</h2>
       <p>
         Your address and settings are kept until you unsubscribe, after which they are removed from the
-        sending list. We keep the consent record for a limited period afterwards, because it is the
-        evidence that we had permission to email you in the first place.
+        sending list. We keep the consent record for two years after that, because it is the evidence
+        that we had permission to email you in the first place. After two years it is deleted.
       </p>
 
       <h2>Your rights</h2>
