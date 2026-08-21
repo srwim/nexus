@@ -367,6 +367,25 @@ input:focus { border-color: var(--accent); outline: none; }
   overflow-wrap: break-word;
   word-break: normal;
 }
+/* Long-form legal/reading pages. The rest of the site is scannable metadata;
+   this is the one place someone reads paragraphs, so it gets a measure. */
+.prose { max-width: 68ch; }
+.prose h2 {
+  font-size: 15px;
+  margin: 28px 0 8px;
+  letter-spacing: -.01em;
+}
+.prose p, .prose li {
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--body, var(--muted));
+}
+.prose ul { padding-left: 20px; margin: 8px 0; }
+.prose li { margin-bottom: 6px; }
+.prose b { color: var(--text); font-weight: 600; }
+.prose a { color: var(--accent); }
+
 /* Explicit consent. Sans, not the mono hint face: this is a sentence someone
    must actually read before handing over an address, and mono at 10.5px with
    .1em tracking is a label face. Quiet, but legible — a consent statement that
@@ -401,6 +420,7 @@ input:focus { border-color: var(--accent); outline: none; }
   line-height: 1.55;
   color: var(--muted);
 }
+.consent-notice a { color: var(--accent); }
 .consent-error {
   margin: 8px 0 0 27px;
   font-family: var(--sans);

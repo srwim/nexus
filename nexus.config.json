@@ -27,7 +27,8 @@
   "newsletter": {
     "to": "saswannabe17@gmail.com",
     "from": "NEXUS <brief@arok.ai>",
-    "unsubscribeUrl": ""
+    "unsubscribeUrl": "",
+    "postalAddress": ""
   },
   "theme": "light",
   "dryRun": false,
