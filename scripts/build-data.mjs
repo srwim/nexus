@@ -11,6 +11,7 @@ import { publisherOf } from "../lib/rank.js";
 import { filterStale } from "../lib/text.js";
 import { getWeather, getLocalNews } from "../lib/digest.js";
 import { digestFromData } from "../lib/publishedDigest.js";
+import { selectSponsors } from "../lib/sponsors.js";
 import { semanticDedupe, report as dedupReport } from "../lib/semantic.js";
 import { renderEmailHtml } from "../lib/email.js";
 
@@ -57,6 +58,10 @@ async function writeJson(name, data) {
 }
 
 const config = await readConfig();
+const sponsorData = await readFile(new URL("../sponsors.json", import.meta.url), "utf8")
+  .then(JSON.parse)
+  .catch(() => ({ campaigns: [] }));
+const denverDate = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Denver" }).format(new Date());
 await mkdir(OUT, { recursive: true });
 
 const jobs = [];
@@ -194,7 +199,14 @@ for (const [file, theme] of [
 ]) {
   await writeFile(
     new URL(`../public/${file}`, import.meta.url),
-    renderEmailHtml(digest, { siteUrl: config.siteUrl, theme })
+    // Sponsors now come from a local file, so the published preview can show
+    // the real ads instead of an empty slot where one will appear.
+    renderEmailHtml(digest, {
+      siteUrl: config.siteUrl,
+      theme,
+      sponsors: selectSponsors(sponsorData, denverDate),
+      postalAddress: config.newsletter?.postalAddress,
+    })
   );
 }
 console.log(`✓ newsletter.html + newsletter-dark.html (${secs(tPreview)})`);

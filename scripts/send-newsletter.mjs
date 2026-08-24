@@ -5,10 +5,14 @@ import { createHmac } from "node:crypto";
 import { fetchPublishedData, digestFromData } from "../lib/publishedDigest.js";
 import { getLocalNews, getWeather } from "../lib/digest.js";
 import { prefsSignature } from "../lib/prefsPayload.js";
+import { selectSponsors, mergeSponsors, describeSponsors } from "../lib/sponsors.js";
 import { renderEmailHtml } from "../lib/email.js";
 import { postSlack, fetchSponsors, hubspotRecipients, uploadToDrive } from "./integrations.mjs";
 
 const config = JSON.parse(await readFile(new URL("../nexus.config.json", import.meta.url), "utf8"));
+const sponsorData = await readFile(new URL("../sponsors.json", import.meta.url), "utf8")
+  .then(JSON.parse)
+  .catch(() => ({ campaigns: [] })); // no sponsors file is a valid state, not an error
 const prefs = { zip: config.zip, ratings: config.ratings, leagues: config.leagues };
 
 // The schedule fires at two UTC times (10:15 & 11:15) so one of them is 4:15 AM
@@ -46,8 +50,15 @@ let poolPromise = null;
 const pool = () => (poolPromise ??= (console.log("Reading published site data…"), fetchPublishedData(config.siteUrl)));
 
 const digest = prebuilt?.digest ?? (await digestFromData(await pool(), prefs));
-const sponsors = prebuilt?.sponsors ?? (await fetchSponsors({ debug: !!config.dryRun }));
 if (prebuilt) console.log(`Using approved brief built at ${prebuilt.generated_at}`);
+
+// Sponsors come from sponsors.json in the repo. Sponsy is still supported for
+// anyone who wants it, but it is off unless enableSponsy is set — and it can
+// only fill placements nobody has bought locally.
+let sponsors = prebuilt?.sponsors ?? selectSponsors(sponsorData, denverDate);
+if (!prebuilt?.sponsors && sponsorData?.enableSponsy) {
+  sponsors = mergeSponsors(sponsors, await fetchSponsors({ debug: !!config.dryRun }), sponsorData, denverDate);
+}
 
 // Publication default, overridable per run (workflow_dispatch "theme" input)
 // for testing without editing nexus.config.json. Individual subscribers can
@@ -55,10 +66,7 @@ if (prebuilt) console.log(`Using approved brief built at ${prebuilt.generated_at
 const envTheme = String(process.env.NEWSLETTER_THEME || "").toLowerCase();
 const defaultTheme =
   envTheme === "dark" || envTheme === "light" ? envTheme : prebuilt?.theme ?? (config.theme === "dark" ? "dark" : "light");
-console.log(
-  "Sponsy:",
-  ["top", "primary", "footer"].map((k) => `${k}=${sponsors[k] ? `"${sponsors[k].title}" -> ${sponsors[k].url || "NO LINK"}` : "—"}`).join(" ")
-);
+console.log("Sponsors:", describeSponsors(sponsors));
 
 // Per-recipient one-click unsubscribe link, signed so it can't be forged.
 // The worker verifies the same HMAC using HUBSPOT_TOKEN. Falls back to a mailto

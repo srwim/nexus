@@ -1,0 +1,17 @@
+{
+  "_readme": "Sponsor campaigns. Edit this file on GitHub and the next scheduled build picks it up. `house` names the campaign that fills any placement nobody has bought. Dates are inclusive YYYY-MM-DD in Denver time; omit them for an always-on campaign. `draft: true` keeps an entry out of the newsletter entirely. Placements: top (under the wordmark), primary (above the news), footer (below it).",
+  "house": "sol-tek",
+  "campaigns": [
+    {
+      "id": "sol-tek",
+      "house": true,
+      "draft": true,
+      "placements": ["top", "primary", "footer"],
+      "title": "",
+      "cta": "",
+      "body": "",
+      "linkText": "sol-tek.us",
+      "url": "https://sol-tek.us/"
+    }
+  ]
+}

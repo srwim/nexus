@@ -13,7 +13,10 @@ import { useEffect, useState } from "react";
 import { usePrefs } from "@/lib/usePrefs";
 import { assembleDigest } from "@/lib/clientDigest";
 import { renderEmailHtml } from "@/lib/email";
+import { selectSponsors } from "@/lib/sponsors";
 import { BASE } from "@/lib/data";
+import config from "@/nexus.config.json";
+import sponsorData from "@/sponsors.json";
 
 export default function PreviewPage() {
   const { prefs, ready } = usePrefs();
@@ -30,7 +33,17 @@ export default function PreviewPage() {
       .then((digest) => {
         if (cancelled) return;
         const siteUrl = typeof window !== "undefined" ? `${window.location.origin}${BASE}/` : "";
-        setHtml(renderEmailHtml(digest, { theme: active, siteUrl }));
+        // Sponsors resolve from the repo file now, so the preview shows the
+        // real ads rather than promising they appear later.
+        const today = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Denver" }).format(new Date());
+        setHtml(
+          renderEmailHtml(digest, {
+            theme: active,
+            siteUrl,
+            sponsors: selectSponsors(sponsorData, today),
+            postalAddress: config.newsletter?.postalAddress,
+          })
+        );
       })
       .catch(() => !cancelled && setFailed(true));
     return () => {
@@ -126,9 +139,9 @@ export default function PreviewPage() {
       />
 
       <div className="hint" style={{ marginTop: 12 }}>
-        Two differences from the real thing: sponsor slots are filled at send time, and this renders
-        from the last published build, so a story added in the past half hour may not appear yet. To
-        make these settings your actual email, use <b>Apply to my email</b> in Settings.
+        One difference from the real thing: this renders from the last published build, so a story
+        added in the past half hour may not appear yet. To make these settings your actual email, use{" "}
+        <b>Apply to my email</b> in Settings.
       </div>
     </div>
   );
