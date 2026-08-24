@@ -40,7 +40,7 @@ export default function PreviewPage() {
           renderEmailHtml(digest, {
             theme: active,
             siteUrl,
-            sponsors: selectSponsors(sponsorData, today),
+            sponsors: selectSponsors(sponsorData, today, config.localNewsProxy),
             postalAddress: config.newsletter?.postalAddress,
           })
         );

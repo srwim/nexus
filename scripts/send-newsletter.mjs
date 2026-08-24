@@ -55,7 +55,7 @@ if (prebuilt) console.log(`Using approved brief built at ${prebuilt.generated_at
 // Sponsors come from sponsors.json in the repo. Sponsy is still supported for
 // anyone who wants it, but it is off unless enableSponsy is set — and it can
 // only fill placements nobody has bought locally.
-let sponsors = prebuilt?.sponsors ?? selectSponsors(sponsorData, denverDate);
+let sponsors = prebuilt?.sponsors ?? selectSponsors(sponsorData, denverDate, config.localNewsProxy);
 if (!prebuilt?.sponsors && sponsorData?.enableSponsy) {
   sponsors = mergeSponsors(sponsors, await fetchSponsors({ debug: !!config.dryRun }), sponsorData, denverDate);
 }

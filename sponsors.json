@@ -1,16 +1,17 @@
 {
-  "_readme": "Sponsor campaigns. Edit this file on GitHub and the next scheduled build picks it up. `house` names the campaign that fills any placement nobody has bought. Dates are inclusive YYYY-MM-DD in Denver time; omit them for an always-on campaign. `draft: true` keeps an entry out of the newsletter entirely. Placements: top (under the wordmark), primary (above the news), footer (below it).",
+  "_readme": "Sponsor campaigns. Edit this file on GitHub and the next scheduled build picks it up. `house` names the campaign that fills any placement nobody has bought. Dates are inclusive YYYY-MM-DD in Denver time; omit them for an always-on campaign. `draft: true` keeps an entry out of the newsletter entirely. Placements: top (under the wordmark), primary (above the news), footer (below it). Put a CLEAN url here with no tracking parameters -- UTM tags are added automatically, so hand-added ones get overwritten and stale ones linger.",
   "house": "sol-tek",
+  "trackClicks": false,
+  "enableSponsy": false,
   "campaigns": [
     {
       "id": "sol-tek",
       "house": true,
-      "draft": true,
       "placements": ["top", "primary", "footer"],
-      "title": "",
+      "title": "Sol-Tek",
       "cta": "",
       "body": "",
-      "linkText": "sol-tek.us",
+      "linkText": "Fractional CTO and AI Leadership",
       "url": "https://sol-tek.us/"
     }
   ]

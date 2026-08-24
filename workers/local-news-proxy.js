@@ -40,6 +40,9 @@ export default {
     if (url.pathname.replace(/\/+$/, "").endsWith("/translate")) {
       return handleTranslate(request, env);
     }
+    if (url.pathname.replace(/\/+$/, "").endsWith("/c")) {
+      return handleClick(url, env);
+    }
 
     const cors = {
       "Access-Control-Allow-Origin": "*",
@@ -112,6 +115,82 @@ export default {
     }
   },
 };
+
+// ── Sponsor click counting ───────────────────────────────────────────────────
+// GET /c?id=<campaignId>&p=<placement>  ->  302 to that campaign's destination.
+//
+// THE DESTINATION IS NEVER A PARAMETER. That is the whole design. A redirector
+// that takes ?u=<url> is an open redirect: anyone can hand out
+// nexus-local.…workers.dev/c?u=https://phishing.example and borrow the
+// reputation of a domain readers trust. Here the id is looked up in the
+// published sponsors.json, so the only reachable destinations are ones already
+// committed to the repo — the allowlist is the sponsor list, by construction.
+//
+// Belt and braces on top of that: the resolved URL must still parse as http(s),
+// so a bad entry reaching sponsors.json cannot produce a "javascript:" redirect.
+const SPONSORS_URL = "https://arok.ai/nexus/sponsors.json";
+
+async function loadCampaigns() {
+  try {
+    // Edge-cached: a click should not cost a round trip to the origin, and the
+    // sponsor list changes at most daily.
+    const res = await fetch(SPONSORS_URL, { cf: { cacheTtl: 600, cacheEverything: true } });
+    if (!res.ok) return [];
+    return (await res.json())?.campaigns || [];
+  } catch {
+    return [];
+  }
+}
+
+function safeDestination(raw) {
+  try {
+    const u = new URL(String(raw));
+    return u.protocol === "https:" || u.protocol === "http:" ? u : null;
+  } catch {
+    return null;
+  }
+}
+
+async function handleClick(url, env) {
+  const id = (url.searchParams.get("id") || "").slice(0, 64);
+  const placement = (url.searchParams.get("p") || "").slice(0, 16);
+  // Explicitly ignored, and named so nobody "helpfully" adds it later.
+  if (url.searchParams.has("u") || url.searchParams.has("url")) {
+    return new Response("This endpoint does not take a destination URL.", { status: 400 });
+  }
+  if (!id) return Response.redirect("https://arok.ai/nexus/", 302);
+
+  const campaign = (await loadCampaigns()).find((c) => c.id === id);
+  const dest = campaign ? safeDestination(campaign.url) : null;
+  // An unknown or malformed campaign goes to the site, not to nowhere and not
+  // to something a query string suggested.
+  if (!dest) return Response.redirect("https://arok.ai/nexus/", 302);
+
+  dest.searchParams.set("utm_source", "nexus");
+  dest.searchParams.set("utm_medium", "email");
+  dest.searchParams.set("utm_campaign", id);
+  if (placement) dest.searchParams.set("utm_content", placement);
+
+  // Counting is optional: no KV binding means the redirect still works. Add a
+  // KV namespace bound as SPONSOR_STATS to switch it on.
+  //
+  // ponytail: read-modify-write on a per-day, per-campaign key. Two clicks in
+  // the same second can lose one, which is fine for a reach estimate and not
+  // fine for billing per click. Upgrade path is Analytics Engine or a Durable
+  // Object counter if a sponsor ever pays on exact clicks.
+  if (env.SPONSOR_STATS) {
+    const day = new Date().toISOString().slice(0, 10);
+    const key = `clicks:${day}:${id}:${placement || "none"}`;
+    try {
+      const current = Number((await env.SPONSOR_STATS.get(key)) || 0);
+      await env.SPONSOR_STATS.put(key, String(current + 1), { expirationTtl: 60 * 60 * 24 * 400 });
+    } catch {
+      /* never let a counter failure break the reader's click */
+    }
+  }
+
+  return Response.redirect(dest.toString(), 302);
+}
 
 // ── Translation for Foreign Reporting ────────────────────────────────────────
 // POST /translate  { "source": "ja", "texts": ["…", "…"] }
