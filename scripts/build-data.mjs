@@ -138,6 +138,22 @@ console.log(
 );
 jobs.push(writeJson("foreign", { countries: foreignItems }));
 
+// The click worker resolves a campaign id to its destination by reading this
+// file, so it has to be reachable on the site — sponsors.json lives at the repo
+// root, which Next never publishes. Only id and url are exposed: that is all the
+// redirect needs, and ad copy for a campaign still in draft has no business
+// being public.
+await writeFile(
+  new URL("../public/sponsors.json", import.meta.url),
+  JSON.stringify({
+    updatedAt,
+    campaigns: (sponsorData.campaigns || [])
+      .filter((c) => !c.draft && c.id && c.url)
+      .map((c) => ({ id: c.id, url: c.url })),
+  })
+);
+console.log("✓ sponsors.json (click destinations)");
+
 // Zipcode-driven data (no model needed) runs in parallel with topic fetching.
 const [localData, weatherData] = await Promise.all([getLocalNews(config.zip, 20), getWeather(config.zip)]);
 jobs.push(writeJson("local", localData));
@@ -204,7 +220,7 @@ for (const [file, theme] of [
     renderEmailHtml(digest, {
       siteUrl: config.siteUrl,
       theme,
-      sponsors: selectSponsors(sponsorData, denverDate),
+      sponsors: selectSponsors(sponsorData, denverDate, config.localNewsProxy),
       postalAddress: config.newsletter?.postalAddress,
     })
   );
