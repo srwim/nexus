@@ -142,6 +142,28 @@ export async function fetchSponsors({ debug = false } = {}) {
 // "nexus_theme" contact property ("light"/"dark"), prefs from "nexus_prefs"
 // (see lib/prefsPayload.js). Both are null when unset or unparseable, in which
 // case the caller falls back to the publication default.
+// The authoritative answer to "may we email this person": HubSpot's own
+// subscription status for the email channel. Any UNSUBSCRIBED entry means no —
+// we send exactly one kind of email, so there is no subscription type a reader
+// could have opted out of that we would still be entitled to use.
+//
+// Returns "in", "out", "unavailable" (token lacks the scope), or "unknown".
+async function optOutStatus(email, auth) {
+  try {
+    const res = await fetch(
+      `https://api.hubapi.com/communication-preferences/v4/statuses/${encodeURIComponent(email)}?channel=EMAIL`,
+      { headers: auth }
+    );
+    if (res.status === 403) return "unavailable";
+    if (!res.ok) return "unknown";
+    const data = await res.json();
+    const results = data?.results || [];
+    return results.some((r) => String(r.status).toUpperCase() === "UNSUBSCRIBED") ? "out" : "in";
+  } catch {
+    return "unknown";
+  }
+}
+
 export async function hubspotRecipients() {
   const token = process.env.HUBSPOT_TOKEN;
   const listId = process.env.HUBSPOT_LIST_ID;
@@ -176,10 +198,12 @@ export async function hubspotRecipients() {
         body: JSON.stringify({ inputs: ids, properties }),
       });
 
+    // hs_email_optout is HubSpot's own "unsubscribed from all email" flag and is
+    // a standard property, so it is safe to request at every rung.
     const attempts = [
-      ["email", "nexus_theme", "nexus_prefs"],
-      ["email", "nexus_theme"],
-      ["email"],
+      ["email", "hs_email_optout", "nexus_theme", "nexus_prefs"],
+      ["email", "hs_email_optout", "nexus_theme"],
+      ["email", "hs_email_optout"],
     ];
     let batchRes = null;
     let level = 0;
@@ -194,7 +218,7 @@ export async function hubspotRecipients() {
     const missing = ["", ' (no "nexus_prefs" property — settings not personalized)', ' (no "nexus_theme"/"nexus_prefs" properties — using publication defaults)'][level];
 
     const contacts = await batchRes.json();
-    const people = (contacts.results || [])
+    const onList = (contacts.results || [])
       .map((c) => {
         const t = String(c.properties?.nexus_theme || "").toLowerCase();
         const prefs = decodePrefs(c.properties?.nexus_prefs);
@@ -204,12 +228,61 @@ export async function hubspotRecipients() {
           // settings blob applies, so a reader only has to sync once.
           theme: t === "dark" || t === "light" ? t : prefs?.theme || null,
           prefs,
+          globalOptOut: String(c.properties?.hs_email_optout || "").toLowerCase() === "true",
         };
       })
       .filter((p) => p.email);
+
+    // ── Opt-out enforcement ──────────────────────────────────────────────
+    // Being on the list is not the same as wanting mail. The unsubscribe
+    // worker flips the contact's subscription status, but nothing removes
+    // them from a static list, and an active list only drops them if someone
+    // remembered to filter on opt-out when building it. A reader unsubscribed
+    // and kept receiving the brief for a week because the send trusted the
+    // list and checked nothing else. It now checks every recipient against
+    // HubSpot's subscription status before sending.
+    //
+    // Fail closed: a recipient whose status cannot be verified is skipped and
+    // logged. A missed edition for one person is recoverable; mailing someone
+    // who opted out is not.
+    const statuses = await Promise.all(onList.map((p) => optOutStatus(p.email, auth)));
+    const people = [];
+    let optedOut = 0;
+    let unverified = 0;
+    let scopeMissing = false;
+    onList.forEach((p, i) => {
+      const s = statuses[i];
+      if (s === "unavailable") scopeMissing = true;
+      const out =
+        p.globalOptOut ||
+        s === "out" ||
+        // Scope missing: the global flag is the best signal left. Anything
+        // else unknown is treated as opted out.
+        (s === "unknown");
+      if (s === "unknown") unverified++;
+      if (out) {
+        if (s !== "unknown") optedOut++;
+        return;
+      }
+      people.push({ email: p.email, theme: p.theme, prefs: p.prefs });
+    });
+
+    if (scopeMissing) {
+      console.warn(
+        "HubSpot list: ⚠ subscription status is UNAVAILABLE (403). The HUBSPOT_TOKEN private app " +
+          "needs the communication_preferences.read_write scope. Falling back to hs_email_optout only, " +
+          "which misses per-type unsubscribes — fix the scope."
+      );
+    }
+    if (unverified) {
+      console.warn(
+        `HubSpot list: ⚠ ${unverified} recipient(s) skipped because their opt-out status could not be verified.`
+      );
+    }
     const personalized = people.filter((p) => p.prefs).length;
     console.log(
-      `HubSpot list: ${people.length} subscriber(s) pulled, ${personalized} with their own settings${missing}`
+      `HubSpot list: ${onList.length} on list, ${optedOut} opted out (dropped), ` +
+        `${people.length} will receive, ${personalized} with their own settings${missing}`
     );
     return people;
   } catch (e) {

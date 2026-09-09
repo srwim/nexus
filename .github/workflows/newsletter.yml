@@ -102,5 +102,9 @@ jobs:
           SPONSY_PUBLICATION_ID: ${{ secrets.SPONSY_PUBLICATION_ID }}
           HUBSPOT_TOKEN: ${{ secrets.HUBSPOT_TOKEN }}
           HUBSPOT_LIST_ID: ${{ secrets.HUBSPOT_LIST_ID }}
+          # Comma-separated addresses that must never be mailed, regardless of
+          # HubSpot state. Emergency brake for an unsubscribe that hasn't
+          # propagated. A secret because this repo is public.
+          SUPPRESS_EMAILS: ${{ secrets.SUPPRESS_EMAILS }}
           GDRIVE_SERVICE_ACCOUNT: ${{ secrets.GDRIVE_SERVICE_ACCOUNT }}
           GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
