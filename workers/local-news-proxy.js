@@ -270,28 +270,60 @@ async function handleUnsubscribe(url, env) {
 
   try {
     const auth = { Authorization: `Bearer ${env.HUBSPOT_TOKEN}`, "Content-Type": "application/json" };
-    // Find the marketing subscription type id.
-    const defsRes = await fetch("https://api.hubapi.com/communication-preferences/v3/definitions", {
-      headers: auth,
-    });
-    if (!defsRes.ok) return page("We couldn't reach the subscription service. Please email unsubscribe@arok.ai.", 502);
-    const defs = await defsRes.json();
-    const subs = defs.subscriptionDefinitions || [];
-    const sub = subs.find((s) => /market/i.test(s.name || "")) || subs[0];
-    if (!sub) return page("No subscription type is configured. Please email unsubscribe@arok.ai.", 500);
 
-    const res = await fetch("https://api.hubapi.com/communication-preferences/v3/unsubscribe", {
-      method: "POST",
-      headers: auth,
-      body: JSON.stringify({ emailAddress: email, subscriptionId: String(sub.id) }),
-    });
-    // 200 = unsubscribed; 400/409 often means "already unsubscribed" — treat as success.
-    if (res.ok || res.status === 400 || res.status === 409) {
+    // Unsubscribe from ALL email, not one guessed subscription type. NEXUS
+    // sends exactly one kind of email, so "all" is what the reader means, and
+    // it sets the global hs_email_optout flag the send loop also checks —
+    // there is no type-matching heuristic left to get wrong.
+    const all = await fetch(
+      `https://api.hubapi.com/communication-preferences/v4/statuses/${encodeURIComponent(email)}/unsubscribe-all?channel=EMAIL`,
+      { method: "POST", headers: auth }
+    );
+    let done = all.ok || (await saysAlreadyUnsubscribed(all));
+
+    // Fallback to the per-type v3 call if v4 is unavailable on this portal.
+    if (!done) {
+      const defsRes = await fetch("https://api.hubapi.com/communication-preferences/v3/definitions", { headers: auth });
+      if (defsRes.ok) {
+        const subs = (await defsRes.json()).subscriptionDefinitions || [];
+        const sub = subs.find((s) => /market/i.test(s.name || "")) || subs[0];
+        if (sub) {
+          const res = await fetch("https://api.hubapi.com/communication-preferences/v3/unsubscribe", {
+            method: "POST",
+            headers: auth,
+            body: JSON.stringify({ emailAddress: email, subscriptionId: String(sub.id) }),
+          });
+          done = res.ok || (await saysAlreadyUnsubscribed(res));
+        }
+      }
+    }
+
+    // Only a confirmed success gets the success page. This used to treat any
+    // 400 as "already unsubscribed" — which is also what a bad token scope, a
+    // wrong subscription id or a malformed request return — so a reader could
+    // be told they were unsubscribed while nothing had happened. Being told
+    // it failed, with somewhere to write, beats being told it worked.
+    if (done) {
       return page(`You're unsubscribed. ${escapeHtml(email)} will no longer receive the NEXUS Daily Brief.`, 200);
     }
-    return page("Something went wrong unsubscribing. Please email unsubscribe@arok.ai.", 502);
+    return page(
+      "We couldn't process that unsubscribe automatically. Please email unsubscribe@arok.ai and we'll remove you by hand.",
+      502
+    );
   } catch {
-    return page("Something went wrong. Please email unsubscribe@arok.ai.", 502);
+    return page("Something went wrong. Please email unsubscribe@arok.ai and we'll remove you by hand.", 502);
+  }
+}
+
+// HubSpot returns 4xx with a message when the contact is already opted out.
+// That is a success from the reader's point of view; any other 4xx is not.
+async function saysAlreadyUnsubscribed(res) {
+  if (res.ok || res.status >= 500) return false;
+  try {
+    const body = await res.clone().text();
+    return /already/i.test(body) && /unsubscri/i.test(body);
+  } catch {
+    return false;
   }
 }
 

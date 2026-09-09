@@ -85,7 +85,8 @@ All integrations are switched on by adding secrets: repo → **Settings → Secr
 | `NEWSLETTER_FROM` | Custom from-address (optional) | A domain verified in Resend |
 | `SLACK_WEBHOOK_URL` | Posts the brief to a Slack channel | Slack → Apps → Incoming Webhooks |
 | `SPONSY_API_KEY` + `SPONSY_PUBLICATION_ID` | Inserts today's sponsor slot into the email | Sponsy → Settings → API |
-| `HUBSPOT_TOKEN` + `HUBSPOT_LIST_ID` | Emails everyone on a HubSpot contact list (delivery via Resend — no paid Marketing Hub needed) | HubSpot → Settings → Private Apps (scopes: `crm.objects.contacts.read`, `crm.lists.read`) |
+| `HUBSPOT_TOKEN` + `HUBSPOT_LIST_ID` | Emails everyone on a HubSpot contact list (delivery via Resend — no paid Marketing Hub needed). Every recipient's subscription status is checked before sending; anyone unsubscribed is skipped whether or not they're still on the list. | HubSpot → Settings → Private Apps (scopes: `crm.objects.contacts.read`, `crm.lists.read`, **`communication_preferences.read_write`** — without the last one the send can't verify opt-outs and warns loudly) |
+| `SUPPRESS_EMAILS` | Comma-separated addresses that are never mailed, regardless of HubSpot. Emergency brake for an unsubscribe that hasn't propagated. | Optional |
 | `GDRIVE_SERVICE_ACCOUNT` + `GDRIVE_FOLDER_ID` | Archives each day's newsletter HTML to Drive | Google Cloud service account (JSON key); share the Drive folder with the service account's email |
 
 Set your own address in `nexus.config.json` → `newsletter.to`. The email goes out daily at 13:00 UTC (edit the cron in `.github/workflows/newsletter.yml`). Test anytime: Actions → "Daily newsletter" → Run workflow — the log shows exactly what was sent, posted, and skipped.

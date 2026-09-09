@@ -99,12 +99,33 @@ for (const person of await hubspotRecipients()) {
   const k = String(person.email || "").toLowerCase();
   if (k) byEmail.set(k, person);
 }
+// Emergency brake. A comma-separated SUPPRESS_EMAILS secret is skipped no
+// matter what HubSpot says — for the case where someone has unsubscribed and
+// the upstream state is wrong or slow, and they must not get tomorrow's mail
+// while that is sorted out. A secret, not a file: this repo is public.
+const suppressed = new Set(
+  String(process.env.SUPPRESS_EMAILS || "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean)
+);
+for (const k of suppressed) byEmail.delete(k);
+if (suppressed.size) console.log(`Suppressed: ${suppressed.size} address(es) via SUPPRESS_EMAILS`);
+
 const recipients = [...byEmail.values()];
+
+// The repo is public, so these Actions logs are public. Subscriber addresses
+// never appear in them in full — the privacy policy says we don't share them,
+// and a log line is sharing.
+const mask = (email) => {
+  const [user = "", domain = ""] = String(email).split("@");
+  return `${user.slice(0, 1)}***@${domain}`;
+};
 console.log(
   `Recipients: ${recipients
     .map(
       (r) =>
-        `${r.email}=${r.theme ? `${r.theme} (own)` : `${defaultTheme} (default)`}${r.prefs ? " +settings" : ""}`
+        `${mask(r.email)}=${r.theme ? `${r.theme} (own)` : `${defaultTheme} (default)`}${r.prefs ? " +settings" : ""}`
     )
     .join(", ")}`
 );
@@ -167,7 +188,7 @@ if (config.dryRun) {
       .map((s) => `${s.label}(${s.type === "news" ? s.items?.length ?? 0 : s.type})`)
       .join(" ");
     console.log(
-      `  ${person.email}  theme=${person.theme || defaultTheme}  settings=${person.prefs ? "own" : "default"}`
+      `  ${mask(person.email)}  theme=${person.theme || defaultTheme}  settings=${person.prefs ? "own" : "default"}`
     );
     console.log(`    ${shape}`);
   }
@@ -213,7 +234,7 @@ if (config.dryRun) {
     else if (res.status === 409) already++; // same key today — already sent
     else {
       fail++;
-      if (fail <= 2) console.warn(`  email to ${to} failed (${res.status}: ${(await res.text()).slice(0, 120)})`);
+      if (fail <= 2) console.warn(`  email to ${mask(to)} failed (${res.status}: ${(await res.text()).slice(0, 120)})`);
     }
   }
   console.log(
