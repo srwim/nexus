@@ -1,0 +1,58 @@
+# Deletes the LOGS of past workflow runs. The run entries stay (status, timing,
+# who triggered it); only the log text goes.
+#
+# Why this exists: this repository is public, so its Actions logs are public,
+# and until 6332c8c the newsletter send printed every subscriber's full email
+# address into them. Masking fixed the future; this removes the past. Run it
+# once now, and again any time something sensitive lands in a log.
+#
+# Uses the workflow's own GITHUB_TOKEN with actions:write, so no personal
+# access token is involved and nothing is pasted anywhere.
+name: Purge workflow logs
+
+on:
+  workflow_dispatch:
+    inputs:
+      workflow:
+        description: Whose run logs to delete
+        type: choice
+        default: newsletter.yml
+        options:
+          - newsletter.yml
+          - site.yml
+          - both
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Delete run logs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          CHOICE: ${{ inputs.workflow }}
+          SELF: ${{ github.run_id }}
+        run: |
+          set -u
+          if [ "$CHOICE" = "both" ]; then files="newsletter.yml site.yml"; else files="$CHOICE"; fi
+          for wf in $files; do
+            echo "── $wf"
+            ids=$(gh api --paginate "repos/$REPO/actions/workflows/$wf/runs?per_page=100" --jq '.workflow_runs[].id' || true)
+            n=0; skipped=0
+            for id in $ids; do
+              [ "$id" = "$SELF" ] && continue
+              # A run still in progress, or one whose logs already expired,
+              # returns an error here. Neither is a problem worth failing on.
+              if gh api -X DELETE "repos/$REPO/actions/runs/$id/logs" >/dev/null 2>&1; then
+                n=$((n+1))
+              else
+                skipped=$((skipped+1))
+              fi
+            done
+            echo "$wf: deleted logs for $n run(s), skipped $skipped"
+          done
