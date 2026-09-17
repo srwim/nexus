@@ -1,6 +1,6 @@
 # NEXUS
 
-Your personal syndicated news site — a **self-updating static site on GitHub Pages**. Rate your topics 0–5 stars, set your zipcode, and get a ranked feed plus a daily brief on the site, in your inbox, and in Slack. GitHub rebuilds the news every 30 minutes for free; there is no server to run or pay for.
+Your personal syndicated news site: a **self-updating static site on GitHub Pages**. Rate your topics 0-5 stars, set your zipcode, and get a ranked feed plus a daily brief on the site, in your inbox, and in Slack. GitHub rebuilds the news every 30 minutes for free; there is no server to run or pay for.
 
 ## What's inside
 
@@ -8,7 +8,7 @@ Your personal syndicated news site — a **self-updating static site on GitHub P
 
 **Pages:** Feed (`/`) ranked by your star ratings · Daily Brief (`/digest`) · Settings (`/settings`)
 
-All content comes from free public sources (BBC, NPR, Politico, The Hill, Al Jazeera, ReliefWeb, Defense One, War on the Rocks, ESPN, TechCrunch, The Verge, Ars Technica, NASA, Space.com, SpaceNews, VentureBeat, MIT Tech Review, Variety, Rolling Stone, Hollywood Reporter, the National Weather Service, and Google News for local). A dead feed silently drops out — the site keeps working.
+All content comes from free public sources (BBC, NPR, Politico, The Hill, Al Jazeera, ReliefWeb, Defense One, War on the Rocks, ESPN, TechCrunch, The Verge, Ars Technica, NASA, Space.com, SpaceNews, VentureBeat, MIT Tech Review, Variety, Rolling Stone, Hollywood Reporter, the National Weather Service, and Google News for local). A dead feed silently drops out; the site keeps working.
 
 ## How it works
 
@@ -26,7 +26,7 @@ send email (Resend) · post to Slack · pull sponsor (Sponsy)
 archive to Google Drive · recipients from HubSpot list
 ```
 
-Star ratings and league picks live in your browser and apply instantly. Sports is per league — Motor Racing expands to Formula 1, NASCAR, MotoGP and IndyCar, and each league draws on its own beat outlets (Autosport, Motorsport.com, PlanetF1, RaceFans, Crash.net, Frontstretch…) alongside ESPN. The **zipcode and newsletter email** live in `nexus.config.json` in the repo (Settings has a "Copy my nexus.config.json" button — paste it into the file on GitHub whenever you change things).
+Star ratings and league picks live in your browser and apply instantly. Sports is per league: Motor Racing expands to Formula 1, NASCAR, MotoGP and IndyCar, and each league draws on its own beat outlets (Autosport, Motorsport.com, PlanetF1, RaceFans, Crash.net, Frontstretch…) alongside ESPN. The **zipcode and newsletter email** live in `nexus.config.json` in the repo (Settings has a "Copy my nexus.config.json" button; paste it into the file on GitHub whenever you change things).
 
 ## Evals and the autonomy gate
 
@@ -58,11 +58,11 @@ logged in [`docs/EVALS.md`](docs/EVALS.md).
 Environment only blocks if it has protection rules. `digest-send` currently has
 none, so runs route there and proceed. Adding a required reviewer under
 Settings → Environments → `digest-send` turns the same verdict into a hard stop
-with a notification, an approval UI, and an audit trail — no diff required.
+with a notification, an approval UI, and an audit trail; no diff required.
 
 ```bash
 npm test         # ranking + scorer + gate
-npm run evals    # deterministic metrics — free, no API key
+npm run evals    # deterministic metrics: free, no API key
 ```
 
 See [docs/EVALS.md](docs/EVALS.md) for the three metrics, why those three, and
@@ -85,11 +85,11 @@ All integrations are switched on by adding secrets: repo → **Settings → Secr
 | `NEWSLETTER_FROM` | Custom from-address (optional) | A domain verified in Resend |
 | `SLACK_WEBHOOK_URL` | Posts the brief to a Slack channel | Slack → Apps → Incoming Webhooks |
 | `SPONSY_API_KEY` + `SPONSY_PUBLICATION_ID` | Inserts today's sponsor slot into the email | Sponsy → Settings → API |
-| `HUBSPOT_TOKEN` + `HUBSPOT_LIST_ID` | Emails everyone on a HubSpot contact list (delivery via Resend — no paid Marketing Hub needed). Every recipient's subscription status is checked before sending; anyone unsubscribed is skipped whether or not they're still on the list. | HubSpot → Settings → Private Apps (scopes: `crm.objects.contacts.read`, `crm.lists.read`, **`communication_preferences.read_write`** — without the last one the send can't verify opt-outs and warns loudly) |
+| `HUBSPOT_TOKEN` + `HUBSPOT_LIST_ID` | Emails everyone on a HubSpot contact list (delivery via Resend; no paid Marketing Hub needed). Every recipient's subscription status is checked before sending; anyone unsubscribed is skipped whether or not they're still on the list. | HubSpot → Settings → Private Apps (scopes: `crm.objects.contacts.read`, `crm.lists.read`, **`communication_preferences.read_write`**; without the last one the send can't verify opt-outs and warns loudly) |
 | `SUPPRESS_EMAILS` | Comma-separated addresses that are never mailed, regardless of HubSpot. Emergency brake for an unsubscribe that hasn't propagated. | Optional |
 | `GDRIVE_SERVICE_ACCOUNT` + `GDRIVE_FOLDER_ID` | Archives each day's newsletter HTML to Drive | Google Cloud service account (JSON key); share the Drive folder with the service account's email |
 
-Set your own address in `nexus.config.json` → `newsletter.to`. The email goes out daily at 13:00 UTC (edit the cron in `.github/workflows/newsletter.yml`). Test anytime: Actions → "Daily newsletter" → Run workflow — the log shows exactly what was sent, posted, and skipped.
+Set your own address in `nexus.config.json` → `newsletter.to`. The email goes out daily at 13:00 UTC (edit the cron in `.github/workflows/newsletter.yml`). Test anytime: Actions → "Daily newsletter" → Run workflow; the log shows exactly what was sent, posted, and skipped.
 
 Newsletter format: every headline includes a paragraph snippet, and weather appears as forecast cards matching the site. Preview at `/newsletter.html` on your site or via Settings → Preview newsletter.
 
@@ -97,32 +97,32 @@ Newsletter format: every headline includes a paragraph snippet, and weather appe
 
 The site is built to be shared. Every visitor gets their own experience with no accounts and no server:
 
-- **Personal ratings** — stars, leagues, and zipcode live in each visitor's browser.
-- **Live per-visitor weather** — when a visitor sets their zip, their forecast comes straight from the National Weather Service in their browser.
-- **Live per-visitor local news** — a small Cloudflare Worker (`workers/local-news-proxy.js`) calls the free [GNews](https://gnews.io) API server-side (100 requests/day free; key stays hidden in the worker) and returns local stories for any visitor's zipcode. Setup steps are at the top of that file: get a free key, add it as the worker variable `GNEWS_KEY`, deploy, and store the worker URL in the `LOCAL_NEWS_PROXY` repo variable. Google News RSS was the original plan but blocks Cloudflare IPs, hence the API.
-- **Share links** — Settings → "Copy share link" produces a URL that carries your exact ratings/leagues/zip to whoever opens it (email is never included).
-- **Sponsors** — campaigns live in `sponsors.json`, edited through GitHub like `nexus.config.json`. Each entry names its placements (`top`, `primary`, `footer`), optional inclusive `start`/`end` dates, and the copy. Whoever is named in `house` fills any placement nobody has bought, so a slot never renders empty. Two sponsors on the same placement alternate by day rather than one taking the whole run. Links are auto-tagged with UTM parameters so a sponsor can verify traffic in their own analytics. Set `"draft": true` to keep an entry out of the newsletter while you write it. Sponsy still works if you want it — set `"enableSponsy": true` — but it only fills placements you haven't sold locally.
+- **Personal ratings**: stars, leagues, and zipcode live in each visitor's browser.
+- **Live per-visitor weather**: when a visitor sets their zip, their forecast comes straight from the National Weather Service in their browser.
+- **Live per-visitor local news**: a small Cloudflare Worker (`workers/local-news-proxy.js`) calls the free [GNews](https://gnews.io) API server-side (100 requests/day free; key stays hidden in the worker) and returns local stories for any visitor's zipcode. Setup steps are at the top of that file: get a free key, add it as the worker variable `GNEWS_KEY`, deploy, and store the worker URL in the `LOCAL_NEWS_PROXY` repo variable. Google News RSS was the original plan but blocks Cloudflare IPs, hence the API.
+- **Share links**: Settings → "Copy share link" produces a URL that carries your exact ratings/leagues/zip to whoever opens it (email is never included).
+- **Sponsors**: campaigns live in `sponsors.json`, edited through GitHub like `nexus.config.json`. Each entry names its placements (`top`, `primary`, `footer`), optional inclusive `start`/`end` dates, and the copy. Whoever is named in `house` fills any placement nobody has bought, so a slot never renders empty. Two sponsors on the same placement alternate by day rather than one taking the whole run. Links are auto-tagged with UTM parameters so a sponsor can verify traffic in their own analytics. Set `"draft": true` to keep an entry out of the newsletter while you write it. Sponsy still works if you want it: set `"enableSponsy": true`; it only fills placements you haven't sold locally.
 
-  **Click counting** is off by default. Set `"trackClicks": true` and sponsor links route through the Cloudflare Worker, which counts and redirects. Add a KV namespace bound as `SPONSOR_STATS` to store the counts; without it the redirect still works and simply doesn't count. The redirect resolves a campaign **id** against the published sponsor list and never accepts a destination URL as a parameter — a `?u=<url>` redirector would let anyone borrow the domain's reputation for phishing. Only `id` and `url` of non-draft campaigns are published, so draft ad copy stays private.
-- **Email preview** — `/preview` renders your own edition in the browser, running the same assemble-then-render pair the nightly send runs. `public/newsletter.html` still exists but is the *publication's* edition, built from `nexus.config.json`; it is not a preview of any individual's settings.
-- **Newsletter signups** — create a plain email form in HubSpot (Marketing → Forms), put its `portalId` and `formId` in `nexus.config.json` under `hubspot`, and a "Get the Daily Brief" signup box appears on the site. Submissions land in HubSpot; add them to the contact list your `HUBSPOT_LIST_ID` secret points at and they'll receive the daily email automatically.
+  **Click counting** is off by default. Set `"trackClicks": true` and sponsor links route through the Cloudflare Worker, which counts and redirects. Add a KV namespace bound as `SPONSOR_STATS` to store the counts; without it the redirect still works and simply doesn't count. The redirect resolves a campaign **id** against the published sponsor list and never accepts a destination URL as a parameter; a `?u=<url>` redirector would let anyone borrow the domain's reputation for phishing. Only `id` and `url` of non-draft campaigns are published, so draft ad copy stays private.
+- **Email preview**: `/preview` renders your own edition in the browser, running the same assemble-then-render pair the nightly send runs. `public/newsletter.html` still exists but is the *publication's* edition, built from `nexus.config.json`; it is not a preview of any individual's settings.
+- **Newsletter signups**: create a plain email form in HubSpot (Marketing → Forms), put its `portalId` and `formId` in `nexus.config.json` under `hubspot`, and a "Get the Daily Brief" signup box appears on the site. Submissions land in HubSpot; add them to the contact list your `HUBSPOT_LIST_ID` secret points at and they'll receive the daily email automatically.
 
-- **Foreign Reporting** — domestic press from Japan, Germany, South Korea, China, France, Morocco, Egypt, Mexico, Argentina and Brazil, in each country's own language, machine-translated to English at build time. The original headline is kept on every story, and anything that couldn't be translated is shown in its original language rather than dropped. To switch translation on:
+- **Foreign Reporting**: domestic press from Japan, Germany, South Korea, China, France, Morocco, Egypt, Mexico, Argentina and Brazil, in each country's own language, machine-translated to English at build time. The original headline is kept on every story, and anything that couldn't be translated is shown in its original language rather than dropped. To switch translation on:
 
   1. Cloudflare → your worker → Settings → Bindings → add a **Workers AI** binding named `AI`.
   2. Add a worker secret `TRANSLATE_KEY` (any long random string), and add a GitHub Actions secret of the same name and value.
   3. Redeploy the worker with the current `workers/local-news-proxy.js`.
 
-  Without those, the section still works — headlines just stay in their original language. Translation runs on Workers AI's free allowance (10,000 neurons/day); the build caches every translation in the published `foreign.json` and re-reads it next run, so a warm build translates only genuinely new headlines and the $0 profile holds.
+  Without those, the section still works; headlines just stay in their original language. Translation runs on Workers AI's free allowance (10,000 neurons/day); the build caches every translation in the published `foreign.json` and re-reads it next run, so a warm build translates only genuinely new headlines and the $0 profile holds.
 
-- **Per-subscriber editions** — each subscriber can receive a brief built from their own ratings, leagues, zipcode and theme instead of the house defaults. Two one-time steps in HubSpot switch it on:
+- **Per-subscriber editions**: each subscriber can receive a brief built from their own ratings, leagues, zipcode and theme instead of the house defaults. Two one-time steps in HubSpot switch it on:
 
   1. **Settings → Properties → Create property** on the Contact object: `nexus_prefs` (single-line text). Optionally `nexus_theme` (single-line text) too, if you haven't already.
   2. **Marketing → Forms → your signup form**: add `nexus_prefs` and `nexus_theme` as fields (hidden is fine).
 
-  Readers then hit **Apply to my email** in Settings and their next brief is built from what they chose. Until those steps are done nothing breaks — signup still works, settings simply don't stick, and everyone gets the publication default.
+  Readers then hit **Apply to my email** in Settings and their next brief is built from what they chose. Until those steps are done nothing breaks: signup still works, settings simply don't stick, and everyone gets the publication default.
 
-If the newsletter grows beyond ~50 recipients, mind Resend's free-tier limits and add a verified sending domain (`NEWSLETTER_FROM`) — deliverability is much better than the shared onboarding address.
+If the newsletter grows beyond ~50 recipients, mind Resend's free-tier limits and add a verified sending domain (`NEWSLETTER_FROM`); deliverability is much better than the shared onboarding address.
 
 ## Run locally
 
@@ -158,10 +158,10 @@ app/                      Feed, Daily Brief, Settings pages
 lib/
   topics.js               Topic → feed registry (add/remove sources here)
   rss.js                  Fetching, caching, dedup, entity decoding, obituary filter
-  rank.js                 Star-weighted selection — what the evals grade
+  rank.js                 Star-weighted selection: what the evals grade
   digest.js               Digest builder + weather/local logic
   email.js                Email HTML template
   clientDigest.js         Browser-side feed assembly from static JSON
 ```
 
-To add a news source, add its RSS URL to the right topic in `lib/topics.js` — the next scheduled build picks it up.
+To add a news source, add its RSS URL to the right topic in `lib/topics.js`; the next scheduled build picks it up.
