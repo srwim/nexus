@@ -35,7 +35,7 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname.replace(/\/+$/, "").endsWith("/unsubscribe")) {
-      return handleUnsubscribe(url, env);
+      return handleUnsubscribe(request, url, env);
     }
     if (url.pathname.replace(/\/+$/, "").endsWith("/translate")) {
       return handleTranslate(request, env);
@@ -253,10 +253,23 @@ async function handleTranslate(request, env) {
 }
 
 // ── One-click unsubscribe ────────────────────────────────────────────────────
-// GET or POST /unsubscribe?e=<email>&t=<hmac>. Verifies the signed token, then
-// opts the address out of the marketing subscription in HubSpot so the daily
-// send (which reads a list that excludes opt-outs) stops emailing them.
-async function handleUnsubscribe(url, env) {
+// POST /unsubscribe?e=<email>&t=<hmac> opts the address out in HubSpot. A GET
+// renders a confirmation page instead and changes nothing.
+//
+// This used to act on ANY method — handleUnsubscribe wasn't even given the
+// request, only the URL — which made the link a trap. Mail providers and
+// security products follow URLs in mail as a matter of course: Gmail and
+// Outlook prefetch, Defender/Proofpoint "safe links" rewrite and visit every
+// URL to scan it, and corporate filters crawl them on delivery. Every one of
+// those visits silently unsubscribed the reader.
+//
+// It did no visible damage for six weeks because nothing read subscription
+// status — then "Honour unsubscribes" (6332c8c) landed on 8 Sep and the send
+// started obeying those phantom opt-outs. Every subscriber stopped receiving
+// the brief roughly a day after their last delivery, because the scan of THAT
+// delivery is what unsubscribed them. RFC 8058 requires POST for exactly this
+// reason: a GET must never be the thing that changes state.
+async function handleUnsubscribe(request, url, env) {
   const email = (url.searchParams.get("e") || "").trim().toLowerCase();
   const token = url.searchParams.get("t") || "";
 
@@ -266,6 +279,13 @@ async function handleUnsubscribe(url, env) {
   const expected = await hmacHex(email, env.HUBSPOT_TOKEN);
   if (token !== expected) {
     return page("This unsubscribe link isn't valid. Email unsubscribe@arok.ai and we'll remove you.", 400);
+  }
+
+  // A reader clicking the footer link arrives by GET and gets a button. The
+  // List-Unsubscribe-Post one-click header sends a real POST, so genuine
+  // one-click unsubscribes still complete without this extra step.
+  if (request.method !== "POST") {
+    return confirmPage(email, url);
   }
 
   try {
@@ -336,6 +356,31 @@ async function hmacHex(message, secret) {
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+}
+
+// The GET landing page: says what will happen, and does nothing until the
+// reader presses the button. The form posts back to this same signed URL, so no
+// token is re-derived and nothing new has to be trusted.
+function confirmPage(email, url) {
+  const action = escapeHtml(`${url.pathname}?e=${encodeURIComponent(email)}&t=${url.searchParams.get("t") || ""}`);
+  const html =
+    `<!doctype html><html lang="en"><head><meta charset="utf-8">` +
+    `<meta name="viewport" content="width=device-width, initial-scale=1"><title>NEXUS</title>` +
+    // Belt and braces: keep this page out of crawlers and prefetchers too.
+    `<meta name="robots" content="noindex,nofollow"></head>` +
+    `<body style="margin:0;background:#0b0b0f;color:#e7e7ee;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;text-align:center;padding:64px 20px;">` +
+    `<div style="font-size:24px;font-weight:800;letter-spacing:2px;color:#6ee7b7;margin-bottom:18px;">NEXUS</div>` +
+    `<p style="font-size:15px;line-height:1.6;max-width:460px;margin:0 auto 24px;">` +
+    `Unsubscribe <strong>${escapeHtml(email)}</strong> from the NEXUS Daily Brief?</p>` +
+    `<form method="POST" action="${action}">` +
+    `<button type="submit" style="font:inherit;font-size:15px;font-weight:600;padding:12px 28px;border:0;border-radius:8px;background:#6ee7b7;color:#0b0b0f;cursor:pointer;">` +
+    `Yes, unsubscribe me</button></form>` +
+    `<p style="font-size:13px;line-height:1.6;color:#9c988d;margin-top:24px;">Nothing has changed yet.</p>` +
+    `</body></html>`;
+  return new Response(html, {
+    status: 200,
+    headers: { "Content-Type": "text/html; charset=utf-8", "X-Robots-Tag": "noindex, nofollow" },
+  });
 }
 
 function page(msg, status) {

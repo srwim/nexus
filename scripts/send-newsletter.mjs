@@ -7,13 +7,14 @@ import { getLocalNews, getWeather } from "../lib/digest.js";
 import { prefsSignature } from "../lib/prefsPayload.js";
 import { selectSponsors, mergeSponsors, describeSponsors } from "../lib/sponsors.js";
 import { renderEmailHtml } from "../lib/email.js";
+import { mergeRecipients } from "../lib/recipients.js";
 import { postSlack, fetchSponsors, hubspotRecipients, uploadToDrive } from "./integrations.mjs";
 
 const config = JSON.parse(await readFile(new URL("../nexus.config.json", import.meta.url), "utf8"));
 const sponsorData = await readFile(new URL("../sponsors.json", import.meta.url), "utf8")
   .then(JSON.parse)
   .catch(() => ({ campaigns: [] })); // no sponsors file is a valid state, not an error
-const prefs = { zip: config.zip, ratings: config.ratings, leagues: config.leagues };
+const prefs = { zip: config.zip, ratings: config.ratings, leagues: config.leagues, countries: config.countries };
 
 // The schedule fires at two UTC times (10:15 & 11:15) so one of them is 4:15 AM
 // in Denver year-round despite daylight saving. GitHub's scheduled runs are
@@ -49,7 +50,26 @@ try {
 let poolPromise = null;
 const pool = () => (poolPromise ??= (console.log("Reading published site data…"), fetchPublishedData(config.siteUrl)));
 
-const digest = prebuilt?.digest ?? (await digestFromData(await pool(), prefs));
+// A section the reader rated but that has no stories renders as nothing at all —
+// renderEmailHtml drops an empty section rather than printing a bare heading. So
+// a topic can fall out of the brief entirely and the mail still looks correct:
+// Tech was rated 3 and silently absent for a day before anyone spotted it. The
+// send can't refill an empty section, but it can refuse to do it quietly.
+const warnedEmpty = new Set();
+function warnEmptySections(brief, who) {
+  const empty = (brief?.sections || [])
+    .filter((s) => s.type === "news" && s.rating > 0 && !(s.items || []).length)
+    .map((s) => `${s.key}(${s.rating}★)`);
+  if (!empty.length) return brief;
+  const line = `${who}: ${empty.join(" ")}`;
+  if (!warnedEmpty.has(line)) {
+    warnedEmpty.add(line);
+    console.warn(`⚠ rated topic(s) rendered zero stories and were dropped from the brief — ${line}`);
+  }
+  return brief;
+}
+
+const digest = warnEmptySections(prebuilt?.digest ?? (await digestFromData(await pool(), prefs)), "publication default");
 if (prebuilt) console.log(`Using approved brief built at ${prebuilt.generated_at}`);
 
 // Sponsors come from sponsors.json in the repo. Sponsy is still supported for
@@ -92,27 +112,32 @@ if (!config.newsletter?.postalAddress) {
 }
 const apiKey = process.env.RESEND_API_KEY;
 // Merge the configured address with the HubSpot list, de-duped by email. List
-// entries win because they carry the subscriber's theme preference.
-const byEmail = new Map();
-if (config.newsletter?.to) byEmail.set(config.newsletter.to.toLowerCase(), { email: config.newsletter.to, theme: null });
-for (const person of await hubspotRecipients()) {
-  const k = String(person.email || "").toLowerCase();
-  if (k) byEmail.set(k, person);
-}
-// Emergency brake. A comma-separated SUPPRESS_EMAILS secret is skipped no
+// entries win because they carry the subscriber's theme preference, and
+// verification drops beat both. Precedence lives in lib/recipients.js.
+//
+// Emergency brake: a comma-separated SUPPRESS_EMAILS secret is skipped no
 // matter what HubSpot says — for the case where someone has unsubscribed and
 // the upstream state is wrong or slow, and they must not get tomorrow's mail
 // while that is sorted out. A secret, not a file: this repo is public.
-const suppressed = new Set(
-  String(process.env.SUPPRESS_EMAILS || "")
-    .split(",")
-    .map((s) => s.trim().toLowerCase())
-    .filter(Boolean)
-);
-for (const k of suppressed) byEmail.delete(k);
-if (suppressed.size) console.log(`Suppressed: ${suppressed.size} address(es) via SUPPRESS_EMAILS`);
-
-const recipients = [...byEmail.values()];
+const suppressed = String(process.env.SUPPRESS_EMAILS || "")
+  .split(",")
+  .map((s) => s.trim().toLowerCase())
+  .filter(Boolean);
+const { recipients: listed, dropped } = await hubspotRecipients();
+const { recipients, resurrected } = mergeRecipients({
+  configTo: config.newsletter?.to,
+  listed,
+  dropped,
+  suppressed,
+});
+for (const email of resurrected) {
+  console.warn(
+    `⚠ ${email} is in newsletter.to AND was dropped by opt-out verification — not sending. ` +
+      "Until now the config entry silently overrode that drop and mailed the address anyway, " +
+      "with publication defaults in place of its own theme and settings."
+  );
+}
+if (suppressed.length) console.log(`Suppressed: ${suppressed.length} address(es) via SUPPRESS_EMAILS`);
 
 // The repo is public, so these Actions logs are public. Subscriber addresses
 // never appear in them in full — the privacy policy says we don't share them,
@@ -169,7 +194,8 @@ async function digestFor(person) {
   if (!digestCache.has(sig)) {
     digestCache.set(
       sig,
-      (async () => digestFromData(await dataForZip(person.prefs.zip), person.prefs))()
+      (async () =>
+        warnEmptySections(digestFromData(await dataForZip(person.prefs.zip), person.prefs), "personalized brief"))()
     );
   }
   return digestCache.get(sig);

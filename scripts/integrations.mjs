@@ -138,10 +138,6 @@ export async function fetchSponsors({ debug = false } = {}) {
 // Reads emails from list HUBSPOT_LIST_ID using a private-app token
 // (HUBSPOT_TOKEN). Delivery still goes through Resend, so no paid
 // Marketing Hub tier is needed.
-// Returns [{ email, theme, prefs }] — theme comes from the optional
-// "nexus_theme" contact property ("light"/"dark"), prefs from "nexus_prefs"
-// (see lib/prefsPayload.js). Both are null when unset or unparseable, in which
-// case the caller falls back to the publication default.
 // The authoritative answer to "may we email this person": HubSpot's own
 // subscription status for the email channel. Any UNSUBSCRIBED entry means no —
 // we send exactly one kind of email, so there is no subscription type a reader
@@ -164,12 +160,26 @@ async function optOutStatus(email, auth) {
   }
 }
 
+// Returns { recipients: [{ email, theme, prefs }], dropped: [email] } — theme
+// comes from the optional "nexus_theme" contact property ("light"/"dark"),
+// prefs from "nexus_prefs" (see lib/prefsPayload.js). Both are null when unset
+// or unparseable, in which case the caller falls back to the publication
+// default.
+//
+// `dropped` is every address that IS on the list but did not clear opt-out
+// verification, and the caller has to subtract it. newsletter.to seeds the
+// recipient map before this runs, so an address in both used to be resurrected
+// by the config entry after this function had deliberately excluded it — which
+// defeated the fail-closed check AND silently swapped that reader's own theme
+// and settings for the publication defaults. One transient non-200 from the
+// preferences endpoint was enough to do it, for one edition, with nothing in
+// the mail to show it had happened.
 export async function hubspotRecipients() {
   const token = process.env.HUBSPOT_TOKEN;
   const listId = process.env.HUBSPOT_LIST_ID;
   if (!token || !listId) {
     console.log("HubSpot list: skipped (no HUBSPOT_TOKEN/HUBSPOT_LIST_ID)");
-    return [];
+    return { recipients: [], dropped: [] };
   }
   const auth = { Authorization: `Bearer ${token}` };
   try {
@@ -179,13 +189,13 @@ export async function hubspotRecipients() {
     );
     if (!memRes.ok) {
       console.warn(`HubSpot list: membership fetch failed (${memRes.status}: ${(await memRes.text()).slice(0, 160)})`);
-      return [];
+      return { recipients: [], dropped: [] };
     }
     const members = await memRes.json();
     const ids = (members.results || []).map((m) => ({ id: m.recordId || m }));
     if (!ids.length) {
       console.log("HubSpot list: 0 members on the list yet");
-      return [];
+      return { recipients: [], dropped: [] };
     }
     // Ask for the optional per-subscriber properties. HubSpot 400s on the whole
     // request if any property is unknown, so fall back a rung at a time: full
@@ -213,7 +223,7 @@ export async function hubspotRecipients() {
     }
     if (!batchRes?.ok) {
       console.warn(`HubSpot list: contact read failed (${batchRes?.status}: ${(await batchRes?.text())?.slice(0, 160)})`);
-      return [];
+      return { recipients: [], dropped: [] };
     }
     const missing = ["", ' (no "nexus_prefs" property — settings not personalized)', ' (no "nexus_theme"/"nexus_prefs" properties — using publication defaults)'][level];
 
@@ -247,6 +257,7 @@ export async function hubspotRecipients() {
     // who opted out is not.
     const statuses = await Promise.all(onList.map((p) => optOutStatus(p.email, auth)));
     const people = [];
+    const dropped = [];
     let optedOut = 0;
     let unverified = 0;
     let scopeMissing = false;
@@ -262,6 +273,7 @@ export async function hubspotRecipients() {
       if (s === "unknown") unverified++;
       if (out) {
         if (s !== "unknown") optedOut++;
+        dropped.push(p.email);
         return;
       }
       people.push({ email: p.email, theme: p.theme, prefs: p.prefs });
@@ -284,10 +296,10 @@ export async function hubspotRecipients() {
       `HubSpot list: ${onList.length} on list, ${optedOut} opted out (dropped), ` +
         `${people.length} will receive, ${personalized} with their own settings${missing}`
     );
-    return people;
+    return { recipients: people, dropped };
   } catch (e) {
     console.warn("HubSpot list: errored —", e?.message || e);
-    return [];
+    return { recipients: [], dropped: [] };
   }
 }
 
