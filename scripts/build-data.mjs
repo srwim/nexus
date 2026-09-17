@@ -185,8 +185,32 @@ for (const [key, items] of fetched) {
   if (deduped.length < items.length) {
     console.log(`  semantic dedup: ${key} ${items.length} → ${deduped.length}`);
   }
-  pool[key] = { items: deduped };
-  jobs.push(writeJson(key, { items: deduped }));
+
+  // Zero items means every feed for this topic came back empty — publishers
+  // 403 datacenter IPs in waves, and six feeds can fail together. Writing that
+  // result overwrote a perfectly good published file with an empty one, and
+  // because the newsletter drops empty sections without comment, the topic just
+  // stopped existing: Tech was rated 3 and absent from the brief with nothing
+  // anywhere saying so. So an empty fetch keeps the last published items rather
+  // than destroying them, bounded to 2 days so a topic that stays broken decays
+  // out instead of serving week-old news as today's.
+  //
+  // ponytail: zero, not a threshold — it's the only count that unambiguously
+  // means "fetch failed" rather than "slow news day".
+  let out = deduped;
+  if (!out.length) {
+    const prior = filterStale((await readPublished(key))?.items, 2);
+    out = prior;
+    console.warn(
+      `  ⚠ ${key}: every feed returned nothing — ` +
+        (out.length
+          ? `reusing ${out.length} item(s) from the last good build`
+          : "and no recent published copy to fall back on, so this topic will be MISSING from the brief")
+    );
+  }
+
+  pool[key] = { items: out };
+  jobs.push(writeJson(key, { items: out }));
 }
 console.log(`⏱ semantic dedup in ${secs(tDedup)}`);
 

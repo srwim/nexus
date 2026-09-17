@@ -1,7 +1,7 @@
 {
-  "zip": "",
+  "zip": "48612",
   "siteUrl": "https://arok.ai/nexus/",
-  "leagues": ["nfl", "nba"],
+  "leagues": ["f1"],
   "countries": ["jp", "de", "fr", "br", "eg"],
   "ratings": {
     "politics": 3,
@@ -30,7 +30,7 @@
     "unsubscribeUrl": "",
     "postalAddress": "Consolidated Technologies LLC · 425 S 1000 E, 512C · Salt Lake City, UT 84102"
   },
-  "theme": "light",
+  "theme": "dark",
   "dryRun": false,
   "localNewsProxy": "https://nexus-local.saswannabe17.workers.dev",
   "hubspot": {
