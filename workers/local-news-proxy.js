@@ -1,4 +1,4 @@
-// NEXUS local-news proxy — a Cloudflare Worker (free tier is plenty).
+// NEXUS local-news proxy: a Cloudflare Worker (free tier is plenty).
 //
 // Why this exists: visitors' browsers can't call a news API with a hidden key,
 // and Google News RSS blocks Cloudflare/datacenter IPs outright. This worker
@@ -10,7 +10,7 @@
 //   1. Get a free API key at https://gnews.io  (100 requests/day free).
 //   2. Cloudflare dashboard → your worker → Settings → Variables and Secrets →
 //      add a variable named  GNEWS_KEY  with your key as the value → Save.
-//      (Alternative provider: NewsData.io — see the commented block below.)
+//      (Alternative provider: NewsData.io: see the commented block below.)
 //   3. Edit code → paste this file → Deploy.
 //   4. The worker URL is already wired into the site via the LOCAL_NEWS_PROXY
 //      repo variable; nothing else to change.
@@ -48,7 +48,7 @@ export default {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Methods": "GET, OPTIONS",
       "Content-Type": "application/json",
-      "Cache-Control": "public, max-age=900", // 15-min edge cache — conserves the daily API quota
+      "Cache-Control": "public, max-age=900", // 15-min edge cache: conserves the daily API quota
     };
     if (request.method === "OPTIONS") return new Response(null, { headers: cors });
 
@@ -58,7 +58,7 @@ export default {
     }
     if (!env.GNEWS_KEY) {
       return new Response(
-        JSON.stringify({ error: "GNEWS_KEY not set — add it in the worker's Variables and Secrets settings." }),
+        JSON.stringify({ error: "GNEWS_KEY not set: add it in the worker's Variables and Secrets settings." }),
         { status: 500, headers: cors }
       );
     }
@@ -80,7 +80,7 @@ export default {
       const q = `"${place.city}" ${stateFull}`;
 
       // Without a date window, "give me 10 results" returns the 10 most recent
-      // EVER — so a town with little coverage backfills with two-week-old
+      // EVER: so a town with little coverage backfills with two-week-old
       // stories. Bounding it means quiet markets return fewer items instead of
       // stale ones. Keep in step with MAX_AGE_DAYS in lib/clientLocal.js.
       //
@@ -124,7 +124,7 @@ export default {
 // nexus-local.…workers.dev/c?u=https://phishing.example and borrow the
 // reputation of a domain readers trust. Here the id is looked up in the
 // published sponsors.json, so the only reachable destinations are ones already
-// committed to the repo — the allowlist is the sponsor list, by construction.
+// committed to the repo: the allowlist is the sponsor list, by construction.
 //
 // Belt and braces on top of that: the resolved URL must still parse as http(s),
 // so a bad entry reaching sponsors.json cannot produce a "javascript:" redirect.
@@ -216,7 +216,7 @@ async function handleTranslate(request, env) {
   // before touching the AI binding is what keeps the quota ours.
   const given = request.headers.get("x-translate-key") || "";
   if (given !== env.TRANSLATE_KEY) return json({ error: "unauthorized" }, 401);
-  if (!env.AI) return json({ error: "no AI binding — add one named AI in the worker settings" }, 500);
+  if (!env.AI) return json({ error: "no AI binding: add one named AI in the worker settings" }, 500);
 
   let body;
   try {
@@ -256,15 +256,15 @@ async function handleTranslate(request, env) {
 // POST /unsubscribe?e=<email>&t=<hmac> opts the address out in HubSpot. A GET
 // renders a confirmation page instead and changes nothing.
 //
-// This used to act on ANY method — handleUnsubscribe wasn't even given the
-// request, only the URL — which made the link a trap. Mail providers and
+// This used to act on ANY method: handleUnsubscribe wasn't even given the
+// request, only the URL: which made the link a trap. Mail providers and
 // security products follow URLs in mail as a matter of course: Gmail and
 // Outlook prefetch, Defender/Proofpoint "safe links" rewrite and visit every
 // URL to scan it, and corporate filters crawl them on delivery. Every one of
 // those visits silently unsubscribed the reader.
 //
 // It did no visible damage for six weeks because nothing read subscription
-// status — then "Honour unsubscribes" (6332c8c) landed on 8 Sep and the send
+// status: then "Honour unsubscribes" (6332c8c) landed on 8 Sep and the send
 // started obeying those phantom opt-outs. Every subscriber stopped receiving
 // the brief roughly a day after their last delivery, because the scan of THAT
 // delivery is what unsubscribed them. RFC 8058 requires POST for exactly this
@@ -293,7 +293,7 @@ async function handleUnsubscribe(request, url, env) {
 
     // Unsubscribe from ALL email, not one guessed subscription type. NEXUS
     // sends exactly one kind of email, so "all" is what the reader means, and
-    // it sets the global hs_email_optout flag the send loop also checks —
+    // it sets the global hs_email_optout flag the send loop also checks, so
     // there is no type-matching heuristic left to get wrong.
     const all = await fetch(
       `https://api.hubapi.com/communication-preferences/v4/statuses/${encodeURIComponent(email)}/unsubscribe-all?channel=EMAIL`,
@@ -319,8 +319,8 @@ async function handleUnsubscribe(request, url, env) {
     }
 
     // Only a confirmed success gets the success page. This used to treat any
-    // 400 as "already unsubscribed" — which is also what a bad token scope, a
-    // wrong subscription id or a malformed request return — so a reader could
+    // 400 as "already unsubscribed": which is also what a bad token scope, a
+    // wrong subscription id or a malformed request return: so a reader could
     // be told they were unsubscribed while nothing had happened. Being told
     // it failed, with somewhere to write, beats being told it worked.
     if (done) {
