@@ -1,7 +1,7 @@
 // Build-time translation for Foreign Reporting.
 //
 // The cost model is the whole design. Workers AI gives 10,000 neurons a day and
-// bills beyond that, and the site rebuilds every half hour — so translating
+// bills beyond that, and the site rebuilds every half hour, so translating
 // every headline every build would turn a $0 project into a metered one within
 // a week.
 //
@@ -38,12 +38,32 @@ export function cacheFromPublished(published) {
   return cache;
 }
 
-// Collect every string that still needs translating, newest stories first so a
-// truncated run spends its budget on what a reader is most likely to see.
+// Collect every string that still needs translating, ordered so that a run which
+// hits the budget spends it evenly rather than alphabetically.
+//
+// This used to walk country by country and push titles and summaries together.
+// Ten countries at fourteen stories each is up to 280 strings against a budget
+// of 120, so the walk never reached the end of the list: Japan, Germany, Korea,
+// China and France consumed the entire budget every build, and Mexico,
+// Argentina and Brazil (positions 8, 9 and 10) were never reached at all. They
+// weren't failing to translate, they were never being offered for translation,
+// and because each build brought fresh headlines for the early countries the
+// queue never drained enough to reach the tail. Brazilian and Argentine stories
+// sat in Portuguese and Spanish indefinitely.
+//
+// Two changes fix it. Titles outrank summaries, because a reader who can't read
+// the headline is not helped by a translated snippet. And countries are woven
+// round-robin, the same way lib/rank.js weaves feeds and for the same reason: a
+// fixed order means whoever is last is always last. Every country now gets an
+// equal share of the budget, so a tight budget degrades to "some summaries are
+// missing everywhere" instead of "three countries are untranslated forever".
 export function pendingStrings(byCountry, cache) {
-  const pending = [];
   const seen = new Set();
+  const titles = [];
+  const summaries = [];
+
   for (const [country, { lang, items }] of Object.entries(byCountry)) {
+    const perCountry = { title: [], summary: [] };
     for (const it of items) {
       for (const field of ["title", "summary"]) {
         const text = (it[field] || "").trim();
@@ -51,11 +71,29 @@ export function pendingStrings(byCountry, cache) {
         const k = key(lang, text);
         if (cache.has(k) || seen.has(k)) continue;
         seen.add(k);
-        pending.push({ country, lang, text, k });
+        perCountry[field].push({ country, lang, text, k });
       }
     }
+    titles.push(perCountry.title);
+    summaries.push(perCountry.summary);
   }
-  return pending;
+
+  return [...weave(titles), ...weave(summaries)];
+}
+
+// One from each list in turn until every list is empty.
+function weave(lists) {
+  const out = [];
+  for (let i = 0; ; i++) {
+    let added = false;
+    for (const list of lists) {
+      if (i < list.length) {
+        out.push(list[i]);
+        added = true;
+      }
+    }
+    if (!added) return out;
+  }
 }
 
 // Apply the cache to the fetched items, keeping the original alongside.
@@ -84,7 +122,7 @@ export function applyTranslations(byCountry, cache) {
 // Fill the cache in place. Returns how many strings were actually translated.
 export async function translatePending(pending, cache, { endpoint, apiKey, budget = MAX_PER_RUN }) {
   if (!endpoint || !apiKey) {
-    console.log("  translate: skipped (no proxy URL or TRANSLATE_KEY) — foreign items stay in their original language");
+    console.log("  translate: skipped (no proxy URL or TRANSLATE_KEY): foreign items stay in their original language");
     return 0;
   }
   const slice = pending.slice(0, budget);
