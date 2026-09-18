@@ -7,7 +7,7 @@
 // in a delivered brief silently opted that reader out. Those phantom opt-outs
 // were invisible until the send began honouring subscription status on 8 Sep.
 // Before resubscribing anyone, the real opt-outs have to be told apart from the
-// machine-made ones — and only the timestamps can do that.
+// machine-made ones, and only the timestamps can do that.
 //
 // This script writes NOTHING. It reads HubSpot and prints. Resubscribing is a
 // deliberate act and stays a human one.
@@ -16,6 +16,11 @@
 //
 // Needs the same scopes the send uses: crm.lists.read, crm.objects.contacts.read
 // and communication_preferences.read_write.
+//
+// --mask prints a***@gmail.com instead of the address, matching how the send
+// masks recipients. It is the DEFAULT under CI because this repo is public and
+// an Actions log is world-readable; a subscriber list is not ours to publish.
+// --no-mask overrides that, for a private runner or a local terminal.
 const token = process.env.HUBSPOT_TOKEN;
 const listId = process.env.HUBSPOT_LIST_ID;
 if (!token || !listId) {
@@ -23,6 +28,16 @@ if (!token || !listId) {
   process.exit(1);
 }
 const auth = { Authorization: `Bearer ${token}` };
+
+// Fail closed: masked unless someone explicitly says otherwise, and CI can only
+// be unmasked on purpose. Forgetting the flag should cost readability, never a
+// subscriber's address.
+const masking = process.argv.includes("--mask") || (!!process.env.CI && !process.argv.includes("--no-mask"));
+const show = (email) => {
+  if (!masking) return email;
+  const [user = "", domain = ""] = String(email).split("@");
+  return `${user.slice(0, 1)}***@${domain}`;
+};
 
 // Opt-outs this far apart or closer are treated as one cluster. Readers decide
 // to leave independently; scanners move through a delivery batch together, so a
@@ -53,7 +68,7 @@ if (!ids.length) {
 
 // ---- 2. contacts, with the opt-out flag's history -------------------------
 // propertiesWithHistory gives each past value with the timestamp it was set and
-// where it came from — which is the whole point of this exercise.
+// where it came from: the whole point of this exercise.
 const contacts = await getJson("https://api.hubapi.com/crm/v3/objects/contacts/batch/read", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
@@ -95,7 +110,7 @@ for (const c of contacts.results || []) {
     .sort((a, b) => b.at - a.at);
 
   const ch = await channelStatus(email);
-  if (ch.status === "in" && !flag) continue; // still subscribed — nothing to judge
+  if (ch.status === "in" && !flag) continue; // still subscribed; nothing to judge
 
   rows.push({
     email,
@@ -129,20 +144,27 @@ console.log("-".repeat(110));
 for (const r of rows) {
   const grouped = sizes.get(r.cluster) > 1;
   const reading = !Number.isFinite(r.at)
-    ? "no timestamp — check the contact timeline by hand"
+    ? "no timestamp; check the contact timeline by hand"
     : grouped
-      ? `LIKELY SCANNER — ${sizes.get(r.cluster)} opt-outs within ${CLUSTER_MS / 3600000}h (cluster ${r.cluster})`
-      : "probably deliberate — isolated in time";
-  console.log(pad(iso(r.at), 22) + pad(r.email, 34) + pad(r.channel, 9) + pad(r.flag ? "true" : "-", 6) + reading);
+      ? `LIKELY SCANNER: ${sizes.get(r.cluster)} opt-outs within ${CLUSTER_MS / 3600000}h (cluster ${r.cluster})`
+      : "probably deliberate; isolated in time";
+  console.log(pad(iso(r.at), 22) + pad(show(r.email), 34) + pad(r.channel, 9) + pad(r.flag ? "true" : "-", 6) + reading);
+}
+
+if (masking) {
+  console.log(
+    "\nAddresses are masked because this log is public. Match them against your HubSpot\n" +
+      "list by first letter and domain, or rerun locally with --no-mask to see them in full."
+  );
 }
 
 console.log(
   "\nHow to read this. A cluster is several addresses opted out within hours of each other:\n" +
     "readers don't leave in lockstep, delivery scanners do. An isolated opt-out is far more\n" +
-    "likely to be a real person — resubscribing one of those would be the actual mistake here,\n" +
+    "likely to be a real person; resubscribing one of those would be the actual mistake here,\n" +
     "so treat 'probably deliberate' as leave-alone unless you know otherwise.\n" +
     "\nCross-check a cluster against the send that preceded it: the brief goes out 10:02-11:47 UTC,\n" +
     "and a scanner fires minutes to hours after delivery.\n" +
-    "\nNothing was changed. Resubscribe from the HubSpot UI, and deploy the fixed worker first —\n" +
+    "\nNothing was changed. Resubscribe from the HubSpot UI, and deploy the fixed worker first;\n" +
     "otherwise the next delivery gets scanned and opts them straight back out.\n"
 );

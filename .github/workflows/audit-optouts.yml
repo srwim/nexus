@@ -1,0 +1,35 @@
+name: Audit opt-outs
+
+# Who is opted out of the brief, and when it happened. Read-only: the script has
+# no write path to HubSpot, so running this can never change a subscription.
+#
+# Exists because the secrets needed to answer the question already live here and
+# cannot be read back out of GitHub. Running it as a workflow means nobody has to
+# copy a HubSpot token onto a laptop to audit their own list.
+#
+# Output is masked. This repo is public, so an Actions log is world-readable and
+# a subscriber list is not ours to publish; scripts/audit-optouts.mjs masks by
+# default whenever CI is set, and this workflow passes --mask as well so the
+# intent is visible at the call site rather than only in the script.
+
+on:
+  workflow_dispatch:
+
+# Read-only job: no write scope, nothing to commit, nothing to deploy.
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      # No npm install: the script uses global fetch and nothing else.
+      - name: List opt-outs with timestamps
+        run: node scripts/audit-optouts.mjs --mask
+        env:
+          HUBSPOT_TOKEN: ${{ secrets.HUBSPOT_TOKEN }}
+          HUBSPOT_LIST_ID: ${{ secrets.HUBSPOT_LIST_ID }}
