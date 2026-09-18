@@ -24,7 +24,7 @@ const updatedAt = new Date().toISOString();
 // warm builds only embed new ones and finish in a couple of minutes. Job
 // timeout is 15 minutes.
 const HARD_CAP = setTimeout(() => {
-  console.warn("Data build hit 12-minute cap — exiting with partial data.");
+  console.warn("Data build hit 12-minute cap: exiting with partial data.");
   process.exit(0);
 }, 12 * 60 * 1000);
 HARD_CAP.unref();
@@ -39,7 +39,7 @@ async function readConfig() {
 
 // The previous build's output, read back from the live site. CI starts from a
 // clean checkout every run, so the published file is the only thing that
-// survives between builds — which makes it the natural translation cache.
+// survives between builds: which makes it the natural translation cache.
 async function readPublished(name) {
   const base = String(config.siteUrl || "").replace(/\/?$/, "/");
   if (base === "/") return null;
@@ -68,7 +68,7 @@ const jobs = [];
 const secs = (t) => `${((Date.now() - t) / 1000).toFixed(1)}s`;
 
 // One line of the publisher-mix report. A section drawing on one or two outlets
-// is the failure this exists to catch — Gaming was 8-for-8 Polygon before anyone
+// is the failure this exists to catch: Gaming was 8-for-8 Polygon before anyone
 // noticed, because a feed that returns nothing looks identical to a feed that
 // simply had no news.
 function logMix(name, items, feedCount) {
@@ -88,7 +88,7 @@ function logMix(name, items, feedCount) {
 }
 
 // Sports is prebuilt per league into a single sports.json. It used to be fetched
-// live in the browser, which limited it to ESPN — publisher RSS is not
+// live in the browser, which limited it to ESPN: publisher RSS is not
 // CORS-enabled, so Autosport and the rest can only be reached from the build.
 const tSports = Date.now();
 const leagueKeys = Object.keys(SPORTS_LEAGUES);
@@ -139,7 +139,7 @@ console.log(
 jobs.push(writeJson("foreign", { countries: foreignItems }));
 
 // The click worker resolves a campaign id to its destination by reading this
-// file, so it has to be reachable on the site — sponsors.json lives at the repo
+// file, so it has to be reachable on the site: sponsors.json lives at the repo
 // root, which Next never publishes. Only id and url are exposed: that is all the
 // redirect needs, and ad copy for a campaign still in draft has no business
 // being public.
@@ -186,7 +186,7 @@ for (const [key, items] of fetched) {
     console.log(`  semantic dedup: ${key} ${items.length} → ${deduped.length}`);
   }
 
-  // Zero items means every feed for this topic came back empty — publishers
+  // Zero items means every feed for this topic came back empty: publishers
   // 403 datacenter IPs in waves, and six feeds can fail together. Writing that
   // result overwrote a perfectly good published file with an empty one, and
   // because the newsletter drops empty sections without comment, the topic just
@@ -195,14 +195,14 @@ for (const [key, items] of fetched) {
   // than destroying them, bounded to 2 days so a topic that stays broken decays
   // out instead of serving week-old news as today's.
   //
-  // ponytail: zero, not a threshold — it's the only count that unambiguously
+  // ponytail: zero, not a threshold: it's the only count that unambiguously
   // means "fetch failed" rather than "slow news day".
   let out = deduped;
   if (!out.length) {
     const prior = filterStale((await readPublished(key))?.items, 2);
     out = prior;
     console.warn(
-      `  ⚠ ${key}: every feed returned nothing — ` +
+      `  ⚠ ${key}: every feed returned nothing: ` +
         (out.length
           ? `reusing ${out.length} item(s) from the last good build`
           : "and no recent published copy to fall back on, so this topic will be MISSING from the brief")
@@ -221,7 +221,7 @@ await Promise.all(jobs);
 
 // Newsletter preview, ranked from the data this run just built rather than
 // re-fetched. Same ranking function the real send uses, so the preview is the
-// email — and it costs nothing, where the old path re-fetched every feed and
+// email: and it costs nothing, where the old path re-fetched every feed and
 // would have shown an empty Foreign Reporting section (translations only exist
 // in the prebuilt file).
 const tPreview = Date.now();

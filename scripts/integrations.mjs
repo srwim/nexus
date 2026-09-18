@@ -1,5 +1,5 @@
 // Optional integrations for the daily newsletter run. Every one is gated on
-// its secret being present — nothing here can break the send if unconfigured.
+// its secret being present: nothing here can break the send if unconfigured.
 import { createSign } from "node:crypto";
 import { decodePrefs } from "../lib/prefsPayload.js";
 
@@ -7,7 +7,7 @@ import { decodePrefs } from "../lib/prefsPayload.js";
 export async function postSlack(digest, config) {
   const url = process.env.SLACK_WEBHOOK_URL;
   if (!url) return "skipped (no SLACK_WEBHOOK_URL)";
-  const lines = [`*NEXUS Daily Brief — ${digest.dateLabel}*`];
+  const lines = [`*NEXUS Daily Brief: ${digest.dateLabel}*`];
   for (const s of digest.sections) {
     if (s.type !== "news" || !s.items?.length) continue;
     lines.push(`\n${s.icon} *${s.label}*`);
@@ -25,14 +25,14 @@ export async function postSlack(digest, config) {
 // ---------- Sponsy: pull today's sponsors into the email ----------
 // In Sponsy a "publication" is your newsletter, and each "slot" is a sponsor
 // booking on a given date against a named placement. We support three:
-//   Primary — full block at the top of the story area
-//   Sponsor — one compact line under the NEXUS title
-//   Footer  — title + text + CTA above the sign-off
+//   Primary: full block at the top of the story area
+//   Sponsor: one compact line under the NEXUS title
+//   Footer : title + text + CTA above the sign-off
 // Auth is the X-API-KEY header (verified against the live API).
 
 // Turn one Sponsy slot into the shape lib/email.js renders. Content lives in
 // custom "placement fields" carrying human labels (Title, Ad Copy, Text, CTA,
-// Link), so we match on label rather than field ID — renaming or reordering
+// Link), so we match on label rather than field ID: renaming or reordering
 // fields in Sponsy won't break this. Images are deliberately ignored: the
 // newsletter is text-only.
 function slotToSponsor(slot) {
@@ -53,11 +53,11 @@ function slotToSponsor(slot) {
   const bodyText = (slot.copy?.markdown || "").trim();
 
   // Sponsy exposes a sponsor's destination in several places depending on how
-  // the advertiser entered it — the link picker, a "Link" field, an anchor typed
+  // the advertiser entered it: the link picker, a "Link" field, an anchor typed
   // into the rich-text copy, or the customer record. Check every one: a sponsor
   // link that silently doesn't render is revenue quietly not delivered.
   // Sponsy's link picker stores { title, url }, where `title` is the anchor text
-  // the advertiser chose — preferred over a bare URL so the plug reads properly.
+  // the advertiser chose: preferred over a bare URL so the plug reads properly.
   const links = (Array.isArray(slot.links) ? slot.links : []).map((l) =>
     typeof l === "string" ? { url: l } : l || {}
   );
@@ -81,7 +81,7 @@ function slotToSponsor(slot) {
   };
 }
 
-// Returns { top, primary, footer } — any of which may be null.
+// Returns { top, primary, footer }: any of which may be null.
 // Pass { debug: true } to dump each placement's raw field values.
 export async function fetchSponsors({ debug = false } = {}) {
   const key = process.env.SPONSY_API_KEY;
@@ -139,7 +139,7 @@ export async function fetchSponsors({ debug = false } = {}) {
 // (HUBSPOT_TOKEN). Delivery still goes through Resend, so no paid
 // Marketing Hub tier is needed.
 // The authoritative answer to "may we email this person": HubSpot's own
-// subscription status for the email channel. Any UNSUBSCRIBED entry means no —
+// subscription status for the email channel. Any UNSUBSCRIBED entry means no:
 // we send exactly one kind of email, so there is no subscription type a reader
 // could have opted out of that we would still be entitled to use.
 //
@@ -160,7 +160,7 @@ async function optOutStatus(email, auth) {
   }
 }
 
-// Returns { recipients: [{ email, theme, prefs }], dropped: [email] } — theme
+// Returns { recipients: [{ email, theme, prefs }], dropped: [email] }: theme
 // comes from the optional "nexus_theme" contact property ("light"/"dark"),
 // prefs from "nexus_prefs" (see lib/prefsPayload.js). Both are null when unset
 // or unparseable, in which case the caller falls back to the publication
@@ -169,7 +169,7 @@ async function optOutStatus(email, auth) {
 // `dropped` is every address that IS on the list but did not clear opt-out
 // verification, and the caller has to subtract it. newsletter.to seeds the
 // recipient map before this runs, so an address in both used to be resurrected
-// by the config entry after this function had deliberately excluded it — which
+// by the config entry after this function had deliberately excluded it: which
 // defeated the fail-closed check AND silently swapped that reader's own theme
 // and settings for the publication defaults. One transient non-200 from the
 // preferences endpoint was enough to do it, for one edition, with nothing in
@@ -225,7 +225,7 @@ export async function hubspotRecipients() {
       console.warn(`HubSpot list: contact read failed (${batchRes?.status}: ${(await batchRes?.text())?.slice(0, 160)})`);
       return { recipients: [], dropped: [] };
     }
-    const missing = ["", ' (no "nexus_prefs" property — settings not personalized)', ' (no "nexus_theme"/"nexus_prefs" properties — using publication defaults)'][level];
+    const missing = ["", ' (no "nexus_prefs" property: settings not personalized)', ' (no "nexus_theme"/"nexus_prefs" properties: using publication defaults)'][level];
 
     const contacts = await batchRes.json();
     const onList = (contacts.results || [])
@@ -283,7 +283,7 @@ export async function hubspotRecipients() {
       console.warn(
         "HubSpot list: ⚠ subscription status is UNAVAILABLE (403). The HUBSPOT_TOKEN private app " +
           "needs the communication_preferences.read_write scope. Falling back to hs_email_optout only, " +
-          "which misses per-type unsubscribes — fix the scope."
+          "which misses per-type unsubscribes: fix the scope."
       );
     }
     if (unverified) {
@@ -298,7 +298,7 @@ export async function hubspotRecipients() {
     );
     return { recipients: people, dropped };
   } catch (e) {
-    console.warn("HubSpot list: errored —", e?.message || e);
+    console.warn("HubSpot list: errored:", e?.message || e);
     return { recipients: [], dropped: [] };
   }
 }

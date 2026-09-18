@@ -5,7 +5,7 @@ import { createHmac } from "node:crypto";
 import { fetchPublishedData, digestFromData } from "../lib/publishedDigest.js";
 import { getLocalNews, getWeather } from "../lib/digest.js";
 import { prefsSignature } from "../lib/prefsPayload.js";
-import { selectSponsors, mergeSponsors, describeSponsors } from "../lib/sponsors.js";
+import { PLACEMENTS, resolveSponsors, describeSponsors } from "../lib/sponsors.js";
 import { renderEmailHtml } from "../lib/email.js";
 import { mergeRecipients } from "../lib/recipients.js";
 import { postSlack, fetchSponsors, hubspotRecipients, uploadToDrive } from "./integrations.mjs";
@@ -18,7 +18,7 @@ const prefs = { zip: config.zip, ratings: config.ratings, leagues: config.league
 
 // The schedule fires at two UTC times (10:15 & 11:15) so one of them is 4:15 AM
 // in Denver year-round despite daylight saving. GitHub's scheduled runs are
-// best-effort though — they get delayed and sometimes dropped entirely — so we
+// best-effort though: they get delayed and sometimes dropped entirely: so we
 // accept ANY slot in the 4-8 AM Denver window instead of demanding hour === 4.
 // (An exact-hour guard meant a dropped 4 AM slot = no newsletter that day.)
 // Sending twice is prevented by the per-day Idempotency-Key below, not by the
@@ -29,19 +29,19 @@ if (process.env.GITHUB_EVENT_NAME === "schedule") {
     new Intl.DateTimeFormat("en-US", { timeZone: "America/Denver", hour: "numeric", hour12: false }).format(new Date())
   );
   if (denverHour < 4 || denverHour > 8) {
-    console.log(`Denver hour ${denverHour} is outside the 4-8 AM send window — skipping this slot.`);
+    console.log(`Denver hour ${denverHour} is outside the 4-8 AM send window: skipping this slot.`);
     process.exit(0);
   }
 }
 
 // Prefer the brief the gate already reviewed. Rebuilding here would mean the
-// mail could differ from what was approved — the whole point of the gate is
+// mail could differ from what was approved: the whole point of the gate is
 // that what ships is what a human signed off on.
 let prebuilt = null;
 try {
   prebuilt = JSON.parse(await readFile(new URL("../brief.json", import.meta.url), "utf8"));
 } catch {
-  /* no gated brief (manual/local run) — build it fresh below */
+  /* no gated brief (manual/local run): build it fresh below */
 }
 
 // The published pool, fetched at most once per run and shared by every
@@ -50,7 +50,7 @@ try {
 let poolPromise = null;
 const pool = () => (poolPromise ??= (console.log("Reading published site data…"), fetchPublishedData(config.siteUrl)));
 
-// A section the reader rated but that has no stories renders as nothing at all —
+// A section the reader rated but that has no stories renders as nothing at all:
 // renderEmailHtml drops an empty section rather than printing a bare heading. So
 // a topic can fall out of the brief entirely and the mail still looks correct:
 // Tech was rated 3 and silently absent for a day before anyone spotted it. The
@@ -64,7 +64,7 @@ function warnEmptySections(brief, who) {
   const line = `${who}: ${empty.join(" ")}`;
   if (!warnedEmpty.has(line)) {
     warnedEmpty.add(line);
-    console.warn(`⚠ rated topic(s) rendered zero stories and were dropped from the brief — ${line}`);
+    console.warn(`⚠ rated topic(s) rendered zero stories and were dropped from the brief: ${line}`);
   }
   return brief;
 }
@@ -73,12 +73,22 @@ const digest = warnEmptySections(prebuilt?.digest ?? (await digestFromData(await
 if (prebuilt) console.log(`Using approved brief built at ${prebuilt.generated_at}`);
 
 // Sponsors come from sponsors.json in the repo. Sponsy is still supported for
-// anyone who wants it, but it is off unless enableSponsy is set — and it can
+// anyone who wants it, but it is off unless enableSponsy is set, and it can
 // only fill placements nobody has bought locally.
-let sponsors = prebuilt?.sponsors ?? selectSponsors(sponsorData, denverDate, config.localNewsProxy);
-if (!prebuilt?.sponsors && sponsorData?.enableSponsy) {
-  sponsors = mergeSponsors(sponsors, await fetchSponsors({ debug: !!config.dryRun }), sponsorData, denverDate);
-}
+//
+// A gated brief's sponsors are used only if they actually contain an ad. The
+// gate used to hand back { top: null, primary: null, footer: null }, which is
+// truthy, so `??` accepted it and the house ad never ran. An all-empty set is
+// indistinguishable from "this step didn't work", so it is not worth trusting
+// over a fresh resolve.
+const hasAd = (s) => PLACEMENTS.some((p) => s?.[p]?.title);
+const sponsors = hasAd(prebuilt?.sponsors)
+  ? prebuilt.sponsors
+  : await resolveSponsors(sponsorData, denverDate, {
+      trackBase: config.localNewsProxy,
+      fetchSponsy: fetchSponsors,
+      debug: !!config.dryRun,
+    });
 
 // Publication default, overridable per run (workflow_dispatch "theme" input)
 // for testing without editing nexus.config.json. Individual subscribers can
@@ -116,7 +126,7 @@ const apiKey = process.env.RESEND_API_KEY;
 // verification drops beat both. Precedence lives in lib/recipients.js.
 //
 // Emergency brake: a comma-separated SUPPRESS_EMAILS secret is skipped no
-// matter what HubSpot says — for the case where someone has unsubscribed and
+// matter what HubSpot says: for the case where someone has unsubscribed and
 // the upstream state is wrong or slow, and they must not get tomorrow's mail
 // while that is sorted out. A secret, not a file: this repo is public.
 const suppressed = String(process.env.SUPPRESS_EMAILS || "")
@@ -132,7 +142,7 @@ const { recipients, resurrected } = mergeRecipients({
 });
 for (const email of resurrected) {
   console.warn(
-    `⚠ ${email} is in newsletter.to AND was dropped by opt-out verification — not sending. ` +
+    `⚠ ${email} is in newsletter.to AND was dropped by opt-out verification: not sending. ` +
       "Until now the config entry silently overrode that drop and mailed the address anyway, " +
       "with publication defaults in place of its own theme and settings."
   );
@@ -140,7 +150,7 @@ for (const email of resurrected) {
 if (suppressed.length) console.log(`Suppressed: ${suppressed.length} address(es) via SUPPRESS_EMAILS`);
 
 // The repo is public, so these Actions logs are public. Subscriber addresses
-// never appear in them in full — the privacy policy says we don't share them,
+// never appear in them in full: the privacy policy says we don't share them,
 // and a log line is sharing.
 const mask = (email) => {
   const [user = "", domain = ""] = String(email).split("@");
@@ -166,13 +176,13 @@ console.log(
 //
 // ponytail: the autonomy gate reviews the default brief only. A personalized
 // brief re-ranks that same reviewed pool, so it cannot surface a story the gate
-// never saw — per-recipient gating was explicitly out of scope.
+// never saw: per-recipient gating was explicitly out of scope.
 const digestCache = new Map();
 const zipCache = new Map();
 
 // Local news and weather in the published pool are built for the publication's
 // own zipcode. A subscriber with a different one needs those two fetched for
-// them — cached by zipcode, so a hundred readers in the same town cost one call.
+// them: cached by zipcode, so a hundred readers in the same town cost one call.
 async function dataForZip(zip) {
   const base = await pool();
   if (!zip || zip === (config.zip || "")) return base;
@@ -202,12 +212,12 @@ async function digestFor(person) {
 }
 
 // Safety valve: set "dryRun": true in nexus.config.json to build and log the
-// whole run without mailing anyone — useful for checking sponsor copy before
+// whole run without mailing anyone: useful for checking sponsor copy before
 // spending a day's idempotency key on a real send.
 if (config.dryRun) {
-  // Build each brief anyway and print its shape — a dry run that skipped the
+  // Build each brief anyway and print its shape: a dry run that skipped the
   // personalization couldn't tell you whether the personalization works.
-  console.log(`DRY RUN — no email sent. ${recipients.length} recipient(s):`);
+  console.log(`DRY RUN: no email sent. ${recipients.length} recipient(s):`);
   for (const person of recipients) {
     const brief = await digestFor(person);
     const shape = brief.sections
@@ -221,7 +231,7 @@ if (config.dryRun) {
 } else if (!apiKey) {
   console.log("Email: skipped (no RESEND_API_KEY secret)");
 } else if (!recipients.length) {
-  console.log("Email: skipped (no recipients — set newsletter.to in nexus.config.json or HUBSPOT_* secrets)");
+  console.log("Email: skipped (no recipients: set newsletter.to in nexus.config.json or HUBSPOT_* secrets)");
 } else {
   const from = config.newsletter?.from || process.env.NEWSLETTER_FROM || "NEXUS <onboarding@resend.dev>";
   // One email per recipient: addresses aren't exposed to each other, and each
@@ -251,13 +261,13 @@ if (config.dryRun) {
         "Content-Type": "application/json",
         // One key per recipient per Denver day (Resend keeps keys 24h). If a
         // second scheduled slot fires, Resend rejects the repeat instead of
-        // mailing twice — so the window above can stay generous.
+        // mailing twice: so the window above can stay generous.
         "Idempotency-Key": `nexus-${denverDate}-${to}`,
       },
-      body: JSON.stringify({ from, to: [to], subject: `Your Daily Brief — ${digest.dateLabel}`, html, headers }),
+      body: JSON.stringify({ from, to: [to], subject: `Your Daily Brief: ${digest.dateLabel}`, html, headers }),
     });
     if (res.ok) ok++;
-    else if (res.status === 409) already++; // same key today — already sent
+    else if (res.status === 409) already++; // same key today: already sent
     else {
       fail++;
       if (fail <= 2) console.warn(`  email to ${mask(to)} failed (${res.status}: ${(await res.text()).slice(0, 120)})`);
