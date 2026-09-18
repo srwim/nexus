@@ -8,7 +8,7 @@
     "dev": "npm run data && next dev",
     "build": "next build",
     "newsletter": "node scripts/send-newsletter.mjs",
-    "test": "node --test lib/*.test.js evals/*.test.js workers/*.test.js",
+    "test": "node --test lib/*.test.js scripts/*.test.js evals/*.test.js workers/*.test.js",
     "evals": "node evals/run.js --no-rubric",
     "capture-case": "node scripts/capture-case.js",
     "audit-optouts": "node scripts/audit-optouts.mjs"
