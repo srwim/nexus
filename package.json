@@ -11,7 +11,8 @@
     "test": "node --test lib/*.test.js scripts/*.test.js evals/*.test.js workers/*.test.js",
     "evals": "node evals/run.js --no-rubric",
     "capture-case": "node scripts/capture-case.js",
-    "audit-optouts": "node scripts/audit-optouts.mjs"
+    "audit-optouts": "node scripts/audit-optouts.mjs",
+    "resubscribe": "node scripts/resubscribe.mjs"
   },
   "dependencies": {
     "next": "^16.2.10",
