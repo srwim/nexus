@@ -1,0 +1,52 @@
+name: Diagnose delivery
+
+# Answers "why didn't so-and-so get the brief?" on demand, instead of waiting
+# for 4 AM and reading the scheduled run's log.
+#
+# Two questions, in the order they have to be asked:
+#   1. Is HubSpot willing to mail this person?   (audit-optouts)
+#   2. Would the send actually reach them?       (send, dry run)
+#
+# Neither step mails anyone. Step 2 runs with DRY_RUN=1, which builds every
+# recipient's brief and prints what would happen without calling Resend at all.
+#
+# Output is masked. This repo is public, so an Actions log is world-readable:
+# audit-optouts masks whenever CI is set, and the send's dry run masks every
+# address it prints.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      # The send pulls in lib/rss.js, which needs rss-parser. The audit alone
+      # would not, but step 2 fails at import time without it.
+      - run: npm ci
+
+      - name: 1. Subscription status per contact
+        run: node scripts/audit-optouts.mjs --mask
+        env:
+          HUBSPOT_TOKEN: ${{ secrets.HUBSPOT_TOKEN }}
+          HUBSPOT_LIST_ID: ${{ secrets.HUBSPOT_LIST_ID }}
+        # A HubSpot problem should not stop step 2 from running: between them
+        # they localise the fault, and knowing both answers beats knowing one.
+        continue-on-error: true
+
+      - name: 2. Who the send would reach, and with what
+        # RESEND_API_KEY is deliberately NOT passed. Nothing can be mailed from
+        # this workflow even if DRY_RUN were somehow lost.
+        run: DRY_RUN=1 node scripts/send-newsletter.mjs
+        env:
+          HUBSPOT_TOKEN: ${{ secrets.HUBSPOT_TOKEN }}
+          HUBSPOT_LIST_ID: ${{ secrets.HUBSPOT_LIST_ID }}
+          SUPPRESS_EMAILS: ${{ secrets.SUPPRESS_EMAILS }}

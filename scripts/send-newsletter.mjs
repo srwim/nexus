@@ -16,6 +16,12 @@ const sponsorData = await readFile(new URL("../sponsors.json", import.meta.url),
   .catch(() => ({ campaigns: [] })); // no sponsors file is a valid state, not an error
 const prefs = { zip: config.zip, ratings: config.ratings, leagues: config.leagues, countries: config.countries };
 
+// dryRun builds and logs the entire run without mailing anyone. It lives in
+// nexus.config.json for local use, and DRY_RUN=1 turns it on for a single
+// workflow run, so diagnosing delivery never requires committing a config
+// change and remembering to revert it.
+const dryRun = !!config.dryRun || /^(1|true|yes)$/i.test(process.env.DRY_RUN || "");
+
 // The schedule fires at two UTC times (10:15 & 11:15) so one of them is 4:15 AM
 // in Denver year-round despite daylight saving. GitHub's scheduled runs are
 // best-effort though: they get delayed and sometimes dropped entirely: so we
@@ -87,7 +93,7 @@ const sponsors = hasAd(prebuilt?.sponsors)
   : await resolveSponsors(sponsorData, denverDate, {
       trackBase: config.localNewsProxy,
       fetchSponsy: fetchSponsors,
-      debug: !!config.dryRun,
+      debug: dryRun,
     });
 
 // Publication default, overridable per run (workflow_dispatch "theme" input)
@@ -214,7 +220,7 @@ async function digestFor(person) {
 // Safety valve: set "dryRun": true in nexus.config.json to build and log the
 // whole run without mailing anyone: useful for checking sponsor copy before
 // spending a day's idempotency key on a real send.
-if (config.dryRun) {
+if (dryRun) {
   // Build each brief anyway and print its shape: a dry run that skipped the
   // personalization couldn't tell you whether the personalization works.
   console.log(`DRY RUN: no email sent. ${recipients.length} recipient(s):`);
@@ -236,9 +242,57 @@ if (config.dryRun) {
   const from = config.newsletter?.from || process.env.NEWSLETTER_FROM || "NEXUS <onboarding@resend.dev>";
   // One email per recipient: addresses aren't exposed to each other, and each
   // gets its own signed unsubscribe link.
+  //
+  // One email per recipient also means one API call per recipient, and Resend's
+  // default limit is 2 requests per second. This loop had no pacing and no
+  // retry, so on a list of three the first call went through and the rest came
+  // back 429 and were counted as permanent failures. A 429 is not a failure,
+  // it is "not yet": the recipient simply never got that day's brief, and which
+  // recipient lost out depended on whatever order the list came back in.
+  //
+  // The generous 4-8 AM window is what hid it. When several cron slots fire,
+  // a later slot retries whoever was skipped, so the loss only shows on days
+  // when GitHub runs the schedule once.
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const SEND_GAP_MS = 600; // under 2/sec with room for jitter
+  const MAX_ATTEMPTS = 4;
+
+  async function deliver(to, payload, idempotencyKey) {
+    for (let attempt = 1; ; attempt++) {
+      const res = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          // One key per recipient per Denver day (Resend keeps keys 24h). If a
+          // second scheduled slot fires, Resend rejects the repeat instead of
+          // mailing twice, so the window above can stay generous. A retry here
+          // reuses the same key, so a retry can never double-send either.
+          "Idempotency-Key": idempotencyKey,
+        },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        const id = await res.json().then((b) => b?.id).catch(() => null);
+        return { state: "sent", id };
+      }
+      if (res.status === 409) return { state: "already" };
+
+      const retryable = res.status === 429 || res.status >= 500;
+      if (!retryable || attempt >= MAX_ATTEMPTS) {
+        return { state: "failed", detail: `${res.status}: ${(await res.text()).slice(0, 140)}` };
+      }
+      const after = Number(res.headers.get("retry-after"));
+      const wait = Number.isFinite(after) && after > 0 ? after * 1000 : SEND_GAP_MS * 2 ** attempt;
+      console.warn(`  ${mask(to)}: HTTP ${res.status}, retrying in ${wait}ms (attempt ${attempt}/${MAX_ATTEMPTS})`);
+      await sleep(wait);
+    }
+  }
+
   let ok = 0;
   let fail = 0;
   let already = 0;
+  let first = true;
   for (const person of recipients.slice(0, 200)) {
     const to = person.email;
     const theme = person.theme || defaultTheme; // subscriber preference wins
@@ -254,29 +308,43 @@ if (config.dryRun) {
     const headers = unsubscribeUrl.startsWith("http")
       ? { "List-Unsubscribe": `<${unsubscribeUrl}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" }
       : { "List-Unsubscribe": `<${unsubscribeUrl}>` };
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-        // One key per recipient per Denver day (Resend keeps keys 24h). If a
-        // second scheduled slot fires, Resend rejects the repeat instead of
-        // mailing twice: so the window above can stay generous.
-        "Idempotency-Key": `nexus-${denverDate}-${to}`,
-      },
-      body: JSON.stringify({ from, to: [to], subject: `Your Daily Brief: ${digest.dateLabel}`, html, headers }),
-    });
-    if (res.ok) ok++;
-    else if (res.status === 409) already++; // same key today: already sent
+    // Pace the calls rather than firing them back to back.
+    if (!first) await sleep(SEND_GAP_MS);
+    first = false;
+
+    // The subject follows each reader's own brief, not the publication's.
+    const result = await deliver(
+      to,
+      { from, to: [to], subject: `Your Daily Brief: ${brief.dateLabel}`, html, headers },
+      `nexus-${denverDate}-${to}`
+    );
+
+    if (result.state === "sent") {
+      ok++;
+      // Logged per recipient on purpose: with an id you can look the message
+      // up in Resend and see whether it was accepted, bounced or deferred.
+      console.log(`  ${mask(to)}: sent${result.id ? ` (resend ${result.id})` : ""}`);
+    }
+    else if (result.state === "already") already++;
     else {
       fail++;
-      if (fail <= 2) console.warn(`  email to ${mask(to)} failed (${res.status}: ${(await res.text()).slice(0, 120)})`);
+      // Every failure is logged. This used to stop after two, which meant a
+      // recipient could go missing with nothing in the log naming them.
+      console.warn(`  email to ${mask(to)} failed (${result.detail})`);
     }
   }
   console.log(
     `Email: sent ${ok}, already sent today ${already}, failed ${fail} ` +
       `(default theme: ${defaultTheme}; ${digestCache.size} personalized brief(s) built)`
   );
+  // A partial send is the failure mode that hides: the run is green, most
+  // people got their mail, and the ones who didn't have no way to tell you.
+  if (fail) {
+    console.warn(
+      `\n⚠ ${fail} of ${recipients.length} recipient(s) did NOT receive today's brief. ` +
+        "Named above. They are not unsubscribed; the send to them failed.\n"
+    );
+  }
 }
 
 console.log("Slack:", await postSlack(digest, config));
