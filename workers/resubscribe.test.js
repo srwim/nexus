@@ -4,6 +4,12 @@
 // Tested against the real worker. HubSpot and Resend are stubbed through
 // globalThis.fetch with a tiny in-memory model of one contact, so each test can
 // ask "what did the worker change?" rather than "what did it try to call?".
+//
+// The stub models ONLY endpoints HubSpot documents. The first version modelled
+// a /subscribe-all route because the worker called one; HubSpot has no such
+// route, so every test passed while the real thing failed on its first use.
+// Anything the worker calls that isn't in HubSpot's reference now 404s here,
+// exactly as it would in production.
 import { test, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
@@ -18,9 +24,16 @@ let hs; // the one HubSpot contact, as the stub sees it
 let calls; // every outbound request, for asserting what did NOT happen
 const realFetch = globalThis.fetch;
 
+// Per subscription type, as HubSpot reports them. Any UNSUBSCRIBED means the
+// send drops the contact.
+const channelOut = () => Object.values(hs.types).includes("UNSUBSCRIBED");
+const allSubscribed = () => {
+  for (const id of Object.keys(hs.types)) hs.types[id] = "SUBSCRIBED";
+};
+
 beforeEach(() => {
   hs = {
-    channelOut: true, // an UNSUBSCRIBED status on the email channel
+    types: { 33583163: "UNSUBSCRIBED" }, // one type, opted out: the real case
     flag: false, // hs_email_optout
     exists: true,
     statusFails: false,
@@ -34,17 +47,32 @@ beforeEach(() => {
     const headers = Object.fromEntries(Object.entries(init.headers || {}).map(([k, v]) => [k.toLowerCase(), v]));
     calls.push({ url, method, headers, body: init.body ? String(init.body) : "" });
     const json = (b, s = 200) => new Response(JSON.stringify(b), { status: s });
+    const statusPath = /\/communication-preferences\/v4\/statuses\/([^/?]+)$/;
+    const path = url.split("?")[0];
 
-    if (url.includes("/v4/statuses/") && url.includes("/subscribe-all")) {
-      if (hs.subscribeWorks) hs.channelOut = false;
-      return json({}, hs.subscribeWorks ? 200 : 400);
+    // POST /v4/statuses/{email}: HubSpot's documented per-type status update.
+    if (method === "POST" && statusPath.test(path)) {
+      const body = JSON.parse(init.body || "{}");
+      if (body.channel !== "EMAIL" || !Number.isFinite(body.subscriptionId) || !body.statusState) {
+        return json({ message: "invalid request" }, 400);
+      }
+      if (!hs.subscribeWorks) return json({ message: "Contact cannot be resubscribed" }, 400);
+      hs.types[body.subscriptionId] = body.statusState;
+      return json({
+        subscriptionId: body.subscriptionId,
+        status: body.statusState,
+        setStatusSuccessReason: "RESUBSCRIBE_OCCURRED",
+      });
     }
-    if (url.includes("/v4/statuses/")) {
+    // GET /v4/statuses/{email}?channel=EMAIL
+    if (method === "GET" && statusPath.test(path)) {
       if (hs.statusFails) return json({ message: "boom" }, 500);
       if (!hs.exists) return json({ message: "not found" }, 404);
-      return json({ results: [{ status: hs.channelOut ? "UNSUBSCRIBED" : "SUBSCRIBED" }] });
+      return json({
+        status: "SUCCESS",
+        results: Object.entries(hs.types).map(([id, status]) => ({ subscriptionId: Number(id), status, channel: "EMAIL" })),
+      });
     }
-    if (url.includes("/v3/definitions")) return json({ subscriptionDefinitions: [] });
     if (url.includes("/contacts/search")) {
       return json({ results: hs.exists ? [{ id: "101", properties: { email: EMAIL, hs_email_optout: String(hs.flag) } }] : [] });
     }
@@ -78,7 +106,9 @@ const intent = async (payload, { method = "POST", env = ENV } = {}) => {
   return { res, body: await res.text() };
 };
 
-const mutations = () => calls.filter((c) => c.method === "PATCH" || /subscribe-all|\/v3\/subscribe/.test(c.url));
+// Any write to HubSpot: a status update, or a PATCH to the contact.
+const mutations = () =>
+  calls.filter((c) => c.method === "PATCH" || (c.method === "POST" && /\/v4\/statuses\/[^/?]+$/.test(c.url.split("?")[0])));
 const emailsSent = () => calls.filter((c) => c.url.includes("api.resend.com"));
 
 // ── the confirmation link ────────────────────────────────────────────────────
@@ -89,18 +119,58 @@ test("opening the link changes nothing: scanners GET every URL in an email", asy
   assert.match(body, /Yes, resubscribe me/);
   assert.match(body, /method="POST"/);
   assert.equal(mutations().length, 0, "a GET must never write to HubSpot");
-  assert.equal(hs.channelOut, true, "still unsubscribed");
+  assert.equal(channelOut(), true, "still unsubscribed");
 });
 
 test("pressing the button restores the subscription under a consent legal basis", async () => {
   const { res, body } = await resub("POST");
   assert.equal(res.status, 200);
   assert.match(body, /You're resubscribed/);
-  assert.equal(hs.channelOut, false);
-  const sub = calls.find((c) => c.url.includes("/subscribe-all"));
-  const payload = JSON.parse(sub.body);
+  assert.equal(channelOut(), false);
+  const payload = JSON.parse(mutations().find((c) => c.method === "POST").body);
   assert.equal(payload.legalBasis, "CONSENT_WITH_NOTICE", "the person asked for this; it is not legitimate interest");
   assert.match(payload.legalBasisExplanation, /confirmed by clicking/);
+});
+
+test("restores through HubSpot's documented per-type update, never a made-up route", async () => {
+  hs.types = { 111: "UNSUBSCRIBED", 222: "UNSUBSCRIBED", 333: "NOT_SPECIFIED" };
+  const { res } = await resub("POST");
+  assert.equal(res.status, 200);
+
+  const writes = mutations().filter((c) => c.method === "POST");
+  assert.equal(writes.length, 2, "one update per UNSUBSCRIBED type, and none for a type they never opted out of");
+  for (const w of writes) {
+    assert.equal(w.url, `https://api.hubapi.com/communication-preferences/v4/statuses/${encodeURIComponent(EMAIL)}`);
+    const b = JSON.parse(w.body);
+    assert.equal(b.statusState, "SUBSCRIBED");
+    assert.equal(b.channel, "EMAIL");
+    assert.equal(typeof b.subscriptionId, "number", "HubSpot's reference types it as a number");
+  }
+  assert.deepEqual(hs.types, { 111: "SUBSCRIBED", 222: "SUBSCRIBED", 333: "NOT_SPECIFIED" });
+  // Scoped to communication-preferences: /crm/v3/objects/contacts is a
+  // legitimate lookup, and a bare /v3/ pattern caught it too.
+  assert.ok(
+    !calls.some((c) => /\/subscribe-all|\/communication-preferences\/v3\//.test(c.url)),
+    "no call to routes that can't resubscribe"
+  );
+});
+
+test("a refused restore tells the operator what HubSpot said, without the full address", async () => {
+  hs.subscribeWorks = false;
+  const warnings = [];
+  const realWarn = console.warn;
+  console.warn = (...a) => warnings.push(a.join(" "));
+  try {
+    await resub("POST");
+  } finally {
+    console.warn = realWarn;
+  }
+  const line = warnings.find((w) => w.startsWith("resubscribe: NOT restored"));
+  assert.ok(line, "the first real failure of this route was undiagnosable; it must never be again");
+  assert.match(line, /type 33583163: 400/, "HubSpot's status per type");
+  assert.match(line, /cannot be resubscribed/, "and its own words");
+  assert.match(line, /r\*\*\*@example\.com/);
+  assert.ok(!line.includes(EMAIL), "masked, not the full address");
 });
 
 test("the global opt-out flag is cleared too, since the send checks both", async () => {
@@ -187,17 +257,17 @@ test("the emailed link is real: it opens to a button and the button works", asyn
 
   const get = await worker.fetch(new Request(link, { method: "GET" }), ENV);
   assert.equal(get.status, 200);
-  assert.equal(hs.channelOut, true, "still unsubscribed after merely opening it");
+  assert.equal(channelOut(), true, "still unsubscribed after merely opening it");
 
   const post = await worker.fetch(new Request(link, { method: "POST" }), ENV);
   assert.equal(post.status, 200);
-  assert.equal(hs.channelOut, false, "restored after the button");
+  assert.equal(channelOut(), false, "restored after the button");
 });
 
 test("a subscribed address gets no email, and an identical answer", async () => {
   const optedOut = (await intent({ email: EMAIL })).body;
   calls = [];
-  hs.channelOut = false;
+  allSubscribed();
   const subscribed = (await intent({ email: EMAIL })).body;
   assert.equal(emailsSent().length, 0);
   assert.equal(subscribed, optedOut, "a different answer would let anyone probe who has unsubscribed");

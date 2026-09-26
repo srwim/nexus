@@ -70,36 +70,41 @@ async function statusOf(email) {
   return { state: out ? "out" : "in", detail: "" };
 }
 
-// HubSpot has moved this endpoint between versions and the v4 subscribe body is
-// not consistent across portals, so try v4, then the documented v3 call. Neither
-// being accepted is reported as a failure rather than papered over.
+// Restore every subscription type the contact is unsubscribed from, using the
+// v4 status update: POST /communication-preferences/v4/statuses/{email}, one
+// call per type. That is HubSpot's documented resubscribe path, and it marks a
+// successful one RESUBSCRIBE_OCCURRED.
+//
+// This used to call a v4 "subscribe-all" route and fall back to v3 subscribe.
+// Neither works: HubSpot has no subscribe-all (only unsubscribe-all), and it
+// documents that v3 subscribe "will not allow you to resubscribe contacts who
+// have opted out". Every run of this script before the fix could only fail.
+// workers/local-news-proxy.js carries the same logic for the self-service path.
 async function subscribe(email) {
-  const v4 = await fetch(
-    `https://api.hubapi.com/communication-preferences/v4/statuses/${encodeURIComponent(email)}/subscribe-all?channel=EMAIL`,
-    { method: "POST", headers: auth, body: JSON.stringify({ legalBasis: LEGAL_BASIS, legalBasisExplanation: EXPLANATION }) }
-  );
-  if (v4.ok) return "v4 subscribe-all";
+  const base = `https://api.hubapi.com/communication-preferences/v4/statuses/${encodeURIComponent(email)}`;
+  const st = await fetch(`${base}?channel=EMAIL`, { headers: auth });
+  if (!st.ok) return `failed (status read ${st.status})`;
+  const out = ((await st.json())?.results || []).filter((r) => String(r.status).toUpperCase() === "UNSUBSCRIBED");
+  if (!out.length) return "no unsubscribed types";
 
-  const defsRes = await fetch("https://api.hubapi.com/communication-preferences/v3/definitions", { headers: auth });
-  if (defsRes.ok) {
-    const subs = (await defsRes.json()).subscriptionDefinitions || [];
-    const sub = subs.find((s) => /market/i.test(s.name || "")) || subs[0];
-    if (sub) {
-      const v3 = await fetch("https://api.hubapi.com/communication-preferences/v3/subscribe", {
-        method: "POST",
-        headers: auth,
-        body: JSON.stringify({
-          emailAddress: email,
-          subscriptionId: String(sub.id),
-          legalBasis: LEGAL_BASIS,
-          legalBasisExplanation: EXPLANATION,
-        }),
-      });
-      if (v3.ok) return `v3 subscribe (${sub.name || sub.id})`;
-      return `failed (v4 ${v4.status}, v3 ${v3.status})`;
-    }
+  const parts = [];
+  for (const r of out) {
+    const res = await fetch(base, {
+      method: "POST",
+      headers: auth,
+      body: JSON.stringify({
+        subscriptionId: Number(r.subscriptionId),
+        statusState: "SUBSCRIBED",
+        legalBasis: LEGAL_BASIS,
+        legalBasisExplanation: EXPLANATION,
+        channel: "EMAIL",
+      }),
+    });
+    const text = await res.text().catch(() => "");
+    const reason = text.match(/"setStatusSuccessReason"\s*:\s*"([A-Z_]+)"/)?.[1];
+    parts.push(`type ${r.subscriptionId}: ${res.status}${reason ? ` ${reason}` : res.ok ? "" : ` ${text.slice(0, 160)}`}`);
   }
-  return `failed (v4 ${v4.status}, no v3 subscription definition)`;
+  return `v4 status update (${parts.join(", ")})`;
 }
 
 // The send checks hs_email_optout as well as the channel status, so a contact
