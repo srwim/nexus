@@ -527,55 +527,91 @@ async function handleResubscribe(request, url, env) {
       "Re-opted in: submitted the NEXUS signup form with explicit consent, then confirmed by clicking " +
       `a link emailed to this address on ${new Date().toISOString()}.`;
 
-    // v4 first, then the documented v3 call; same fallback as resubscribe.mjs.
-    const v4 = await fetch(
-      `https://api.hubapi.com/communication-preferences/v4/statuses/${encodeURIComponent(email)}/subscribe-all?channel=EMAIL`,
-      {
-        method: "POST",
-        headers: auth,
-        body: JSON.stringify({ legalBasis: "CONSENT_WITH_NOTICE", legalBasisExplanation: explanation }),
-      }
-    );
-    if (!v4.ok) {
-      const defsRes = await fetch("https://api.hubapi.com/communication-preferences/v3/definitions", { headers: auth });
-      if (defsRes.ok) {
-        const subs = (await defsRes.json()).subscriptionDefinitions || [];
-        const sub = subs.find((s) => /market/i.test(s.name || "")) || subs[0];
-        if (sub) {
-          await fetch("https://api.hubapi.com/communication-preferences/v3/subscribe", {
-            method: "POST",
-            headers: auth,
-            body: JSON.stringify({
-              emailAddress: email,
-              subscriptionId: String(sub.id),
-              legalBasis: "CONSENT_WITH_NOTICE",
-              legalBasisExplanation: explanation,
-            }),
-          });
-        }
-      }
-    }
+    const restored = await restoreEachType(email, auth, explanation);
 
     // The global flag is a separate switch; the send checks it too.
     const before = await optOutState(email, auth);
+    let flagNote = "not set";
     if (before.flag && before.contactId) {
-      await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${before.contactId}`, {
+      const patch = await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${before.contactId}`, {
         method: "PATCH",
         headers: auth,
         body: JSON.stringify({ properties: { hs_email_optout: "false" } }),
       });
+      flagNote = patch.ok ? "cleared" : `PATCH ${patch.status}`;
     }
 
     // Verified, not assumed: the success page only appears if the send's own
     // rule now lets them through.
     const after = await optOutState(email, auth);
     if (after.state === "in") {
+      console.log(`resubscribe: restored ${maskEmail(email)} (${restored.summary}; flag ${flagNote})`);
       return page(`You're resubscribed. ${escapeHtml(email)} will receive the NEXUS Daily Brief from the next edition.`, 200);
     }
+    // The reader gets a plain message; the operator gets HubSpot's own words.
+    // Without this line the first failure of this route was undiagnosable.
+    console.warn(
+      `resubscribe: NOT restored ${maskEmail(email)}: ${restored.summary}; flag ${flagNote}; ` +
+        `still reads ${after.state}${after.flag ? " (hs_email_optout set)" : ""}`
+    );
     return page("We couldn't finish resubscribing you automatically. Email privacy@arok.ai and we'll sort it out by hand.", 502);
-  } catch {
+  } catch (e) {
+    console.warn(`resubscribe: errored for ${maskEmail(email)}: ${e?.message || e}`);
     return page("Something went wrong. Email privacy@arok.ai and we'll sort it out by hand.", 502);
   }
+}
+
+// Put back every email subscription type the contact is unsubscribed from.
+//
+// HubSpot has no "subscribe-all": only unsubscribe-all exists, and the first
+// version of this route called a subscribe-all endpoint that isn't there. Nor
+// does the v3 subscribe call help: HubSpot documents that it "will not allow
+// you to resubscribe contacts who have opted out". The documented way back is
+// the v4 status update, one call per subscription type, which HubSpot marks
+// RESUBSCRIBE_OCCURRED when it takes.
+//
+// Every UNSUBSCRIBED type is restored, not just one, because the send drops a
+// contact if ANY type reads UNSUBSCRIBED.
+async function restoreEachType(email, auth, explanation) {
+  const base = `https://api.hubapi.com/communication-preferences/v4/statuses/${encodeURIComponent(email)}`;
+  const st = await fetch(`${base}?channel=EMAIL`, { headers: auth });
+  if (!st.ok) return { summary: `status read failed (${st.status})` };
+
+  const out = ((await st.json())?.results || []).filter((r) => String(r.status).toUpperCase() === "UNSUBSCRIBED");
+  if (!out.length) return { summary: "no unsubscribed types" };
+
+  const parts = [];
+  for (const r of out) {
+    const res = await fetch(base, {
+      method: "POST",
+      headers: auth,
+      body: JSON.stringify({
+        subscriptionId: Number(r.subscriptionId),
+        statusState: "SUBSCRIBED",
+        legalBasis: "CONSENT_WITH_NOTICE",
+        legalBasisExplanation: explanation,
+        channel: "EMAIL",
+      }),
+    });
+    let detail = `${res.status}`;
+    try {
+      const body = await res.text();
+      const reason = body.match(/"setStatusSuccessReason"\s*:\s*"([A-Z_]+)"/)?.[1];
+      if (reason) detail += ` ${reason}`;
+      else if (!res.ok) detail += ` ${body.slice(0, 160)}`;
+    } catch {
+      /* the status code is enough to go on */
+    }
+    parts.push(`type ${r.subscriptionId}: ${detail}`);
+  }
+  return { summary: parts.join(", ") };
+}
+
+// Cloudflare's logs are private to the account, but there's no reason for a
+// subscriber's full address to sit in them either.
+function maskEmail(email) {
+  const [user = "", domain = ""] = String(email).split("@");
+  return `${user.slice(0, 1)}***@${domain}`;
 }
 
 // HubSpot returns 4xx with a message when the contact is already opted out.
