@@ -98,6 +98,10 @@ export default function PrivacyPage() {
       <ul>
         <li>Every email says truthfully who it is from, with an accurate subject line.</li>
         <li>Every email carries a one-click unsubscribe link, honoured promptly and automatically.</li>
+        <li>
+          If you unsubscribe and later sign up again, we email you a link to confirm first. Nothing is
+          sent until you click it, so nobody else can re-subscribe your address.
+        </li>
         <li>Every email includes our postal address.</li>
         <li>You will get one email a day, and nothing else. We do not send other campaigns.</li>
       </ul>

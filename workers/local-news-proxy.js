@@ -30,12 +30,26 @@
 //   by GitHub) with these scopes: communication_preferences.read_write. The link
 //   carries a signed token (HMAC of the email using HUBSPOT_TOKEN) so nobody can
 //   unsubscribe anyone else.
+//
+// RETURNING SUBSCRIBERS (/subscribe-intent and /resubscribe routes):
+//   Someone who unsubscribed and signs up again is emailed a confirmation link,
+//   and only clicking it restores their subscription. Needs, on this worker:
+//     - RESEND_API_KEY secret (the same Resend key GitHub uses), to send the link
+//     - HUBSPOT_TOKEN scopes: communication_preferences.read_write,
+//       crm.objects.contacts.read and crm.objects.contacts.write
+//   Optional: NEWSLETTER_FROM to override the "NEXUS <brief@arok.ai>" sender.
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname.replace(/\/+$/, "").endsWith("/unsubscribe")) {
       return handleUnsubscribe(request, url, env);
+    }
+    if (url.pathname.replace(/\/+$/, "").endsWith("/subscribe-intent")) {
+      return handleSubscribeIntent(request, url, env);
+    }
+    if (url.pathname.replace(/\/+$/, "").endsWith("/resubscribe")) {
+      return handleResubscribe(request, url, env);
     }
     if (url.pathname.replace(/\/+$/, "").endsWith("/translate")) {
       return handleTranslate(request, env);
@@ -335,6 +349,235 @@ async function handleUnsubscribe(request, url, env) {
   }
 }
 
+// ── Returning subscribers: double opt-in ─────────────────────────────────────
+// Someone who unsubscribed and later signs up again ends up with two HubSpot
+// records in conflict: fresh consent from the form, and an older opt-out that
+// the send obeys. The opt-out wins, so to them, signing up does nothing.
+//
+// The form must not be what reverses the opt-out. Anyone can type any address
+// into a form, so if submitting one re-subscribed an opted-out address, a
+// stranger could undo someone's "stop emailing me", which is exactly what
+// CAN-SPAM and GDPR forbid. A returning address is instead emailed a link, and
+// only a click from that inbox restores it.
+//
+// POST /subscribe-intent   body {"email": "..."} sent as text/plain (no preflight)
+//   Answers {"ok": true} for every well-formed address, confirmation sent or
+//   not. Answering differently for opted-out addresses would let anyone probe
+//   who has unsubscribed, and that is personal data about them.
+// GET  /resubscribe?e=&x=&t=   a page with a button; changes nothing (scanners GET)
+// POST /resubscribe?e=&x=&t=   restores, then re-reads HubSpot and reports
+//   success only if the send will actually include them.
+//
+// ponytail: the HubSpot calls below duplicate scripts/resubscribe.mjs. This
+// file is deployed by pasting it into Cloudflare's editor, so it cannot import
+// from lib/. If the two drift, the send's rule in scripts/integrations.mjs is
+// the one to match.
+const RESUB_TTL_MS = 72 * 60 * 60 * 1000;
+
+// Domain-separated from the unsubscribe token, which is HMAC(email) under the
+// same key. Without the prefix and expiry in the message, a leaked unsubscribe
+// link would double as a valid resubscribe link for the same address.
+const resubMessage = (email, exp) => `resubscribe|${email}|${exp}`;
+
+const isEmail = (e) => typeof e === "string" && e.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+
+// The send drops a contact if ANY email subscription reads UNSUBSCRIBED or the
+// global hs_email_optout flag is set (scripts/integrations.mjs). This checks
+// the same two things: restoring one and not the other would tell a reader
+// they are back while the send still skips them.
+async function optOutState(email, auth) {
+  try {
+    const st = await fetch(
+      `https://api.hubapi.com/communication-preferences/v4/statuses/${encodeURIComponent(email)}?channel=EMAIL`,
+      { headers: auth }
+    );
+    let channelOut = false;
+    if (st.ok) {
+      channelOut = ((await st.json())?.results || []).some((r) => String(r.status).toUpperCase() === "UNSUBSCRIBED");
+    } else if (st.status !== 404) {
+      return { state: "unknown" }; // 404 just means HubSpot has never heard of them
+    }
+
+    const search = await fetch("https://api.hubapi.com/crm/v3/objects/contacts/search", {
+      method: "POST",
+      headers: auth,
+      body: JSON.stringify({
+        filterGroups: [{ filters: [{ propertyName: "email", operator: "EQ", value: email }] }],
+        properties: ["email", "hs_email_optout"],
+        limit: 1,
+      }),
+    });
+    if (!search.ok) return { state: "unknown" };
+    const contact = (await search.json())?.results?.[0] || null;
+    const flag = String(contact?.properties?.hs_email_optout || "").toLowerCase() === "true";
+    return { state: channelOut || flag ? "out" : "in", contactId: contact?.id || null, flag };
+  } catch {
+    return { state: "unknown" };
+  }
+}
+
+async function handleSubscribeIntent(request, url, env) {
+  const cors = {
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Content-Type": "application/json",
+  };
+  const json = (body, status = 200) => new Response(JSON.stringify(body), { status, headers: cors });
+  if (request.method === "OPTIONS") return new Response(null, { headers: cors });
+  if (request.method !== "POST") return json({ ok: false, error: "POST only" }, 405);
+
+  let email = "";
+  try {
+    email = String(JSON.parse(await request.text())?.email || "").trim().toLowerCase();
+  } catch {
+    /* falls through to the validity check */
+  }
+  if (!isEmail(email)) return json({ ok: false, error: "invalid email" }, 400);
+  if (!env.HUBSPOT_TOKEN) return json({ ok: true });
+
+  const auth = { Authorization: `Bearer ${env.HUBSPOT_TOKEN}`, "Content-Type": "application/json" };
+  // Only a definite opt-out earns an email. "unknown" does not: this endpoint
+  // is public, and mailing addresses we can't classify would make it a way to
+  // send our mail to arbitrary strangers.
+  if ((await optOutState(email, auth)).state === "out") {
+    const sent = await sendResubConfirmation(email, url.origin, env);
+    // Visible in the worker's logs, deliberately not in the response.
+    if (!sent) console.warn("resubscribe: confirmation email not sent (check RESEND_API_KEY on the worker)");
+  }
+  return json({ ok: true });
+}
+
+async function sendResubConfirmation(email, origin, env) {
+  if (!env.RESEND_API_KEY) return false;
+  const exp = Date.now() + RESUB_TTL_MS;
+  const t = await hmacHex(resubMessage(email, exp), env.HUBSPOT_TOKEN);
+  const link = `${origin}/resubscribe?e=${encodeURIComponent(email)}&x=${exp}&t=${t}`;
+  const day = new Date().toISOString().slice(0, 10);
+
+  const text =
+    "You asked to receive the NEXUS Daily Brief at this address. It unsubscribed in the past, " +
+    "so we need you to confirm before we start sending again.\n\n" +
+    `Confirm: ${link}\n\n` +
+    "This link works for 3 days. If you didn't ask for this, ignore this email and nothing will change.";
+  const html =
+    `<div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px 20px;color:#1a1815;">` +
+    `<div style="font-size:22px;font-weight:800;letter-spacing:2px;color:#9c552b;margin-bottom:18px;">NEXUS</div>` +
+    `<p style="font-size:15px;line-height:1.6;">You asked to receive the NEXUS Daily Brief at this address. ` +
+    `It unsubscribed in the past, so we need you to confirm before we start sending again.</p>` +
+    `<p style="margin:26px 0;"><a href="${escapeHtml(link)}" style="display:inline-block;background:#9c552b;color:#ffffff;` +
+    `text-decoration:none;font-weight:600;font-size:15px;padding:12px 24px;">Confirm my subscription</a></p>` +
+    `<p style="font-size:13px;line-height:1.6;color:#6b665c;">This link works for 3 days. ` +
+    `If you didn't ask for this, ignore this email and nothing will change.</p></div>`;
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+        // One confirmation per address per UTC day, enforced by Resend itself.
+        // Without a cap this endpoint could fill an opted-out stranger's inbox,
+        // and burn the free sending quota the daily brief depends on.
+        "Idempotency-Key": `nexus-resub-${day}-${email}`,
+      },
+      body: JSON.stringify({
+        from: env.NEWSLETTER_FROM || "NEXUS <brief@arok.ai>",
+        to: [email],
+        subject: "Confirm your NEXUS subscription",
+        text,
+        html,
+      }),
+    });
+    return res.ok || res.status === 409; // 409: today's confirmation already went out
+  } catch {
+    return false;
+  }
+}
+
+async function handleResubscribe(request, url, env) {
+  const email = (url.searchParams.get("e") || "").trim().toLowerCase();
+  const exp = Number(url.searchParams.get("x") || 0);
+  const token = url.searchParams.get("t") || "";
+  const again = "Sign up again at arok.ai/nexus and we'll send a fresh link.";
+
+  if (!isEmail(email) || !Number.isFinite(exp) || !exp || !token || !env.HUBSPOT_TOKEN) {
+    return page(`This confirmation link is incomplete. ${again}`, 400);
+  }
+  if (token !== (await hmacHex(resubMessage(email, exp), env.HUBSPOT_TOKEN))) {
+    return page(`This confirmation link isn't valid. ${again}`, 400);
+  }
+  if (Date.now() > exp) {
+    return page(`This confirmation link has expired. ${again}`, 410);
+  }
+
+  // Same rule the unsubscribe route learned the hard way: mail scanners GET
+  // every link, so a GET only ever shows the button.
+  if (request.method !== "POST") {
+    return actionPage(
+      `Start sending the NEXUS Daily Brief to <strong>${escapeHtml(email)}</strong> again?`,
+      "Yes, resubscribe me",
+      `${url.pathname}?e=${encodeURIComponent(email)}&x=${exp}&t=${token}`
+    );
+  }
+
+  try {
+    const auth = { Authorization: `Bearer ${env.HUBSPOT_TOKEN}`, "Content-Type": "application/json" };
+    const explanation =
+      "Re-opted in: submitted the NEXUS signup form with explicit consent, then confirmed by clicking " +
+      `a link emailed to this address on ${new Date().toISOString()}.`;
+
+    // v4 first, then the documented v3 call; same fallback as resubscribe.mjs.
+    const v4 = await fetch(
+      `https://api.hubapi.com/communication-preferences/v4/statuses/${encodeURIComponent(email)}/subscribe-all?channel=EMAIL`,
+      {
+        method: "POST",
+        headers: auth,
+        body: JSON.stringify({ legalBasis: "CONSENT_WITH_NOTICE", legalBasisExplanation: explanation }),
+      }
+    );
+    if (!v4.ok) {
+      const defsRes = await fetch("https://api.hubapi.com/communication-preferences/v3/definitions", { headers: auth });
+      if (defsRes.ok) {
+        const subs = (await defsRes.json()).subscriptionDefinitions || [];
+        const sub = subs.find((s) => /market/i.test(s.name || "")) || subs[0];
+        if (sub) {
+          await fetch("https://api.hubapi.com/communication-preferences/v3/subscribe", {
+            method: "POST",
+            headers: auth,
+            body: JSON.stringify({
+              emailAddress: email,
+              subscriptionId: String(sub.id),
+              legalBasis: "CONSENT_WITH_NOTICE",
+              legalBasisExplanation: explanation,
+            }),
+          });
+        }
+      }
+    }
+
+    // The global flag is a separate switch; the send checks it too.
+    const before = await optOutState(email, auth);
+    if (before.flag && before.contactId) {
+      await fetch(`https://api.hubapi.com/crm/v3/objects/contacts/${before.contactId}`, {
+        method: "PATCH",
+        headers: auth,
+        body: JSON.stringify({ properties: { hs_email_optout: "false" } }),
+      });
+    }
+
+    // Verified, not assumed: the success page only appears if the send's own
+    // rule now lets them through.
+    const after = await optOutState(email, auth);
+    if (after.state === "in") {
+      return page(`You're resubscribed. ${escapeHtml(email)} will receive the NEXUS Daily Brief from the next edition.`, 200);
+    }
+    return page("We couldn't finish resubscribing you automatically. Email privacy@arok.ai and we'll sort it out by hand.", 502);
+  } catch {
+    return page("Something went wrong. Email privacy@arok.ai and we'll sort it out by hand.", 502);
+  }
+}
+
 // HubSpot returns 4xx with a message when the contact is already opted out.
 // That is a success from the reader's point of view; any other 4xx is not.
 async function saysAlreadyUnsubscribed(res) {
@@ -362,7 +605,18 @@ function escapeHtml(s) {
 // reader presses the button. The form posts back to this same signed URL, so no
 // token is re-derived and nothing new has to be trusted.
 function confirmPage(email, url) {
-  const action = escapeHtml(`${url.pathname}?e=${encodeURIComponent(email)}&t=${url.searchParams.get("t") || ""}`);
+  return actionPage(
+    `Unsubscribe <strong>${escapeHtml(email)}</strong> from the NEXUS Daily Brief?`,
+    "Yes, unsubscribe me",
+    `${url.pathname}?e=${encodeURIComponent(email)}&t=${url.searchParams.get("t") || ""}`
+  );
+}
+
+// Shared by unsubscribe and resubscribe: a question, one button that POSTs back
+// to the same signed URL, and nothing changed until it is pressed.
+// `questionHtml` must already be escaped; `rawAction` is escaped here.
+function actionPage(questionHtml, button, rawAction) {
+  const action = escapeHtml(rawAction);
   const html =
     `<!doctype html><html lang="en"><head><meta charset="utf-8">` +
     `<meta name="viewport" content="width=device-width, initial-scale=1"><title>NEXUS</title>` +
@@ -371,10 +625,10 @@ function confirmPage(email, url) {
     `<body style="margin:0;background:#0b0b0f;color:#e7e7ee;font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;text-align:center;padding:64px 20px;">` +
     `<div style="font-size:24px;font-weight:800;letter-spacing:2px;color:#6ee7b7;margin-bottom:18px;">NEXUS</div>` +
     `<p style="font-size:15px;line-height:1.6;max-width:460px;margin:0 auto 24px;">` +
-    `Unsubscribe <strong>${escapeHtml(email)}</strong> from the NEXUS Daily Brief?</p>` +
+    `${questionHtml}</p>` +
     `<form method="POST" action="${action}">` +
     `<button type="submit" style="font:inherit;font-size:15px;font-weight:600;padding:12px 28px;border:0;border-radius:8px;background:#6ee7b7;color:#0b0b0f;cursor:pointer;">` +
-    `Yes, unsubscribe me</button></form>` +
+    `${escapeHtml(button)}</button></form>` +
     `<p style="font-size:13px;line-height:1.6;color:#9c988d;margin-top:24px;">Nothing has changed yet.</p>` +
     `</body></html>`;
   return new Response(html, {

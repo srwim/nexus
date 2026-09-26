@@ -7,7 +7,7 @@ import { TOPICS, leaguesBySport } from "@/lib/topics";
 import { COUNTRIES } from "@/lib/foreign";
 import { submitSubscription } from "@/lib/hubspotForm";
 import { SignupForm } from "@/components/SignupForm";
-import { ConsentCheckbox } from "@/components/ConsentCheckbox";
+import { ConsentCheckbox, RETURNING_NOTE } from "@/components/ConsentCheckbox";
 
 function Stars({ value, onChange }) {
   return (
@@ -90,6 +90,7 @@ export default function SettingsPage() {
   const [syncError, setSyncError] = useState("");
   const [syncConsent, setSyncConsent] = useState(false); // never pre-ticked
   const [syncConsentError, setSyncConsentError] = useState(false);
+  const [syncReturning, setSyncReturning] = useState(false);
 
   // Reveal admin-only tools when signed into the arok.ai WordPress admin.
   useEffect(() => {
@@ -301,13 +302,14 @@ export default function SettingsPage() {
               return;
             }
             setSyncStatus("sending");
-            const { ok, prefsSaved, error } = await submitSubscription({
+            const { ok, prefsSaved, error, reconfirmChecked } = await submitSubscription({
               email: address,
               prefs,
               consented: syncConsent,
             });
             if (ok) update({ ...prefs, email: address });
             setSyncError(error || "");
+            setSyncReturning(!!reconfirmChecked);
             setSyncStatus(ok ? (prefsSaved ? "done" : "partial") : "error");
           }}
         >
@@ -336,6 +338,11 @@ export default function SettingsPage() {
           }}
           error={syncConsentError}
         />
+        {syncReturning && (syncStatus === "done" || syncStatus === "partial") ? (
+          <div className="consent-notice" style={{ marginTop: 10 }}>
+            {RETURNING_NOTE}
+          </div>
+        ) : null}
         {syncStatus === "partial" || syncStatus === "error" ? (
           <div style={{ marginTop: 8 }}>
             <div style={{ color: "var(--danger)", fontSize: 13 }}>
