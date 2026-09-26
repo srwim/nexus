@@ -6,7 +6,7 @@ import { useState } from "react";
 import config from "../nexus.config.json";
 import { loadPrefs, savePrefs } from "../lib/usePrefs";
 import { submitSubscription } from "../lib/hubspotForm";
-import { ConsentCheckbox } from "./ConsentCheckbox";
+import { ConsentCheckbox, RETURNING_NOTE } from "./ConsentCheckbox";
 
 export function SignupForm() {
   const hs = config.hubspot || {};
@@ -16,6 +16,7 @@ export function SignupForm() {
   const [error, setError] = useState("");
   const [consent, setConsent] = useState(false); // never pre-ticked
   const [consentError, setConsentError] = useState(false);
+  const [returning, setReturning] = useState(false);
 
   if (!hs.portalId || !hs.formId) return null;
 
@@ -35,9 +36,10 @@ export function SignupForm() {
     }
     setStatus("sending");
     const prefs = loadPrefs();
-    const { ok, error } = await submitSubscription({ email, name, prefs, consented: consent });
+    const { ok, error, reconfirmChecked } = await submitSubscription({ email, name, prefs, consented: consent });
     if (ok) savePrefs({ ...prefs, email });
     setError(error || "");
+    setReturning(!!reconfirmChecked);
     setStatus(ok ? "done" : "error");
   };
 
@@ -48,6 +50,11 @@ export function SignupForm() {
         <div style={{ color: "var(--muted)", fontSize: 13, marginTop: 6 }}>
           The Daily Brief lands in your inbox each morning.
         </div>
+        {returning ? (
+          <div style={{ color: "var(--muted)", fontSize: 12, marginTop: 10, maxWidth: "52ch", marginInline: "auto" }}>
+            {RETURNING_NOTE}
+          </div>
+        ) : null}
       </div>
     );
   }

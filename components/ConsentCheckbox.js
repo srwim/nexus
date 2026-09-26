@@ -5,6 +5,12 @@
 import Link from "next/link";
 import { CONSENT_TEXT, CONSENT_NOTICE } from "@/lib/consent";
 
+// Shown after any successful signup. Conditional on purpose: the worker never
+// reveals whether an address had opted out, so the page can't either, and a
+// first-time subscriber reads this as a harmless aside.
+export const RETURNING_NOTE =
+  "Unsubscribed from NEXUS in the past? We've emailed you a link to confirm you want it back; the brief resumes once you click it.";
+
 export function ConsentCheckbox({ id, checked, onChange, error }) {
   return (
     <div className="consent-block">
