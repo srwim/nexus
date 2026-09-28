@@ -38,8 +38,26 @@
 //     - HUBSPOT_TOKEN scopes: communication_preferences.read_write,
 //       crm.objects.contacts.read and crm.objects.contacts.write
 //   Optional: NEWSLETTER_FROM to override the "NEXUS <brief@arok.ai>" sender.
+//
+// ON-TIME DAILY BRIEF (cron trigger):
+//   GitHub's scheduler runs the newsletter hours late and drops most slots.
+//   Cloudflare's cron is on time, so this worker presses "Run workflow" at
+//   4:15 AM Denver. To enable:
+//     a. GitHub → Settings → Developer settings → Fine-grained tokens → new token:
+//        repository access "Only select repositories: srwim/nexus",
+//        permission "Actions: Read and write", nothing else.
+//     b. Worker → Settings → Variables and Secrets → add secret
+//        GITHUB_DISPATCH_TOKEN with that token. Paste it there, nowhere else.
+//     c. Worker → Settings → Triggers → Cron Triggers → add  15 10,11 * * *
+//        (10:15 and 11:15 UTC: one of them is 4:15 AM Denver year-round).
 
 export default {
+  // Cloudflare cron entry point. waitUntil keeps the worker alive until the
+  // GitHub call finishes; a scheduled event has no response to hold it open.
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(dispatchNewsletter(env, new Date(event.scheduledTime)));
+  },
+
   async fetch(request, env) {
     const url = new URL(request.url);
     if (url.pathname.replace(/\/+$/, "").endsWith("/unsubscribe")) {
@@ -129,6 +147,56 @@ export default {
     }
   },
 };
+
+// ── On-time daily brief ──────────────────────────────────────────────────────
+// Triggers the newsletter workflow through GitHub's workflow_dispatch API.
+//
+// Why not just GitHub's cron: it is documented as best-effort, and in practice
+// it fired one of the workflow's eight daily slots, three to five hours late,
+// and on days it landed after the send window the brief silently didn't go.
+// Cloudflare's cron fires on the minute. GitHub's schedule stays in place as
+// the backup, and the send's per-day idempotency key means whichever run lands
+// first mails everyone and every later one is a no-op.
+//
+// The cron fires at 10:15 and 11:15 UTC. Only the one that is 4 AM in Denver
+// dispatches, so daylight saving needs no second schedule and there is exactly
+// one dispatch a day. A dispatched run skips the send window, like any manual
+// run, so it always goes out.
+export async function dispatchNewsletter(env, now = new Date()) {
+  const hour = Number(
+    new Intl.DateTimeFormat("en-US", { timeZone: "America/Denver", hour: "numeric", hourCycle: "h23" }).format(now)
+  );
+  if (hour !== 4) return "skipped: not 4 AM in Denver";
+  if (!env.GITHUB_DISPATCH_TOKEN) {
+    console.warn("newsletter: GITHUB_DISPATCH_TOKEN not set on the worker; relying on GitHub's own schedule");
+    return "skipped: no token";
+  }
+
+  const repo = env.GITHUB_REPO || "srwim/nexus";
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/newsletter.yml/dispatches`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${env.GITHUB_DISPATCH_TOKEN}`,
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "nexus-worker", // GitHub rejects API calls without one
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ ref: "main" }),
+    });
+    if (res.ok) {
+      console.log("newsletter: dispatched the daily brief");
+      return "dispatched";
+    }
+    // 401/403 here almost always means the token expired or lacks Actions: write.
+    console.warn(`newsletter: dispatch failed (${res.status}: ${(await res.text()).slice(0, 160)})`);
+    return `failed: ${res.status}`;
+  } catch (e) {
+    console.warn(`newsletter: dispatch errored (${e?.message || e})`);
+    return "failed: network";
+  }
+}
 
 // ── Sponsor click counting ───────────────────────────────────────────────────
 // GET /c?id=<campaignId>&p=<placement>  ->  302 to that campaign's destination.

@@ -12,6 +12,7 @@ import { buildPublishedDigest } from "../lib/publishedDigest.js";
 import { renderEmailHtml } from "../lib/email.js";
 import { resolveSponsors, describeSponsors } from "../lib/sponsors.js";
 import { fetchSponsors } from "./integrations.mjs";
+import { inSendWindow, skipMessage } from "../lib/sendWindow.js";
 
 const config = JSON.parse(await readFile(new URL("../nexus.config.json", import.meta.url), "utf8"));
 const sponsorData = await readFile(new URL("../sponsors.json", import.meta.url), "utf8")
@@ -21,18 +22,14 @@ const sponsorData = await readFile(new URL("../sponsors.json", import.meta.url),
 // missing from these prefs is missing from the mail no matter what the send does.
 const prefs = { zip: config.zip, ratings: config.ratings, leagues: config.leagues, countries: config.countries };
 
-// Same 4-8 AM Denver window the send used to enforce, moved to the front of the
-// pipeline so an out-of-window slot costs one cheap job instead of building a
-// brief and raising an approval request nobody asked for.
-if (process.env.GITHUB_EVENT_NAME === "schedule") {
-  const hour = Number(
-    new Intl.DateTimeFormat("en-US", { timeZone: "America/Denver", hour: "numeric", hour12: false }).format(new Date())
-  );
-  if (hour < 4 || hour > 8) {
-    console.log(`Denver hour ${hour} is outside the 4-8 AM window: skipping.`);
-    if (process.env.GITHUB_OUTPUT) await writeFile(process.env.GITHUB_OUTPUT, "skip=true\n", { flag: "a" });
-    process.exit(0);
-  }
+// The send window, checked at the front of the pipeline so an out-of-window
+// slot costs one cheap job instead of building a brief and raising an approval
+// request nobody asked for. Defined once in lib/sendWindow.js; see there for
+// why it is no longer 4 to 8 AM.
+if (process.env.GITHUB_EVENT_NAME === "schedule" && !inSendWindow()) {
+  console.log(skipMessage());
+  if (process.env.GITHUB_OUTPUT) await writeFile(process.env.GITHUB_OUTPUT, "skip=true\n", { flag: "a" });
+  process.exit(0);
 }
 
 const envTheme = String(process.env.NEWSLETTER_THEME || "").toLowerCase();
