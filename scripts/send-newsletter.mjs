@@ -8,6 +8,7 @@ import { prefsSignature } from "../lib/prefsPayload.js";
 import { PLACEMENTS, resolveSponsors, describeSponsors } from "../lib/sponsors.js";
 import { renderEmailHtml } from "../lib/email.js";
 import { mergeRecipients } from "../lib/recipients.js";
+import { inSendWindow, skipMessage } from "../lib/sendWindow.js";
 import { postSlack, fetchSponsors, hubspotRecipients, uploadToDrive } from "./integrations.mjs";
 
 const config = JSON.parse(await readFile(new URL("../nexus.config.json", import.meta.url), "utf8"));
@@ -22,22 +23,15 @@ const prefs = { zip: config.zip, ratings: config.ratings, leagues: config.league
 // change and remembering to revert it.
 const dryRun = !!config.dryRun || /^(1|true|yes)$/i.test(process.env.DRY_RUN || "");
 
-// The schedule fires at two UTC times (10:15 & 11:15) so one of them is 4:15 AM
-// in Denver year-round despite daylight saving. GitHub's scheduled runs are
-// best-effort though: they get delayed and sometimes dropped entirely: so we
-// accept ANY slot in the 4-8 AM Denver window instead of demanding hour === 4.
-// (An exact-hour guard meant a dropped 4 AM slot = no newsletter that day.)
-// Sending twice is prevented by the per-day Idempotency-Key below, not by the
-// clock. Manual runs always send.
+// GitHub's scheduled runs are best-effort: delayed by hours and mostly dropped.
+// Any scheduled slot inside the send window may mail; sending twice is
+// prevented by the per-day Idempotency-Key below, not by the clock. The window
+// is defined once in lib/sendWindow.js, shared with build-brief.js. Manual
+// runs, including the Cloudflare cron trigger, always send.
 const denverDate = new Intl.DateTimeFormat("en-CA", { timeZone: "America/Denver" }).format(new Date());
-if (process.env.GITHUB_EVENT_NAME === "schedule") {
-  const denverHour = Number(
-    new Intl.DateTimeFormat("en-US", { timeZone: "America/Denver", hour: "numeric", hour12: false }).format(new Date())
-  );
-  if (denverHour < 4 || denverHour > 8) {
-    console.log(`Denver hour ${denverHour} is outside the 4-8 AM send window: skipping this slot.`);
-    process.exit(0);
-  }
+if (process.env.GITHUB_EVENT_NAME === "schedule" && !inSendWindow()) {
+  console.log(skipMessage());
+  process.exit(0);
 }
 
 // Prefer the brief the gate already reviewed. Rebuilding here would mean the
@@ -250,7 +244,7 @@ if (dryRun) {
   // it is "not yet": the recipient simply never got that day's brief, and which
   // recipient lost out depended on whatever order the list came back in.
   //
-  // The generous 4-8 AM window is what hid it. When several cron slots fire,
+  // The multi-hour send window is what hid it. When several cron slots fire,
   // a later slot retries whoever was skipped, so the loss only shows on days
   // when GitHub runs the schedule once.
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
