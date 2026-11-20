@@ -99,34 +99,36 @@ export function cacheFromPublished(published) {
 // queue never drained enough to reach the tail. Brazilian and Argentine stories
 // sat in Portuguese and Spanish indefinitely.
 //
-// Two changes fix it. Titles outrank summaries, because a reader who can't read
-// the headline is not helped by a translated snippet. And countries are woven
-// round-robin, the same way lib/rank.js weaves feeds and for the same reason: a
-// fixed order means whoever is last is always last. Every country now gets an
-// equal share of the budget, so a tight budget degrades to "some summaries are
-// missing everywhere" instead of "three countries are untranslated forever".
+// Countries are woven round-robin, the same way lib/rank.js weaves feeds and
+// for the same reason: a fixed order means whoever is last is always last.
+//
+// Within a country, an item's summary travels right behind its own title. It
+// used to queue behind every title in the run, so a tight budget translated the
+// headline and left an Arabic or French snippet under it for days. Pairing
+// costs some headline throughput on a cold start; a summary that still misses
+// the budget is dropped at apply time rather than shown untranslated.
 export function pendingStrings(byCountry, cache) {
   const seen = new Set();
-  const titles = [];
-  const summaries = [];
+  const perCountry = [];
 
   for (const [country, { lang, items }] of Object.entries(byCountry)) {
-    const perCountry = { title: [], summary: [] };
+    const units = [];
     for (const it of items) {
+      const unit = [];
       for (const field of ["title", "summary"]) {
         const text = (it[field] || "").trim();
         if (!text || looksEnglish(text)) continue;
         const k = key(lang, text);
         if (cache.has(k) || seen.has(k)) continue;
         seen.add(k);
-        perCountry[field].push({ country, lang, text, k });
+        unit.push({ country, lang, text, k });
       }
+      if (unit.length) units.push(unit);
     }
-    titles.push(perCountry.title);
-    summaries.push(perCountry.summary);
+    perCountry.push(units);
   }
 
-  return [...weave(titles), ...weave(summaries)];
+  return weave(perCountry).flat();
 }
 
 // One from each list in turn until every list is empty.
@@ -148,27 +150,33 @@ function weave(lists) {
 const inEnglish = (text, translation) => !(text || "").trim() || Boolean(translation) || looksEnglish(text);
 
 // Apply the cache to the fetched items, keeping the original alongside.
-// `translated: false` is what the UI shows as "original language".
 //
-// `translated` used to be Boolean(title), so an item whose summary never got
-// translated (summaries queue behind every title, and a failed one just waits
-// for the next run) still claimed to be in English over a French snippet. It is
-// now true only when every non-empty field is.
+// A translated title never sits over an untranslated snippet: if the summary
+// missed translation, it is dropped (summaryOriginal keeps it). An item whose
+// title is still untranslated stays whole in its own language.
+//
+// translated: every shown field is in English (the UI's "original language"
+// flag). machineTranslated: some field was actually translated, which is what
+// the "Translated from <language>" tag needs; English-at-source is neither.
 export function applyTranslations(byCountry, cache) {
   const out = {};
   for (const [country, { lang, items }] of Object.entries(byCountry)) {
     out[country] = items.map((it) => {
       const title = cache.get(key(lang, it.title || ""));
-      const summary = cache.get(key(lang, it.summary || ""));
+      let summary = cache.get(key(lang, it.summary || ""));
+      const titleEnglish = inEnglish(it.title, title);
+      const dropSummary = titleEnglish && !inEnglish(it.summary, summary);
+      if (dropSummary) summary = "";
       return {
         ...it,
         country,
         lang,
         title: title || it.title,
         titleOriginal: it.title,
-        summary: summary || it.summary,
+        summary: dropSummary ? "" : summary || it.summary,
         summaryOriginal: it.summary,
-        translated: inEnglish(it.title, title) && inEnglish(it.summary, summary),
+        translated: titleEnglish && (dropSummary || inEnglish(it.summary, summary)),
+        machineTranslated: Boolean(title || summary),
       };
     });
   }

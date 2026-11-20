@@ -43,18 +43,18 @@ test("the budget is shared roughly evenly", () => {
   assert.ok(Math.max(...counts) - Math.min(...counts) <= 1, `uneven split: ${counts.join(",")}`);
 });
 
-test("titles are translated before any summary is attempted", () => {
+test("a summary travels right behind its own title", () => {
   const slice = pendingStrings(fullPool(), new Map()).slice(0, MAX_PER_RUN);
-  const firstSummary = slice.findIndex((r) => r.text.includes("summary"));
-  const lastTitle = slice.map((r) => r.text.includes("title")).lastIndexOf(true);
-  if (firstSummary !== -1) assert.ok(lastTitle < firstSummary, "a summary jumped ahead of a title");
+  slice.forEach((r, i) => {
+    if (r.text.includes("summary")) assert.equal(slice[i - 1]?.text, r.text.replace("summary", "title"));
+  });
 });
 
-test("a small pool is returned whole, titles first", () => {
+test("a small pool is returned whole, each summary with its title", () => {
   const pool = { br: { lang: "pt", items: [{ title: "t1", summary: "s1" }, { title: "t2", summary: "s2" }] } };
   assert.deepEqual(
     pendingStrings(pool, new Map()).map((r) => r.text),
-    ["t1", "t2", "s1", "s2"]
+    ["t1", "s1", "t2", "s2"]
   );
 });
 
@@ -99,6 +99,7 @@ test("an untranslated item keeps its original text and is marked untranslated", 
   const applied = applyTranslations(pool, new Map());
   assert.equal(applied.br[0].title, "Título");
   assert.equal(applied.br[0].translated, false, "untranslated is a supported state, not a dropped story");
+  assert.equal(applied.br[0].machineTranslated, false);
 });
 
 test("empty input never throws", () => {
@@ -115,8 +116,10 @@ test("translated is true only when every non-empty field is", () => {
   });
   const [half, whole] = applyTranslations(pool, cache).fr;
   assert.equal(half.title, "Title");
-  assert.equal(half.summary, "Résumé du jour");
-  assert.equal(half.translated, false, "a French snippet under an English title is not translated");
+  assert.equal(half.summary, "", "an untranslated snippet under an English title is dropped");
+  assert.equal(half.summaryOriginal, "Résumé du jour", "the original is kept");
+  assert.equal(half.translated, true);
+  assert.equal(half.machineTranslated, true);
   assert.equal(whole.translated, true, "an empty summary has nothing to translate");
 });
 
@@ -163,6 +166,7 @@ test("English fields cost nothing and are not mislabeled", () => {
   const cache = new Map([[pending[0].k, "Summary of the day"]]);
   const [it] = applyTranslations(pool, cache).fr;
   assert.equal(it.translated, true);
+  assert.equal(it.machineTranslated, true, "the summary was translated");
   assert.deepEqual(mislabeled({ countries: { fr: [it] } }), []);
 });
 
