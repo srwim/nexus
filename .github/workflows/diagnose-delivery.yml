@@ -50,3 +50,4 @@ jobs:
           HUBSPOT_TOKEN: ${{ secrets.HUBSPOT_TOKEN }}
           HUBSPOT_LIST_ID: ${{ secrets.HUBSPOT_LIST_ID }}
           SUPPRESS_EMAILS: ${{ secrets.SUPPRESS_EMAILS }}
+          NEWSLETTER_TO: ${{ secrets.NEWSLETTER_TO }}

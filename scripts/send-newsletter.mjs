@@ -135,14 +135,17 @@ const suppressed = String(process.env.SUPPRESS_EMAILS || "")
   .filter(Boolean);
 const { recipients: listed, dropped } = await hubspotRecipients();
 const { recipients, resurrected } = mergeRecipients({
-  configTo: config.newsletter?.to,
+  // A GitHub secret, not nexus.config.json: that file is bundled into the public
+  // site JavaScript, so an address kept there is published to every visitor.
+  configTo: process.env.NEWSLETTER_TO || config.newsletter?.to,
   listed,
   dropped,
   suppressed,
 });
 for (const email of resurrected) {
   console.warn(
-    `⚠ ${email} is in newsletter.to AND was dropped by opt-out verification: not sending. ` +
+    // Masked inline: this repo's Actions logs are public, and `mask` below isn't defined yet.
+    `⚠ ${String(email).replace(/^(.).*@/, "$1***@")} is in NEWSLETTER_TO AND was dropped by opt-out verification: not sending. ` +
       "Until now the config entry silently overrode that drop and mailed the address anyway, " +
       "with publication defaults in place of its own theme and settings."
   );
@@ -231,7 +234,7 @@ if (dryRun) {
 } else if (!apiKey) {
   console.log("Email: skipped (no RESEND_API_KEY secret)");
 } else if (!recipients.length) {
-  console.log("Email: skipped (no recipients: set newsletter.to in nexus.config.json or HUBSPOT_* secrets)");
+  console.log("Email: skipped (no recipients: set the NEWSLETTER_TO or HUBSPOT_* secrets)");
 } else {
   const from = config.newsletter?.from || process.env.NEWSLETTER_FROM || "NEXUS <onboarding@resend.dev>";
   // One email per recipient: addresses aren't exposed to each other, and each

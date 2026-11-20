@@ -102,6 +102,9 @@ jobs:
           SPONSY_PUBLICATION_ID: ${{ secrets.SPONSY_PUBLICATION_ID }}
           HUBSPOT_TOKEN: ${{ secrets.HUBSPOT_TOKEN }}
           HUBSPOT_LIST_ID: ${{ secrets.HUBSPOT_LIST_ID }}
+          # The publication's own address. A secret because nexus.config.json is
+          # bundled into the public site, and this repo is public too.
+          NEWSLETTER_TO: ${{ secrets.NEWSLETTER_TO }}
           # Comma-separated addresses that must never be mailed, regardless of
           # HubSpot state. Emergency brake for an unsubscribe that hasn't
           # propagated. A secret because this repo is public.
