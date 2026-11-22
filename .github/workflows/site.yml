@@ -4,7 +4,9 @@ on:
   push:
     branches: [main]
   schedule:
-    - cron: "*/30 * * * *" # refresh news every 30 minutes
+    # BACKUP ONLY. GitHub ran this every 6 to 9 hours in Nov 2026; the on-time
+    # trigger is the Cloudflare worker's 7,37 * * * * cron (workers/local-news-proxy.js).
+    - cron: "*/30 * * * *"
   workflow_dispatch:
 
 permissions:

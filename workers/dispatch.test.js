@@ -107,3 +107,55 @@ test("the HTTP routes are untouched by adding a scheduled handler", async () => 
   const res = await worker.fetch(new Request("https://w.example/?zip=abc"), {});
   assert.equal(res.status, 400, "local news still validates its zip");
 });
+
+// ── half-hourly site build ───────────────────────────────────────────────────
+import { SITE_CRON } from "./local-news-proxy.js";
+
+async function fireCron(cron, iso, env = ENV) {
+  const pending = [];
+  await worker.scheduled({ scheduledTime: Date.parse(iso), cron }, env, { waitUntil: (p) => pending.push(p) });
+  return Promise.all(pending);
+}
+
+test("the site cron dispatches the site build, at any hour of the day", async () => {
+  for (const iso of ["2026-11-22T01:07:00Z", "2026-11-22T14:37:00Z", "2026-11-22T10:07:00Z"]) {
+    calls = [];
+    const [result] = await fireCron(SITE_CRON, iso);
+    assert.equal(result, "dispatched", iso);
+    assert.equal(calls.length, 1);
+    assert.equal(calls[0].url, "https://api.github.com/repos/srwim/nexus/actions/workflows/site.yml/dispatches");
+    assert.deepEqual(JSON.parse(calls[0].body), { ref: "main" });
+  }
+});
+
+test("the site cron never triggers the newsletter, even at 4 AM Denver", async () => {
+  await fireCron(SITE_CRON, "2026-09-28T10:07:00Z"); // 4:07 AM MDT
+  assert.equal(calls.length, 1);
+  assert.ok(!calls[0].url.includes("newsletter.yml"));
+});
+
+test("the newsletter cron still only dispatches the newsletter", async () => {
+  await fireCron("15 10,11 * * *", "2026-09-28T10:15:00Z");
+  assert.equal(calls.length, 1);
+  assert.ok(calls[0].url.endsWith("/newsletter.yml/dispatches"));
+});
+
+test("an unrecognised cron falls to the newsletter path, whose 4 AM guard makes it harmless", async () => {
+  const [result] = await fireCron("0 * * * *", "2026-11-22T15:00:00Z");
+  assert.match(result, /not 4 AM/);
+  assert.equal(calls.length, 0, "a typo'd trigger can't send an extra brief");
+});
+
+test("without a token the site build logs why and does nothing", async () => {
+  const warnings = [];
+  const realWarn = console.warn;
+  console.warn = (...a) => warnings.push(a.join(" "));
+  try {
+    const [result] = await fireCron(SITE_CRON, "2026-11-22T01:07:00Z", {});
+    assert.equal(result, "skipped: no token");
+  } finally {
+    console.warn = realWarn;
+  }
+  assert.equal(calls.length, 0);
+  assert.ok(warnings.some((w) => w.startsWith("site: GITHUB_DISPATCH_TOKEN not set")));
+});

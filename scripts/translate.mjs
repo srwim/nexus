@@ -19,6 +19,29 @@ import { createHash } from "node:crypto";
 
 export const MAX_PER_RUN = 120;
 
+// The per-run budget assumed a build every 30 minutes. GitHub's scheduler ran
+// them every 6 to 9 hours instead (Nov 2026), so each run translated the newest
+// ~6 stories per country and everything that arrived before them was never
+// reached: coverage sat near 50% for every busy country. A run now gets one
+// MAX_PER_RUN for each half hour since the last published build.
+//
+// This doesn't raise total spend: the cache means each string is translated
+// once whenever it happens, so daily neurons track how much news arrives, not
+// how often we build. It only lets a late build catch up in one go instead of
+// never. Capped at MAX_SCALE so one very late build can't run long; a cold
+// start (no prior build to measure from) gets the base budget, as before.
+export const MAX_SCALE = 4;
+export function budgetFor(lastBuiltAt, now = Date.now()) {
+  const gapMinutes = (now - Date.parse(lastBuiltAt)) / 60000;
+  if (!Number.isFinite(gapMinutes) || gapMinutes <= 0) return MAX_PER_RUN;
+  return MAX_PER_RUN * Math.min(MAX_SCALE, Math.max(1, Math.ceil(gapMinutes / 30)));
+}
+
+// Wall-clock limit for one run's translation. A bigger budget means more
+// sequential batches, and build-data has a 12-minute hard cap that exits with
+// partial data. Past this, remaining strings simply wait for the next build.
+export const TRANSLATE_DEADLINE_MS = 4 * 60 * 1000;
+
 // Trimmed here, not by callers: the cache used to be seeded from the untrimmed
 // original while lookups trimmed, so any feed that pads its text (La Jornada
 // pads every title) missed the cache and was re-translated every half hour.
@@ -198,7 +221,12 @@ export function mislabeled(published) {
 }
 
 // Fill the cache in place. Returns how many strings were actually translated.
-export async function translatePending(pending, cache, { endpoint, apiKey, budget = MAX_PER_RUN }) {
+export async function translatePending(
+  pending,
+  cache,
+  { endpoint, apiKey, budget = MAX_PER_RUN, deadlineMs = TRANSLATE_DEADLINE_MS, now = Date.now }
+) {
+  const startedAt = now();
   if (!endpoint || !apiKey) {
     console.log("  translate: skipped (no proxy URL or TRANSLATE_KEY): foreign items stay in their original language");
     return 0;
@@ -216,8 +244,14 @@ export async function translatePending(pending, cache, { endpoint, apiKey, budge
   }
 
   let done = 0;
+  let stopped = false;
   for (const [lang, group] of byLang) {
     for (let i = 0; i < group.length; i += 30) {
+      if (now() - startedAt > deadlineMs) {
+        if (!stopped) console.log(`  translate: time limit reached after ${done} strings; the rest wait for the next build`);
+        stopped = true;
+        break;
+      }
       const batch = group.slice(i, i + 30);
       const sent = batch.map((b) => protect(b.text));
       try {

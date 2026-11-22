@@ -50,12 +50,21 @@
 //        GITHUB_DISPATCH_TOKEN with that token. Paste it there, nowhere else.
 //     c. Worker → Settings → Triggers → Cron Triggers → add  15 10,11 * * *
 //        (10:15 and 11:15 UTC: one of them is 4:15 AM Denver year-round).
+//     d. Same place, add a second trigger  7,37 * * * *  for the half-hourly
+//        site build. Same token; it needs no other setup.
 
 export default {
   // Cloudflare cron entry point. waitUntil keeps the worker alive until the
   // GitHub call finishes; a scheduled event has no response to hold it open.
+  // Routed by which cron fired. Anything that isn't the site cron goes to the
+  // newsletter, which has its own 4 AM guard, so a mistyped trigger can never
+  // send an extra brief; at worst it does nothing.
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(dispatchNewsletter(env, new Date(event.scheduledTime)));
+    ctx.waitUntil(
+      event.cron === SITE_CRON
+        ? dispatchWorkflow(env, "site.yml", "site")
+        : dispatchNewsletter(env, new Date(event.scheduledTime))
+    );
   },
 
   async fetch(request, env) {
@@ -167,14 +176,29 @@ export async function dispatchNewsletter(env, now = new Date()) {
     new Intl.DateTimeFormat("en-US", { timeZone: "America/Denver", hour: "numeric", hourCycle: "h23" }).format(now)
   );
   if (hour !== 4) return "skipped: not 4 AM in Denver";
+  return dispatchWorkflow(env, "newsletter.yml", "newsletter");
+}
+
+// ── Half-hourly site build ───────────────────────────────────────────────────
+// site.yml is scheduled every 30 minutes, and in Nov 2026 GitHub ran it every
+// 6 to 9 hours: the whole site refreshed three or four times a day, and Foreign
+// Reporting fell behind because each build only translates so much. The worker
+// dispatches it on Cloudflare's schedule instead. GitHub's own schedule stays as
+// the backup, and site.yml's concurrency group cancels a superseded run, so an
+// overlap costs a few minutes of CI, nothing more.
+export const SITE_CRON = "7,37 * * * *";
+
+// Pressing "Run workflow" on one of this repo's workflows. Shared by the
+// newsletter and the site build so both fail the same visible way.
+export async function dispatchWorkflow(env, file, label) {
   if (!env.GITHUB_DISPATCH_TOKEN) {
-    console.warn("newsletter: GITHUB_DISPATCH_TOKEN not set on the worker; relying on GitHub's own schedule");
+    console.warn(`${label}: GITHUB_DISPATCH_TOKEN not set on the worker; relying on GitHub's own schedule`);
     return "skipped: no token";
   }
 
   const repo = env.GITHUB_REPO || "srwim/nexus";
   try {
-    const res = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/newsletter.yml/dispatches`, {
+    const res = await fetch(`https://api.github.com/repos/${repo}/actions/workflows/${file}/dispatches`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${env.GITHUB_DISPATCH_TOKEN}`,
@@ -186,14 +210,14 @@ export async function dispatchNewsletter(env, now = new Date()) {
       body: JSON.stringify({ ref: "main" }),
     });
     if (res.ok) {
-      console.log("newsletter: dispatched the daily brief");
+      console.log(`${label}: dispatched ${file}`);
       return "dispatched";
     }
     // 401/403 here almost always means the token expired or lacks Actions: write.
-    console.warn(`newsletter: dispatch failed (${res.status}: ${(await res.text()).slice(0, 160)})`);
+    console.warn(`${label}: dispatch failed (${res.status}: ${(await res.text()).slice(0, 160)})`);
     return `failed: ${res.status}`;
   } catch (e) {
-    console.warn(`newsletter: dispatch errored (${e?.message || e})`);
+    console.warn(`${label}: dispatch errored (${e?.message || e})`);
     return "failed: network";
   }
 }

@@ -6,7 +6,7 @@ import { TOPICS, SPORTS_LEAGUES } from "../lib/topics.js";
 import { fetchFeeds } from "../lib/rss.js";
 import { fetchLeagueLive } from "../lib/sportsLive.js";
 import { COUNTRIES } from "../lib/foreign.js";
-import { cacheFromPublished, pendingStrings, applyTranslations, translatePending } from "./translate.mjs";
+import { cacheFromPublished, pendingStrings, applyTranslations, translatePending, budgetFor } from "./translate.mjs";
 import { publisherOf } from "../lib/rank.js";
 import { filterStale } from "../lib/text.js";
 import { getWeather, getLocalNews } from "../lib/digest.js";
@@ -123,10 +123,15 @@ countryKeys.forEach((c, i) => logMix(c, foreignLists[i], COUNTRIES[c].feeds.leng
 const priorForeign = await readPublished("foreign");
 const translationCache = cacheFromPublished(priorForeign);
 const pending = pendingStrings(byCountry, translationCache);
+// Budget scales with the gap since the last build; see budgetFor().
+const translateBudget = budgetFor(priorForeign?.updatedAt);
+const tTranslate = Date.now();
 const translatedNow = await translatePending(pending, translationCache, {
   endpoint: config.localNewsProxy,
   apiKey: process.env.TRANSLATE_KEY,
+  budget: translateBudget,
 });
+console.log(`  translate: budget ${translateBudget} (last build ${priorForeign?.updatedAt || "unknown"}), took ${secs(tTranslate)}`);
 const foreignItems = applyTranslations(byCountry, translationCache);
 const totalForeign = Object.values(foreignItems).reduce((n, l) => n + l.length, 0);
 const stillOriginal = Object.values(foreignItems)
