@@ -5,7 +5,7 @@ on:
     branches: [main]
   schedule:
     # BACKUP ONLY. GitHub ran this every 6 to 9 hours in Nov 2026; the on-time
-    # trigger is the Cloudflare worker's 7,37 * * * * cron (workers/local-news-proxy.js).
+    # trigger is the Cloudflare worker's 15,45 * * * * cron (workers/local-news-proxy.js).
     - cron: "*/30 * * * *"
   workflow_dispatch:
 

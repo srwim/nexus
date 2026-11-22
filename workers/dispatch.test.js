@@ -1,11 +1,14 @@
-// The on-time trigger: Cloudflare's cron pressing "Run workflow" at 4:15 AM
-// Denver, because GitHub's own scheduler ran the brief hours late or not at all.
+// The on-time triggers: one Cloudflare cron (SCHEDULE) pressing "Run workflow"
+// for the site every half hour, and for the newsletter at 4:15 AM Denver,
+// because GitHub's own scheduler ran both hours late or not at all.
 // Tested through the worker's real scheduled() entry point with fetch stubbed.
 import { test, beforeEach, afterEach } from "node:test";
 import assert from "node:assert/strict";
-import worker, { dispatchNewsletter } from "./local-news-proxy.js";
+import worker, { dispatchNewsletter, SCHEDULE } from "./local-news-proxy.js";
 
 const ENV = { GITHUB_DISPATCH_TOKEN: "github_pat_test" };
+const SITE = "https://api.github.com/repos/srwim/nexus/actions/workflows/site.yml/dispatches";
+const BRIEF = "https://api.github.com/repos/srwim/nexus/actions/workflows/newsletter.yml/dispatches";
 let calls;
 let reply;
 const realFetch = globalThis.fetch;
@@ -25,42 +28,74 @@ afterEach(() => {
 });
 
 // Run the worker exactly as Cloudflare would, and wait for the work it queued.
-async function fire(iso, env = ENV) {
+async function fire(iso, env = ENV, cron = SCHEDULE) {
   const pending = [];
-  await worker.scheduled({ scheduledTime: Date.parse(iso), cron: "15 10,11 * * *" }, env, {
+  await worker.scheduled({ scheduledTime: Date.parse(iso), cron }, env, {
     waitUntil: (p) => pending.push(p),
   });
   return Promise.all(pending);
 }
 
-test("in summer, the 10:15 UTC firing is 4:15 AM Denver and dispatches", async () => {
-  const [result] = await fire("2026-09-28T10:15:00Z");
-  assert.equal(result, "dispatched");
-  assert.equal(calls.length, 1);
-  assert.equal(calls[0].url, "https://api.github.com/repos/srwim/nexus/actions/workflows/newsletter.yml/dispatches");
-  assert.equal(calls[0].method, "POST");
-  assert.deepEqual(JSON.parse(calls[0].body), { ref: "main" });
+const urls = () => calls.map((c) => c.url).sort();
+
+test("the schedule is one trigger: the Free plan allows five per account", () => {
+  assert.equal(SCHEDULE, "15,45 * * * *");
 });
 
-test("in summer, the 11:15 UTC firing is 5:15 AM and does nothing", async () => {
-  const [result] = await fire("2026-09-28T11:15:00Z");
-  assert.match(result, /not 4 AM/);
-  assert.equal(calls.length, 0, "exactly one dispatch a day, not two");
+test("every firing builds the site, at any hour of the day", async () => {
+  for (const iso of ["2026-11-22T01:15:00Z", "2026-11-22T14:45:00Z", "2026-11-22T20:15:00Z"]) {
+    calls = [];
+    const [site, brief] = await fire(iso);
+    assert.equal(site, "dispatched", iso);
+    assert.match(brief, /not 4 AM/, iso);
+    assert.deepEqual(urls(), [SITE], iso);
+    assert.equal(calls[0].method, "POST");
+    assert.deepEqual(JSON.parse(calls[0].body), { ref: "main" });
+  }
 });
 
-test("in winter the roles swap, so daylight saving needs no second schedule", async () => {
-  assert.equal((await fire("2026-12-15T11:15:00Z"))[0], "dispatched", "11:15 UTC is 4:15 MST");
+test("in summer, 10:15 UTC is 4:15 AM Denver: site build plus the brief", async () => {
+  const results = await fire("2026-09-28T10:15:00Z");
+  assert.deepEqual(results, ["dispatched", "dispatched"]);
+  assert.deepEqual(urls(), [BRIEF, SITE].sort());
+  for (const c of calls) assert.deepEqual(JSON.parse(c.body), { ref: "main" });
+});
+
+test("in winter, 11:15 UTC is 4:15 AM MST: daylight saving needs no second schedule", async () => {
+  await fire("2026-12-15T11:15:00Z");
+  assert.ok(urls().includes(BRIEF), "11:15 UTC is 4:15 MST");
   calls = [];
-  assert.match((await fire("2026-12-15T10:15:00Z"))[0], /not 4 AM/, "10:15 UTC is 3:15 MST");
-  assert.equal(calls.length, 0);
+  await fire("2026-12-15T10:15:00Z");
+  assert.deepEqual(urls(), [SITE], "10:15 UTC is 3:15 MST: site only");
+});
+
+test("4:45 AM is still the 4 AM hour but sends no second brief", async () => {
+  const [, brief] = await fire("2026-09-28T10:45:00Z"); // 4:45 AM MDT
+  assert.match(brief, /already ran/);
+  assert.deepEqual(urls(), [SITE], "exactly one brief a day, not two");
+});
+
+test("a whole day of firings sends exactly one brief", async () => {
+  for (let m = 0; m < 24 * 60; m += 30) {
+    const t = Date.parse("2026-11-22T00:15:00Z") + m * 60000;
+    await fire(new Date(t).toISOString());
+  }
+  assert.equal(calls.filter((c) => c.url === BRIEF).length, 1);
+  assert.equal(calls.filter((c) => c.url === SITE).length, 48);
+});
+
+test("a leftover or extra trigger only builds the site; the clock decides the brief", async () => {
+  await fire("2026-11-22T15:00:00Z", ENV, "15 10,11 * * *");
+  assert.deepEqual(urls(), [SITE]);
 });
 
 test("the token goes to GitHub as a bearer credential, with the headers GitHub requires", async () => {
   await fire("2026-09-28T10:15:00Z");
-  const h = calls[0].headers;
-  assert.equal(h.authorization, "Bearer github_pat_test");
-  assert.equal(h.accept, "application/vnd.github+json");
-  assert.ok(h["user-agent"], "GitHub rejects API calls without a User-Agent");
+  for (const { headers: h } of calls) {
+    assert.equal(h.authorization, "Bearer github_pat_test");
+    assert.equal(h.accept, "application/vnd.github+json");
+    assert.ok(h["user-agent"], "GitHub rejects API calls without a User-Agent");
+  }
 });
 
 test("without a token it does nothing and says so, leaving GitHub's schedule in charge", async () => {
@@ -68,13 +103,14 @@ test("without a token it does nothing and says so, leaving GitHub's schedule in 
   const realWarn = console.warn;
   console.warn = (...a) => warnings.push(a.join(" "));
   try {
-    const [result] = await fire("2026-09-28T10:15:00Z", {});
-    assert.equal(result, "skipped: no token");
+    const results = await fire("2026-09-28T10:15:00Z", {});
+    assert.deepEqual(results, ["skipped: no token", "skipped: no token"]);
   } finally {
     console.warn = realWarn;
   }
   assert.equal(calls.length, 0);
-  assert.ok(warnings.some((w) => /GITHUB_DISPATCH_TOKEN not set/.test(w)));
+  assert.ok(warnings.some((w) => w.startsWith("site: GITHUB_DISPATCH_TOKEN not set")));
+  assert.ok(warnings.some((w) => w.startsWith("newsletter: GITHUB_DISPATCH_TOKEN not set")));
 });
 
 test("a rejected dispatch is logged with GitHub's reason, not swallowed", async () => {
@@ -97,65 +133,13 @@ test("a network failure is contained rather than crashing the scheduled event", 
   const realWarn = console.warn;
   console.warn = () => {};
   try {
-    assert.equal(await dispatchNewsletter(ENV, new Date("2026-09-28T10:15:00Z")), "failed: network");
+    assert.deepEqual(await fire("2026-09-28T10:15:00Z"), ["failed: network", "failed: network"]);
   } finally {
     console.warn = realWarn;
   }
 });
 
-test("the HTTP routes are untouched by adding a scheduled handler", async () => {
+test("the HTTP routes are untouched by the scheduled handler", async () => {
   const res = await worker.fetch(new Request("https://w.example/?zip=abc"), {});
   assert.equal(res.status, 400, "local news still validates its zip");
-});
-
-// ── half-hourly site build ───────────────────────────────────────────────────
-import { SITE_CRON } from "./local-news-proxy.js";
-
-async function fireCron(cron, iso, env = ENV) {
-  const pending = [];
-  await worker.scheduled({ scheduledTime: Date.parse(iso), cron }, env, { waitUntil: (p) => pending.push(p) });
-  return Promise.all(pending);
-}
-
-test("the site cron dispatches the site build, at any hour of the day", async () => {
-  for (const iso of ["2026-11-22T01:07:00Z", "2026-11-22T14:37:00Z", "2026-11-22T10:07:00Z"]) {
-    calls = [];
-    const [result] = await fireCron(SITE_CRON, iso);
-    assert.equal(result, "dispatched", iso);
-    assert.equal(calls.length, 1);
-    assert.equal(calls[0].url, "https://api.github.com/repos/srwim/nexus/actions/workflows/site.yml/dispatches");
-    assert.deepEqual(JSON.parse(calls[0].body), { ref: "main" });
-  }
-});
-
-test("the site cron never triggers the newsletter, even at 4 AM Denver", async () => {
-  await fireCron(SITE_CRON, "2026-09-28T10:07:00Z"); // 4:07 AM MDT
-  assert.equal(calls.length, 1);
-  assert.ok(!calls[0].url.includes("newsletter.yml"));
-});
-
-test("the newsletter cron still only dispatches the newsletter", async () => {
-  await fireCron("15 10,11 * * *", "2026-09-28T10:15:00Z");
-  assert.equal(calls.length, 1);
-  assert.ok(calls[0].url.endsWith("/newsletter.yml/dispatches"));
-});
-
-test("an unrecognised cron falls to the newsletter path, whose 4 AM guard makes it harmless", async () => {
-  const [result] = await fireCron("0 * * * *", "2026-11-22T15:00:00Z");
-  assert.match(result, /not 4 AM/);
-  assert.equal(calls.length, 0, "a typo'd trigger can't send an extra brief");
-});
-
-test("without a token the site build logs why and does nothing", async () => {
-  const warnings = [];
-  const realWarn = console.warn;
-  console.warn = (...a) => warnings.push(a.join(" "));
-  try {
-    const [result] = await fireCron(SITE_CRON, "2026-11-22T01:07:00Z", {});
-    assert.equal(result, "skipped: no token");
-  } finally {
-    console.warn = realWarn;
-  }
-  assert.equal(calls.length, 0);
-  assert.ok(warnings.some((w) => w.startsWith("site: GITHUB_DISPATCH_TOKEN not set")));
 });

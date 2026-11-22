@@ -48,23 +48,25 @@
 //        permission "Actions: Read and write", nothing else.
 //     b. Worker → Settings → Variables and Secrets → add secret
 //        GITHUB_DISPATCH_TOKEN with that token. Paste it there, nowhere else.
-//     c. Worker → Settings → Triggers → Cron Triggers → add  15 10,11 * * *
-//        (10:15 and 11:15 UTC: one of them is 4:15 AM Denver year-round).
-//     d. Same place, add a second trigger  7,37 * * * *  for the half-hourly
-//        site build. Same token; it needs no other setup.
+//     c. Worker → Settings → Triggers → Cron Triggers → add ONE trigger:
+//        15,45 * * * *   It builds the site every half hour, and the 4:15 AM
+//        Denver firing also sends the brief. One trigger because the Free plan
+//        allows five per account across all workers.
 
 export default {
-  // Cloudflare cron entry point. waitUntil keeps the worker alive until the
-  // GitHub call finishes; a scheduled event has no response to hold it open.
-  // Routed by which cron fired. Anything that isn't the site cron goes to the
-  // newsletter, which has its own 4 AM guard, so a mistyped trigger can never
-  // send an extra brief; at worst it does nothing.
+  // Cloudflare cron entry point: ONE trigger, SCHEDULE, does both jobs. The
+  // Workers Free plan allows five cron triggers per account, shared by every
+  // worker, and they were already in use. Every firing builds the site; the one
+  // that lands at 4:15 AM Denver also sends the newsletter. The routing is by
+  // clock, not by which cron fired, so any extra or leftover trigger is safe:
+  // it builds the site once more and can never send a second brief.
+  //
+  // waitUntil keeps the worker alive until the GitHub calls finish; a
+  // scheduled event has no response to hold it open.
   async scheduled(event, env, ctx) {
-    ctx.waitUntil(
-      event.cron === SITE_CRON
-        ? dispatchWorkflow(env, "site.yml", "site")
-        : dispatchNewsletter(env, new Date(event.scheduledTime))
-    );
+    const now = new Date(event.scheduledTime);
+    ctx.waitUntil(dispatchWorkflow(env, "site.yml", "site"));
+    ctx.waitUntil(dispatchNewsletter(env, now));
   },
 
   async fetch(request, env) {
@@ -167,15 +169,24 @@ export default {
 // the backup, and the send's per-day idempotency key means whichever run lands
 // first mails everyone and every later one is a no-op.
 //
-// The cron fires at 10:15 and 11:15 UTC. Only the one that is 4 AM in Denver
-// dispatches, so daylight saving needs no second schedule and there is exactly
-// one dispatch a day. A dispatched run skips the send window, like any manual
-// run, so it always goes out.
+// The schedule fires every half hour. Only a firing in the first half of the
+// 4 AM hour in Denver dispatches the brief, which with SCHEDULE is exactly
+// 4:15: one dispatch a day, and daylight saving needs no second schedule
+// because the check is in Denver time. A dispatched run skips the send window,
+// like any manual run, so it always goes out.
 export async function dispatchNewsletter(env, now = new Date()) {
-  const hour = Number(
-    new Intl.DateTimeFormat("en-US", { timeZone: "America/Denver", hour: "numeric", hourCycle: "h23" }).format(now)
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: "America/Denver",
+      hour: "numeric",
+      minute: "numeric",
+      hourCycle: "h23",
+    })
+      .formatToParts(now)
+      .map((p) => [p.type, Number(p.value)])
   );
-  if (hour !== 4) return "skipped: not 4 AM in Denver";
+  if (parts.hour !== 4) return "skipped: not 4 AM in Denver";
+  if (parts.minute >= 30) return "skipped: the 4 AM slot already ran";
   return dispatchWorkflow(env, "newsletter.yml", "newsletter");
 }
 
@@ -186,7 +197,9 @@ export async function dispatchNewsletter(env, now = new Date()) {
 // dispatches it on Cloudflare's schedule instead. GitHub's own schedule stays as
 // the backup, and site.yml's concurrency group cancels a superseded run, so an
 // overlap costs a few minutes of CI, nothing more.
-export const SITE_CRON = "7,37 * * * *";
+//
+// The one cron trigger to configure on the worker.
+export const SCHEDULE = "15,45 * * * *";
 
 // Pressing "Run workflow" on one of this repo's workflows. Shared by the
 // newsletter and the site build so both fail the same visible way.
